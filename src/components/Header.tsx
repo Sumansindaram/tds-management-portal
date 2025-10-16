@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, User, Users } from 'lucide-react';
+import { LogOut, Shield, User, Users, Home } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,6 +43,15 @@ export function Header() {
           <div className="flex items-center gap-3">
             {user && (
               <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/')}
+                  className="text-primary-foreground hover:bg-primary-foreground/10"
+                >
+                  <Home className="mr-2 h-4 w-4" />
+                  Home
+                </Button>
                 {role === 'super_admin' && (
                   <Button
                     variant="ghost"

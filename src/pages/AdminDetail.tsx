@@ -28,6 +28,7 @@ export default function AdminDetail() {
   const [comment, setComment] = useState('');
   const [transportFiles, setTransportFiles] = useState<Record<string, string[]>>({});
   const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (id && (role === 'admin' || role === 'super_admin')) {
@@ -94,17 +95,23 @@ export default function AdminDetail() {
 
   const openFile = async (bucket: string, filePath: string) => {
     try {
-      const { data } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from(bucket)
-        .createSignedUrl(filePath, 3600);
+        .download(filePath);
 
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank');
+      if (error) throw error;
+      
+      if (data) {
+        const url = URL.createObjectURL(data);
+        window.open(url, '_blank');
+        // Clean up the URL after a delay
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error opening file:', error);
       toast({
         title: 'Error',
-        description: 'Failed to open file',
+        description: error.message || 'Failed to open file',
         variant: 'destructive',
       });
     }
@@ -134,6 +141,11 @@ export default function AdminDetail() {
 
       if (error) throw error;
 
+      // Update local state immediately
+      setEntry({ ...entry, status: newStatus, admin_comment: comment || null });
+      setIsEditing(false);
+      setComment('');
+
       // Call edge function to send email
       await supabase.functions.invoke('send-tds-notification', {
         body: {
@@ -149,8 +161,6 @@ export default function AdminDetail() {
         title: 'Success',
         description: `Status updated to ${newStatus}`,
       });
-
-      navigate('/admin');
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -242,16 +252,8 @@ export default function AdminDetail() {
         </div>
 
         <Card className="shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle className="text-primary">Request Details</CardTitle>
-            <Button
-              onClick={() => navigate('/')}
-              variant="outline"
-              size="sm"
-            >
-              <Home className="mr-2 h-4 w-4" />
-              Home
-            </Button>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
@@ -347,39 +349,74 @@ export default function AdminDetail() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-3 border-t pt-6">
-              <Button
-                onClick={() => updateStatus('Approved')}
-                disabled={updating}
-                className="bg-success hover:bg-success/90"
-              >
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Approve
-              </Button>
-              <Button
-                onClick={() => updateStatus('Rejected')}
-                disabled={updating}
-                variant="destructive"
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Reject
-              </Button>
-              <Button
-                onClick={() => updateStatus('Returned')}
-                disabled={updating}
-                className="bg-warning hover:bg-warning/90"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Return
-              </Button>
-              <Button
-                onClick={() => navigate('/admin')}
-                variant="outline"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to List
-              </Button>
-            </div>
+            {entry.status === 'Pending' || isEditing ? (
+              <div className="flex flex-wrap gap-3 border-t pt-6">
+                <Button
+                  onClick={() => updateStatus('Approved')}
+                  disabled={updating}
+                  className="bg-success hover:bg-success/90"
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Approve
+                </Button>
+                <Button
+                  onClick={() => updateStatus('Rejected')}
+                  disabled={updating}
+                  variant="destructive"
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Reject
+                </Button>
+                <Button
+                  onClick={() => updateStatus('Returned')}
+                  disabled={updating}
+                  className="bg-warning hover:bg-warning/90"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Return
+                </Button>
+                {isEditing && (
+                  <Button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setComment('');
+                    }}
+                    variant="outline"
+                  >
+                    Cancel Edit
+                  </Button>
+                )}
+                <Button
+                  onClick={() => navigate('/admin')}
+                  variant="outline"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to List
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-3 border-t pt-6">
+                <div className="flex-1 rounded-lg bg-muted/50 p-4 border-2 border-dashed">
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    This request has been {entry.status.toLowerCase()}. To change the decision, click the Edit button.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  variant="outline"
+                  className="ml-auto"
+                >
+                  Edit Decision
+                </Button>
+                <Button
+                  onClick={() => navigate('/admin')}
+                  variant="outline"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to List
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>
