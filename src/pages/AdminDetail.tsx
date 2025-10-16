@@ -209,12 +209,29 @@ export default function AdminDetail() {
     return matchesSearch && matchesStatus;
   });
 
-  const openFile = (bucket: string, entryObj: any, fileName: string) => {
+  const openFile = async (bucket: string, entryObj: any, fileName: string) => {
     const candidatePaths = [
       `${entryObj?.nsn}/${entryObj?.id}/${fileName}`,
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
+    // Try to find which path actually has the file
+    for (const path of candidatePaths) {
+      try {
+        const { data, error } = await supabase.storage.from(bucket).list(
+          path.split("/").slice(0, -1).join("/"),
+          { limit: 1 }
+        );
+        if (!error && data && data.length > 0) {
+          setPdfDialog({ bucket, path });
+          return;
+        }
+      } catch (_) {
+        // Try next path
+      }
+    }
+
+    // Fallback to first path if none found
     setPdfDialog({ bucket, path: candidatePaths[0] });
   };
   const updateStatus = async (newStatus: string) => {
