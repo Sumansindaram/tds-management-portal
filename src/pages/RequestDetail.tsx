@@ -192,6 +192,7 @@ export default function RequestDetail() {
     { label: 'LIMS 2.5', value: entry.lims_25 },
     { label: 'LIMS 2.8', value: entry.lims_28 },
     { label: 'Out of Service Date', value: entry.out_of_service_date },
+    { label: 'Classification', value: entry.classification },
     { label: 'MLC', value: entry.mlc },
     { label: 'Service', value: entry.service },
     { label: 'Owner Nation', value: entry.owner_nation },

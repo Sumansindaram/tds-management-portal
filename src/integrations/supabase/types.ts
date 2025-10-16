@@ -48,6 +48,7 @@ export type Database = {
           asset_code: string
           asset_type: string
           authorised_person_confirmed: boolean | null
+          classification: string | null
           created_at: string | null
           crew_number: string | null
           data_responsibility_confirmed: boolean | null
@@ -89,6 +90,7 @@ export type Database = {
           asset_code: string
           asset_type: string
           authorised_person_confirmed?: boolean | null
+          classification?: string | null
           created_at?: string | null
           crew_number?: string | null
           data_responsibility_confirmed?: boolean | null
@@ -130,6 +132,7 @@ export type Database = {
           asset_code?: string
           asset_type?: string
           authorised_person_confirmed?: boolean | null
+          classification?: string | null
           created_at?: string | null
           crew_number?: string | null
           data_responsibility_confirmed?: boolean | null

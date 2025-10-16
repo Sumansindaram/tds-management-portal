@@ -48,6 +48,7 @@ export default function Form() {
     lims_25: '',
     lims_28: '',
     out_of_service_date: '',
+    classification: '',
     mlc: '',
     licence: '',
     crew_number: '',
@@ -127,7 +128,39 @@ export default function Form() {
   }, [formData.length, formData.width, formData.height, formData.unladen_weight]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    let validatedValue = value;
+
+    // Validation rules
+    switch (field) {
+      case 'ssr_name':
+        // Only alphabetic characters and spaces
+        validatedValue = value.replace(/[^a-zA-Z\s]/g, '');
+        break;
+      
+      case 'length':
+      case 'width':
+      case 'height':
+      case 'unladen_weight':
+      case 'laden_weight':
+        // Numbers with max 2 decimal places
+        if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+          validatedValue = value;
+        } else {
+          return; // Don't update if invalid format
+        }
+        break;
+      
+      case 'range':
+      case 'fuel_capacity':
+      case 'single_carriage':
+      case 'dual_carriage':
+      case 'max_speed':
+        // Whole numbers only
+        validatedValue = value.replace(/[^0-9]/g, '');
+        break;
+    }
+
+    setFormData(prev => ({ ...prev, [field]: validatedValue }));
   };
 
   const handleReset = () => {
@@ -147,6 +180,7 @@ export default function Form() {
       lims_25: '',
       lims_28: '',
       out_of_service_date: '',
+      classification: '',
       mlc: '',
       licence: '',
       crew_number: '',
@@ -441,6 +475,23 @@ export default function Form() {
                     onChange={(e) => handleInputChange('out_of_service_date', e.target.value)}
                     required
                   />
+                </div>
+                <div>
+                  <Label>Classification *</Label>
+                  <Select value={formData.classification} onValueChange={(v) => handleInputChange('classification', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select classification" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="Official">Official</SelectItem>
+                      <SelectItem value="Official-Sensitive">Official-Sensitive</SelectItem>
+                      <SelectItem value="Official Secret">Official Secret</SelectItem>
+                      <SelectItem value="Official-Sensitive Secret">Official-Sensitive Secret</SelectItem>
+                      <SelectItem value="Unclassified">Unclassified</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Not Applicable">Not Applicable</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>MLC *</Label>
