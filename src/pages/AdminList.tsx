@@ -37,6 +37,18 @@ export default function AdminList() {
     }
   }, [role]);
 
+  // Reload data when window regains focus (user navigates back)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (role === 'admin' || role === 'super_admin') {
+        loadEntries();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [role]);
+
   const loadEntries = async () => {
     try {
       const { data, error } = await supabase

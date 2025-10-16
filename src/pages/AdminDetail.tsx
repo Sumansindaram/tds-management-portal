@@ -97,15 +97,12 @@ export default function AdminDetail() {
     try {
       const { data, error } = await supabase.storage
         .from(bucket)
-        .download(filePath);
+        .createSignedUrl(filePath, 60); // 60 seconds expiry
 
       if (error) throw error;
       
-      if (data) {
-        const url = URL.createObjectURL(data);
-        window.open(url, '_blank');
-        // Clean up the URL after a delay
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
       }
     } catch (error: any) {
       console.error('Error opening file:', error);
@@ -251,7 +248,7 @@ export default function AdminDetail() {
           </Card>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className={`shadow-lg ${entry.status !== 'Pending' && !isEditing ? 'opacity-60' : ''}`}>
           <CardHeader>
             <CardTitle className="text-primary">Request Details</CardTitle>
           </CardHeader>
@@ -346,6 +343,7 @@ export default function AdminDetail() {
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Enter your comments here..."
                 rows={4}
+                disabled={entry.status !== 'Pending' && !isEditing}
               />
             </div>
 
