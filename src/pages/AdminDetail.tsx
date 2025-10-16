@@ -12,10 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip, Clock, Download, Filter } from 'lucide-react';
 import jsPDF from 'jspdf';
-import PdfViewer from '@/components/PdfViewer';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -38,7 +36,6 @@ export default function AdminDetail() {
   const [commentHistory, setCommentHistory] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [pdfDialog, setPdfDialog] = useState<{ bucket: string; path: string } | null>(null);
 
   useEffect(() => {
     if (id && (role === 'admin' || role === 'super_admin')) {
@@ -215,27 +212,27 @@ export default function AdminDetail() {
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
-    // Try to find which path actually has THIS file
+    // Try each path and open the first one that works
     for (const path of candidatePaths) {
       try {
-        const dir = path.split("/").slice(0, -1).join("/");
         const { data, error } = await supabase.storage
           .from(bucket)
-          .list(dir, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
-        if (!error && Array.isArray(data)) {
-          const exists = data.some((f: any) => f?.name === fileName);
-          if (exists) {
-            setPdfDialog({ bucket, path });
-            return;
-          }
+          .createSignedUrl(path, 300);
+        
+        if (!error && data?.signedUrl) {
+          window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+          return;
         }
       } catch (_) {
         // Try next path
       }
     }
 
-    // Fallback to legacy/user path if present
-    setPdfDialog({ bucket, path: candidatePaths[1] || candidatePaths[0] });
+    toast({
+      title: 'File not found',
+      description: 'Could not open the file.',
+      variant: 'destructive',
+    });
   };
   const updateStatus = async (newStatus: string) => {
     if (!entry) return;
@@ -436,8 +433,9 @@ export default function AdminDetail() {
                       disabled={!hasFiles}
                        onClick={() => {
                          if (hasFiles && entry) {
-                           const first = transportFiles[group][0];
-                           openFile('transportation-data', entry, first);
+                           transportFiles[group].forEach((fileName) => {
+                             openFile('transportation-data', entry, fileName);
+                           });
                          }
                        }}
                     >
@@ -655,21 +653,6 @@ export default function AdminDetail() {
           </CardContent>
         </Card>
       </main>
-
-      <Dialog open={!!pdfDialog} onOpenChange={() => setPdfDialog(null)}>
-        <DialogContent className="max-w-5xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>Document Viewer</DialogTitle>
-          </DialogHeader>
-          {pdfDialog && (
-            <PdfViewer
-              bucket={pdfDialog.bucket}
-              path={pdfDialog.path}
-              height="75vh"
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
