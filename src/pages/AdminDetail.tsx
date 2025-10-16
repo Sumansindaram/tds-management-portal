@@ -73,62 +73,61 @@ export default function AdminDetail() {
 
   const loadFiles = async (entryId: string, submittedBy: string, nsn?: string) => {
     try {
-      // Try NSN-based folder first, then fall back to legacy submittedBy-based folder
       const transportPrefixNew = nsn ? `${nsn}/${entryId}` : undefined;
       const transportPrefixOld = `${submittedBy}/${entryId}`;
 
-      let transportData = null as Awaited<ReturnType<typeof supabase.storage.from>> | any;
+      // Helper to list with explicit options and normalized path
+      const listWithPrefix = async (bucket: string, prefix?: string) => {
+        const normalized = prefix ? prefix.replace(/\/$/, '') : undefined;
+        if (!normalized) return { data: [] } as any;
+        return await supabase.storage
+          .from(bucket)
+          .list(normalized, { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
+      };
+
+      // Transportation Data
+      let transportData: any[] = [];
       if (transportPrefixNew) {
-        const resNew = await supabase.storage
-          .from('transportation-data')
-          .list(transportPrefixNew);
-        if (resNew?.data && resNew.data.length > 0) transportData = resNew.data;
+        const resNew = await listWithPrefix('transportation-data', transportPrefixNew);
+        if (resNew?.data?.length) transportData = resNew.data;
       }
-      if (!transportData) {
-        const resOld = await supabase.storage
-          .from('transportation-data')
-          .list(transportPrefixOld);
+      if (!transportData.length) {
+        const resOld = await listWithPrefix('transportation-data', transportPrefixOld);
         transportData = resOld?.data || [];
       }
 
-      if (transportData) {
+      if (transportData.length) {
         const filesByCategory: Record<string, string[]> = {};
         transportData.forEach((file: any) => {
-          const category = TRANSPORT_GROUPS.find(g => file.name.startsWith(g));
-          if (category) {
-            if (!filesByCategory[category]) filesByCategory[category] = [];
-            filesByCategory[category].push(file.name);
+          if (file.name) {
+            const category = TRANSPORT_GROUPS.find((g) => file.name.startsWith(g));
+            if (category) {
+              if (!filesByCategory[category]) filesByCategory[category] = [];
+              filesByCategory[category].push(file.name);
+            }
           }
         });
         setTransportFiles(filesByCategory);
+      } else {
+        setTransportFiles({});
       }
 
-      // Supporting documents
-      const supportPrefixNew = nsn ? `${nsn}/${entryId}` : undefined;
-      const supportPrefixOld = `${submittedBy}/${entryId}`;
-
-      let supportData = null as any;
-      if (supportPrefixNew) {
-        const resNew = await supabase.storage
-          .from('supporting-documents')
-          .list(supportPrefixNew);
-        if (resNew?.data && resNew.data.length > 0) supportData = resNew.data;
+      // Supporting Documents
+      let supportData: any[] = [];
+      if (transportPrefixNew) {
+        const resNew = await listWithPrefix('supporting-documents', transportPrefixNew);
+        if (resNew?.data?.length) supportData = resNew.data;
       }
-      if (!supportData) {
-        const resOld = await supabase.storage
-          .from('supporting-documents')
-          .list(supportPrefixOld);
+      if (!supportData.length) {
+        const resOld = await listWithPrefix('supporting-documents', transportPrefixOld);
         supportData = resOld?.data || [];
       }
 
-      if (supportData) {
-        setSupportingFiles(supportData.map((f: any) => f.name));
-      }
+      setSupportingFiles(supportData.map((f: any) => f.name).filter(Boolean));
     } catch (error) {
       console.error('Error loading files:', error);
     }
   };
-
   const loadCommentHistory = async (entryId: string) => {
     try {
       const { data, error } = await supabase
@@ -213,18 +212,41 @@ export default function AdminDetail() {
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
+    // 1) Try direct download to blob (avoids top-level navigation to blocked domains)
     for (const path of candidatePaths) {
       try {
-        // Prefer signed URL to avoid blob:// being blocked by some browsers/iframes
-        const { data: signed } = await supabase.storage
-          .from(bucket)
-          .createSignedUrl(path, 300);
+        const { data } = await supabase.storage.from(bucket).download(path);
+        if (data) {
+          const blobUrl = URL.createObjectURL(data);
+          window.open(blobUrl, '_blank', 'noopener,noreferrer');
+          // Revoke after a minute
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+          return;
+        }
+      } catch (_) {
+        // try next path
+      }
+    }
+
+    // 2) Fallback to signed URL, then fetch to blob (still avoids navigating to supabase.co)
+    for (const path of candidatePaths) {
+      try {
+        const { data: signed } = await supabase.storage.from(bucket).createSignedUrl(path, 300);
         if (signed?.signedUrl) {
+          const res = await fetch(signed.signedUrl);
+          if (res.ok) {
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank', 'noopener,noreferrer');
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+            return;
+          }
+          // As a last resort, open the signed URL directly
           window.open(signed.signedUrl, '_blank', 'noopener,noreferrer');
           return;
         }
-      } catch (e) {
-        // try next
+      } catch (_) {
+        // try next path
       }
     }
 
@@ -234,7 +256,6 @@ export default function AdminDetail() {
       variant: 'destructive',
     });
   };
-
   const updateStatus = async (newStatus: string) => {
     if (!entry) return;
 

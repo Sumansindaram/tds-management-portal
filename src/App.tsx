@@ -12,6 +12,7 @@ import AdminList from "./pages/AdminList";
 import AdminDetail from "./pages/AdminDetail";
 import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
+import RequestDetail from "./pages/RequestDetail";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,14 @@ const App = () => (
               element={
                 <ProtectedRoute superAdminOnly>
                   <Users />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/request/:id"
+              element={
+                <ProtectedRoute>
+                  <RequestDetail />
                 </ProtectedRoute>
               }
             />
