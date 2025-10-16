@@ -9,7 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip } from 'lucide-react';
+
+const TRANSPORT_GROUPS = [
+  'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
+  'AMPHIBIOUS', 'SLINGING', 'ISO CONTAINER', 'MET', 'MAN SV 6T MM',
+  'MAN SV 9T MM', 'MAN SV 15T MM', 'PLS', 'MAN SV 9T IMM', 'AIR'
+];
 
 export default function AdminDetail() {
   const { id } = useParams();
@@ -20,6 +26,8 @@ export default function AdminDetail() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [comment, setComment] = useState('');
+  const [transportFiles, setTransportFiles] = useState<Record<string, string[]>>({});
+  const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
 
   useEffect(() => {
     if (id && (role === 'admin' || role === 'super_admin')) {
@@ -37,6 +45,9 @@ export default function AdminDetail() {
 
       if (error) throw error;
       setEntry(data);
+      
+      // Load files from storage
+      await loadFiles(data.id, data.submitted_by);
     } catch (error) {
       console.error('Error loading entry:', error);
       toast({
@@ -46,6 +57,56 @@ export default function AdminDetail() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadFiles = async (entryId: string, submittedBy: string) => {
+    try {
+      // Load transportation data files
+      const { data: transportData } = await supabase.storage
+        .from('transportation-data')
+        .list(`${submittedBy}/${entryId}`);
+
+      if (transportData) {
+        const filesByCategory: Record<string, string[]> = {};
+        transportData.forEach(file => {
+          const category = TRANSPORT_GROUPS.find(g => file.name.startsWith(g));
+          if (category) {
+            if (!filesByCategory[category]) filesByCategory[category] = [];
+            filesByCategory[category].push(file.name);
+          }
+        });
+        setTransportFiles(filesByCategory);
+      }
+
+      // Load supporting documents
+      const { data: supportData } = await supabase.storage
+        .from('supporting-documents')
+        .list(`${submittedBy}/${entryId}`);
+
+      if (supportData) {
+        setSupportingFiles(supportData.map(f => f.name));
+      }
+    } catch (error) {
+      console.error('Error loading files:', error);
+    }
+  };
+
+  const openFile = async (bucket: string, filePath: string) => {
+    try {
+      const { data } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(filePath, 3600);
+
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to open file',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -155,27 +216,118 @@ export default function AdminDetail() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto p-6">
+      <main className="container mx-auto p-6 space-y-6">
+        {/* Reference and Status at top */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="shadow-sm">
+            <CardContent className="pt-6">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
+                Reference
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {entry.reference}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm">
+            <CardContent className="pt-6">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
+                Status
+              </p>
+              <Badge variant="outline" className="text-lg px-4 py-1">
+                {entry.status}
+              </Badge>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card className="shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-primary">Request Details</CardTitle>
-            <Badge variant="outline" className="text-lg">
-              {entry.reference}
-            </Badge>
+            <Button
+              onClick={() => navigate('/')}
+              variant="outline"
+              size="sm"
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Home
+            </Button>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
-              {fields.map(field => (
-                <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {field.label}
-                  </p>
-                  <p className="text-lg font-semibold text-foreground">
-                    {field.value || '—'}
-                  </p>
-                </div>
-              ))}
+              {fields
+                .filter(f => f.label !== 'Reference' && f.label !== 'Status')
+                .map(field => (
+                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {field.label}
+                    </p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {field.value || '—'}
+                    </p>
+                  </div>
+                ))}
             </div>
+
+            {/* Transportation Data Files */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">
+                Transportation Data
+              </h3>
+              <div className="grid gap-3 md:grid-cols-4">
+                {TRANSPORT_GROUPS.map(group => {
+                  const hasFiles = transportFiles[group] && transportFiles[group].length > 0;
+                  return (
+                    <Button
+                      key={group}
+                      variant={hasFiles ? "default" : "outline"}
+                      className={hasFiles ? "" : "opacity-40"}
+                      disabled={!hasFiles}
+                      onClick={() => {
+                        if (hasFiles && entry) {
+                          transportFiles[group].forEach(fileName => {
+                            openFile('transportation-data', `${entry.submitted_by}/${entry.id}/${fileName}`);
+                          });
+                        }
+                      }}
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span className="text-xs font-medium">{group}</span>
+                      {hasFiles && (
+                        <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center">
+                          {transportFiles[group].length}
+                        </Badge>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Supporting Documents */}
+            {supportingFiles.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">
+                  Supporting Documents
+                </h3>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {supportingFiles.map((fileName, idx) => (
+                    <Button
+                      key={idx}
+                      variant="default"
+                      onClick={() => {
+                        if (entry) {
+                          openFile('supporting-documents', `${entry.submitted_by}/${entry.id}/${fileName}`);
+                        }
+                      }}
+                    >
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      <span className="truncate text-xs">{fileName}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {entry.admin_comment && (
               <div className="rounded-lg bg-muted p-4">
