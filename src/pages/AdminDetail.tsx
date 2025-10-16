@@ -95,14 +95,28 @@ export default function AdminDetail() {
 
   const openFile = async (bucket: string, filePath: string) => {
     try {
-      const { data, error } = await supabase.storage
+      // Prefer blob download to avoid Edge/extension blocking cross-site tab opens
+      const { data: blobData, error: downloadError } = await supabase.storage
         .from(bucket)
-        .createSignedUrl(filePath, 60); // 60 seconds expiry
+        .download(filePath);
 
-      if (error) throw error;
+      if (!downloadError && blobData) {
+        const url = URL.createObjectURL(blobData);
+        window.open(url, '_blank', 'noopener,noreferrer');
+        // Revoke after a minute to allow the user to keep the tab open
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        return;
+      }
+
+      // Fallback to signed URL if blob download fails
+      const { data: signed, error: signError } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(filePath, 60);
+
+      if (signError) throw signError;
       
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank');
+      if (signed?.signedUrl) {
+        window.open(signed.signedUrl, '_blank', 'noopener,noreferrer');
       }
     } catch (error: any) {
       console.error('Error opening file:', error);
@@ -219,8 +233,10 @@ export default function AdminDetail() {
     { label: 'RIC Code', value: entry.ric_code },
     { label: 'Asset Type', value: entry.asset_type },
   ];
-
-  return (
+ 
+   const isReadOnly = entry.status !== 'Pending' && !isEditing;
+ 
+   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 space-y-6">
@@ -253,7 +269,7 @@ export default function AdminDetail() {
             <CardTitle className="text-primary">Request Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className={`grid gap-6 md:grid-cols-2 ${isReadOnly ? 'pointer-events-none' : ''}`}>
               {fields
                 .filter(f => f.label !== 'Reference' && f.label !== 'Status')
                 .map(field => (
@@ -282,13 +298,15 @@ export default function AdminDetail() {
                       variant={hasFiles ? "default" : "outline"}
                       className={hasFiles ? "" : "opacity-40"}
                       disabled={!hasFiles}
-                      onClick={() => {
-                        if (hasFiles && entry) {
-                          transportFiles[group].forEach(fileName => {
-                            openFile('transportation-data', `${entry.submitted_by}/${entry.id}/${fileName}`);
-                          });
-                        }
-                      }}
+                       onClick={() => {
+                         if (hasFiles && entry) {
+                           transportFiles[group].forEach((fileName, idx) => {
+                             setTimeout(() => {
+                               openFile('transportation-data', `${entry.submitted_by}/${entry.id}/${fileName}`);
+                             }, idx * 200); // stagger to reduce popup blocking
+                           });
+                         }
+                       }}
                     >
                       <FileText className="mr-2 h-4 w-4" />
                       <span className="text-xs font-medium">{group}</span>
