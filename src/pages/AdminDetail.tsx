@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip, Clock } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip, Clock, Download, Filter } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -31,6 +34,8 @@ export default function AdminDetail() {
   const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [commentHistory, setCommentHistory] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     if (id && (role === 'admin' || role === 'super_admin')) {
@@ -112,6 +117,69 @@ export default function AdminDetail() {
       console.error('Error loading comment history:', error);
     }
   };
+
+  const exportToPDF = () => {
+    if (!entry || commentHistory.length === 0) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Header
+    doc.setFontSize(18);
+    doc.text('Comment History Report', pageWidth / 2, 20, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.text(`Reference: ${entry.reference}`, 20, 35);
+    doc.text(`Designation: ${entry.designation}`, 20, 42);
+    doc.text(`Current Status: ${entry.status}`, 20, 49);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 56);
+    
+    // Comments
+    let yPos = 70;
+    doc.setFontSize(14);
+    doc.text('Comment Timeline', 20, yPos);
+    yPos += 10;
+    
+    commentHistory.forEach((item, idx) => {
+      // Check if we need a new page
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${idx + 1}. ${item.status} - ${new Date(item.created_at).toLocaleString()}`, 20, yPos);
+      yPos += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.text(`By: ${item.admin_name}`, 25, yPos);
+      yPos += 6;
+      
+      // Wrap comment text
+      const splitComment = doc.splitTextToSize(item.comment, pageWidth - 50);
+      doc.text(splitComment, 25, yPos);
+      yPos += (splitComment.length * 6) + 8;
+    });
+    
+    doc.save(`${entry.reference}_comment_history.pdf`);
+    
+    toast({
+      title: 'Success',
+      description: 'Comment history exported to PDF',
+    });
+  };
+
+  // Filter comment history based on search and status
+  const filteredCommentHistory = commentHistory.filter(item => {
+    const matchesSearch = searchTerm === '' || 
+      item.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.admin_name.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const openFile = async (bucket: string, filePath: string) => {
     try {
@@ -396,38 +464,86 @@ export default function AdminDetail() {
             {/* Comment History */}
             {commentHistory.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Comment History
-                </h3>
-                <Accordion type="single" collapsible className="w-full">
-                  {commentHistory.map((historyItem, idx) => (
-                    <AccordionItem key={historyItem.id} value={`item-${idx}`}>
-                      <AccordionTrigger className="hover:no-underline">
-                        <div className="flex items-center gap-3 text-left">
-                          <Badge variant={
-                            historyItem.status === 'Approved' ? 'default' :
-                            historyItem.status === 'Rejected' ? 'destructive' :
-                            historyItem.status === 'Returned' ? 'secondary' : 'outline'
-                          }>
-                            {historyItem.status}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(historyItem.created_at).toLocaleString()}
-                          </span>
-                          <span className="text-sm font-medium">
-                            by {historyItem.admin_name}
-                          </span>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="rounded-lg bg-muted/50 p-4 mt-2">
-                          <p className="text-sm whitespace-pre-wrap">{historyItem.comment}</p>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-primary flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Comment History ({filteredCommentHistory.length})
+                  </h3>
+                  <Button
+                    onClick={exportToPDF}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export to PDF
+                  </Button>
+                </div>
+                
+                {/* Filters */}
+                <div className="grid gap-3 md:grid-cols-2 p-4 bg-muted/30 rounded-lg border">
+                  <div className="space-y-2">
+                    <Label htmlFor="search" className="text-xs flex items-center gap-2">
+                      <Filter className="h-3 w-3" />
+                      Search comments or admin name
+                    </Label>
+                    <Input
+                      id="search"
+                      placeholder="Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="status-filter" className="text-xs">Filter by status</Label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger id="status-filter">
+                        <SelectValue placeholder="All statuses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="Approved">Approved</SelectItem>
+                        <SelectItem value="Rejected">Rejected</SelectItem>
+                        <SelectItem value="Returned">Returned</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {filteredCommentHistory.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No comments match your filters
+                  </div>
+                ) : (
+                  <Accordion type="single" collapsible className="w-full">
+                    {filteredCommentHistory.map((historyItem, idx) => (
+                      <AccordionItem key={historyItem.id} value={`item-${idx}`}>
+                        <AccordionTrigger className="hover:no-underline">
+                          <div className="flex items-center gap-3 text-left">
+                            <Badge variant={
+                              historyItem.status === 'Approved' ? 'default' :
+                              historyItem.status === 'Rejected' ? 'destructive' :
+                              historyItem.status === 'Returned' ? 'secondary' : 'outline'
+                            }>
+                              {historyItem.status}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(historyItem.created_at).toLocaleString()}
+                            </span>
+                            <span className="text-sm font-medium">
+                              by {historyItem.admin_name}
+                            </span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="rounded-lg bg-muted/50 p-4 mt-2">
+                            <p className="text-sm whitespace-pre-wrap">{historyItem.comment}</p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                )}
               </div>
             )}
 
