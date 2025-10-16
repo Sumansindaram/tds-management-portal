@@ -516,7 +516,7 @@ export default function Form() {
                 {TRANSPORT_GROUPS.map(group => (
                   <Label
                     key={group}
-                    className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-dashed border-primary/30 px-4 h-14 w-full transition-colors hover:border-primary hover:bg-primary/5"
+                    className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-dashed border-primary/30 px-4 h-16 w-full min-w-0 transition-colors hover:border-primary hover:bg-primary/5"
                   >
                     <div className="flex items-center gap-2">
                       <svg
@@ -534,7 +534,7 @@ export default function Form() {
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                         <polyline points="14 2 14 8 20 8" />
                       </svg>
-                      <span className="text-sm font-medium whitespace-nowrap">{group}</span>
+                      <span className="text-sm font-medium whitespace-nowrap truncate">{group}</span>
                     </div>
                     {transportFiles[group] && (
                       <span className="text-xs text-primary font-medium whitespace-nowrap">✓ Uploaded</span>
