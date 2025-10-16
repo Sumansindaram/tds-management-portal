@@ -164,11 +164,15 @@ export default function AdminDetail() {
             </Badge>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {fields.map(field => (
-                <div key={field.label} className="space-y-1">
-                  <p className="text-sm font-semibold text-muted-foreground">{field.label}</p>
-                  <p className="text-base">{field.value || '—'}</p>
+                <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {field.label}
+                  </p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {field.value || '—'}
+                  </p>
                 </div>
               ))}
             </div>
