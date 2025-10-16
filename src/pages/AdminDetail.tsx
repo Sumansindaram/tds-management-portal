@@ -215,24 +215,27 @@ export default function AdminDetail() {
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
-    // Try to find which path actually has the file
+    // Try to find which path actually has THIS file
     for (const path of candidatePaths) {
       try {
-        const { data, error } = await supabase.storage.from(bucket).list(
-          path.split("/").slice(0, -1).join("/"),
-          { limit: 1 }
-        );
-        if (!error && data && data.length > 0) {
-          setPdfDialog({ bucket, path });
-          return;
+        const dir = path.split("/").slice(0, -1).join("/");
+        const { data, error } = await supabase.storage
+          .from(bucket)
+          .list(dir, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+        if (!error && Array.isArray(data)) {
+          const exists = data.some((f: any) => f?.name === fileName);
+          if (exists) {
+            setPdfDialog({ bucket, path });
+            return;
+          }
         }
       } catch (_) {
         // Try next path
       }
     }
 
-    // Fallback to first path if none found
-    setPdfDialog({ bucket, path: candidatePaths[0] });
+    // Fallback to legacy/user path if present
+    setPdfDialog({ bucket, path: candidatePaths[1] || candidatePaths[0] });
   };
   const updateStatus = async (newStatus: string) => {
     if (!entry) return;
@@ -433,11 +436,8 @@ export default function AdminDetail() {
                       disabled={!hasFiles}
                        onClick={() => {
                          if (hasFiles && entry) {
-                           transportFiles[group].forEach((fileName, idx) => {
-                             setTimeout(() => {
-                               openFile('transportation-data', entry, fileName);
-                             }, idx * 200); // stagger to reduce popup blocking
-                           });
+                           const first = transportFiles[group][0];
+                           openFile('transportation-data', entry, first);
                          }
                        }}
                     >

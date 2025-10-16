@@ -111,24 +111,27 @@ export default function RequestDetail() {
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
-    // Try to find which path actually has the file
-    for (const path of candidatePaths) {
-      try {
-        const { data, error } = await supabase.storage.from(bucket).list(
-          path.split("/").slice(0, -1).join("/"),
-          { limit: 1 }
-        );
-        if (!error && data && data.length > 0) {
+  // Try to find which path actually has THIS file
+  for (const path of candidatePaths) {
+    try {
+      const dir = path.split("/").slice(0, -1).join("/");
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .list(dir, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+      if (!error && Array.isArray(data)) {
+        const exists = data.some((f: any) => f?.name === fileName);
+        if (exists) {
           setPdfDialog({ bucket, path });
           return;
         }
-      } catch (_) {
-        // Try next path
       }
+    } catch (_) {
+      // Try next path
     }
+  }
 
-    // Fallback to first path if none found
-    setPdfDialog({ bucket, path: candidatePaths[0] });
+  // Fallback to legacy/user path if present
+  setPdfDialog({ bucket, path: candidatePaths[1] || candidatePaths[0] });
   };
 
   if (loading) {
