@@ -124,7 +124,52 @@ export default function Form() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleReset = () => {
+    setFormData({
+      ssr_name: '',
+      ssr_email: user?.email || '',
+      designation: '',
+      nsn: '',
+      asset_code: '',
+      short_name: '',
+      length: '',
+      width: '',
+      height: '',
+      unladen_weight: '',
+      laden_weight: '',
+      alest: '',
+      lims_25: '',
+      lims_28: '',
+      out_of_service_date: '',
+      mlc: '',
+      licence: '',
+      crew_number: '',
+      passenger_capacity: '',
+      range: '',
+      fuel_capacity: '',
+      single_carriage: '',
+      dual_carriage: '',
+      max_speed: '',
+      service: 'Army',
+      owner_nation: 'UK',
+      ric_code: '',
+      asset_type: 'A Vehicles',
+    });
+    setTransportFiles({});
+    setSupportingFiles(null);
+  };
+
   const handleSubmit = async () => {
+    // Validate supporting documents
+    if (!supportingFiles || supportingFiles.length === 0) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please attach at least one supporting document.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // Generate reference
@@ -182,11 +227,16 @@ export default function Form() {
         description: `Request submitted with reference: ${refData}`,
       });
 
+      // Reset form before navigation/reload
+      handleReset();
+
       if (user) {
         navigate('/');
       } else {
-        // For non-authenticated users, reset form
-        window.location.reload();
+        // Small delay to show success message before reload
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
     } catch (error: any) {
       toast({
@@ -464,13 +514,28 @@ export default function Form() {
               <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
                 Transportation Data
               </h3>
-              <div className="grid gap-3 md:grid-cols-4">
+              <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                 {TRANSPORT_GROUPS.map(group => (
                   <Label
                     key={group}
-                    className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-primary/30 p-4 text-center transition-colors hover:border-primary hover:bg-primary/5"
+                    className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/30 p-4 text-center transition-colors hover:border-primary hover:bg-primary/5 min-h-[100px]"
                   >
-                    <span className="text-sm font-bold">{group}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={transportFiles[group] ? "text-primary" : "text-muted-foreground"}
+                    >
+                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <span className="text-sm font-medium">{group}</span>
                     <Input
                       type="file"
                       accept=".pdf"
@@ -482,8 +547,8 @@ export default function Form() {
                       }}
                     />
                     {transportFiles[group] && (
-                      <span className="text-xs text-muted-foreground">
-                        {transportFiles[group]?.name}
+                      <span className="text-xs text-primary font-medium">
+                        ✓ {transportFiles[group]?.name.slice(0, 15)}...
                       </span>
                     )}
                   </Label>
@@ -510,7 +575,16 @@ export default function Form() {
               )}
             </section>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end gap-4 pt-4">
+              <Button
+                onClick={handleReset}
+                disabled={loading}
+                variant="outline"
+                size="lg"
+                className="min-w-32"
+              >
+                Reset Form
+              </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
