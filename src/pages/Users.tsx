@@ -90,20 +90,11 @@ export default function Users() {
   };
 
   const handleEdit = (userToEdit: UserWithRole) => {
-    // Prevent editing self or other super admins
+    // Prevent editing self only
     if (userToEdit.id === user?.id) {
       toast({
         title: 'Not Allowed',
         description: 'You cannot edit your own role',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (userToEdit.role === 'super_admin') {
-      toast({
-        title: 'Not Allowed',
-        description: 'Super Admin roles cannot be modified',
         variant: 'destructive',
       });
       return;
@@ -209,7 +200,7 @@ export default function Users() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEdit(u)}
-                            disabled={u.id === user?.id || u.role === 'super_admin'}
+                            disabled={u.id === user?.id}
                             className="h-8 w-8 p-0"
                           >
                             <Pencil className="h-4 w-4" />
@@ -232,7 +223,7 @@ export default function Users() {
               Edit User: {editingUser?.full_name}
             </DialogTitle>
             <DialogDescription>
-              Change the user's role. Super Admins cannot be modified.
+              Change the user's role. You cannot edit your own role.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -245,9 +236,7 @@ export default function Users() {
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super_admin" disabled>
-                    Super Admin (Cannot be assigned)
-                  </SelectItem>
+                  <SelectItem value="super_admin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
