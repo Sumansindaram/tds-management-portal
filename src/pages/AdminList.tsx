@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,10 +29,13 @@ export default function AdminList() {
   const [entries, setEntries] = useState<TDSEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { role } = useAuth();
 
   useEffect(() => {
-    loadEntries();
-  }, []);
+    if (role === 'admin' || role === 'super_admin') {
+      loadEntries();
+    }
+  }, [role]);
 
   const loadEntries = async () => {
     try {

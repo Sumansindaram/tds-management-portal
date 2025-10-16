@@ -3,12 +3,13 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { FileText, List, PlusCircle } from 'lucide-react';
+import { FileText, List, PlusCircle, Users } from 'lucide-react';
 
 export default function Dashboard() {
   const { role } = useAuth();
   const navigate = useNavigate();
-  const isAdmin = role === 'admin';
+  const isAdmin = role === 'admin' || role === 'super_admin';
+  const isSuperAdmin = role === 'super_admin';
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,6 +67,21 @@ export default function Dashboard() {
                   <Button className="w-full" variant="outline">New Entry</Button>
                 </CardContent>
               </Card>
+
+              {isSuperAdmin && (
+                <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate('/users')}>
+                  <CardHeader>
+                    <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                      <Users className="h-6 w-6 text-primary-foreground" />
+                    </div>
+                    <CardTitle>Manage Users</CardTitle>
+                    <CardDescription>Control user roles and permissions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full" variant="outline">Manage Users</Button>
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
         </div>

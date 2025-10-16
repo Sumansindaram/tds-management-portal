@@ -24,6 +24,7 @@ export default function Form() {
   const [loading, setLoading] = useState(false);
   const [transportFiles, setTransportFiles] = useState<Record<string, File | null>>({});
   const [supportingFiles, setSupportingFiles] = useState<FileList | null>(null);
+  const [sessionId] = useState(() => `session-${Date.now()}-${Math.random()}`);
 
   const [formData, setFormData] = useState({
     ssr_name: '',
@@ -124,8 +125,6 @@ export default function Form() {
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
-
     setLoading(true);
     try {
       // Generate reference
@@ -134,13 +133,13 @@ export default function Form() {
 
       if (refError) throw refError;
 
-      // Create entry
+      // Create entry (public submission - no auth required)
       const { data: entry, error: entryError } = await supabase
         .from('tds_entries')
         .insert([{
           ...formData,
           reference: refData,
-          submitted_by: user.id,
+          submitted_by: user?.id || null,
           status: 'Pending',
         }])
         .select()
@@ -148,13 +147,14 @@ export default function Form() {
 
       if (entryError) throw entryError;
 
-      // Upload files
+      // Upload files using session ID for non-authenticated users
       const uploadPromises: Promise<any>[] = [];
+      const uploaderId = user?.id || sessionId;
 
       // Transport files
       Object.entries(transportFiles).forEach(([category, file]) => {
         if (file) {
-          const path = `${user.id}/${entry.id}/${category}_${file.name}`;
+          const path = `${uploaderId}/${entry.id}/${category}_${file.name}`;
           uploadPromises.push(
             supabase.storage
               .from('transportation-data')
@@ -166,7 +166,7 @@ export default function Form() {
       // Supporting files
       if (supportingFiles) {
         Array.from(supportingFiles).forEach(file => {
-          const path = `${user.id}/${entry.id}/${file.name}`;
+          const path = `${uploaderId}/${entry.id}/${file.name}`;
           uploadPromises.push(
             supabase.storage
               .from('supporting-documents')
@@ -182,7 +182,12 @@ export default function Form() {
         description: `Request submitted with reference: ${refData}`,
       });
 
-      navigate('/');
+      if (user) {
+        navigate('/');
+      } else {
+        // For non-authenticated users, reset form
+        window.location.reload();
+      }
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -196,7 +201,26 @@ export default function Form() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      {user && <Header />}
+      {!user && (
+        <header className="bg-primary text-primary-foreground shadow-lg">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-extrabold">JSP 800 Vol 7</h1>
+                <p className="text-sm opacity-90">Tie Down Scheme (TDS) Portal</p>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/auth')}
+                className="text-primary-foreground hover:bg-primary-foreground/10"
+              >
+                Staff Login
+              </Button>
+            </div>
+          </div>
+        </header>
+      )}
       <main className="container mx-auto p-6">
         <Card className="shadow-lg">
           <CardHeader>

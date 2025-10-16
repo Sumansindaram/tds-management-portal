@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw } from 'lucide-reac
 
 export default function AdminDetail() {
   const { id } = useParams();
+  const { role } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [entry, setEntry] = useState<any>(null);
@@ -20,8 +22,10 @@ export default function AdminDetail() {
   const [comment, setComment] = useState('');
 
   useEffect(() => {
-    if (id) loadEntry();
-  }, [id]);
+    if (id && (role === 'admin' || role === 'super_admin')) {
+      loadEntry();
+    }
+  }, [id, role]);
 
   const loadEntry = async () => {
     try {

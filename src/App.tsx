@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Form from "./pages/Form";
 import AdminList from "./pages/AdminList";
 import AdminDetail from "./pages/AdminDetail";
+import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,14 +32,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/form"
-              element={
-                <ProtectedRoute>
-                  <Form />
-                </ProtectedRoute>
-              }
-            />
+            {/* Public form - no auth required */}
+            <Route path="/form" element={<Form />} />
             <Route
               path="/admin"
               element={
@@ -52,6 +47,14 @@ const App = () => (
               element={
                 <ProtectedRoute adminOnly>
                   <AdminDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute superAdminOnly>
+                  <Users />
                 </ProtectedRoute>
               }
             />
