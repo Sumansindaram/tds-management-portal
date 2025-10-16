@@ -8,6 +8,8 @@ import { FileText, Paperclip } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import PdfViewer from '@/components/PdfViewer';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -23,6 +25,7 @@ export default function RequestDetail() {
   const [loading, setLoading] = useState(true);
   const [transportFiles, setTransportFiles] = useState<Record<string, string[]>>({});
   const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
+  const [pdfDialog, setPdfDialog] = useState<{ bucket: string; path: string } | null>(null);
   const isReadOnly = true;
 
   useEffect(() => {
@@ -102,44 +105,13 @@ export default function RequestDetail() {
     }
   };
 
-  const openFile = async (bucket: string, entryObj: any, fileName: string) => {
+  const openFile = (bucket: string, entryObj: any, fileName: string) => {
     const candidatePaths = [
       `${entryObj?.nsn}/${entryObj?.id}/${fileName}`,
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
-    // Prefer blob download to avoid blocked navigation
-    for (const path of candidatePaths) {
-      try {
-        const { data } = await supabase.storage.from(bucket).download(path);
-        if (data) {
-          const blobUrl = URL.createObjectURL(data);
-          window.open(blobUrl, '_blank', 'noopener,noreferrer');
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
-          return;
-        }
-      } catch (_) {}
-    }
-
-    for (const path of candidatePaths) {
-      try {
-        const { data: signed } = await supabase.storage.from(bucket).createSignedUrl(path, 300);
-        if (signed?.signedUrl) {
-          const res = await fetch(signed.signedUrl);
-          if (res.ok) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank', 'noopener,noreferrer');
-            setTimeout(() => URL.revokeObjectURL(url), 60_000);
-            return;
-          }
-          window.open(signed.signedUrl, '_blank', 'noopener,noreferrer');
-          return;
-        }
-      } catch (_) {}
-    }
-
-    toast({ title: 'File not available', description: 'Could not open the file from storage.', variant: 'destructive' });
+    setPdfDialog({ bucket, path: candidatePaths[0] });
   };
 
   if (loading) {
@@ -255,6 +227,21 @@ export default function RequestDetail() {
           </CardContent>
         </Card>
       </main>
+
+      <Dialog open={!!pdfDialog} onOpenChange={() => setPdfDialog(null)}>
+        <DialogContent className="max-w-5xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Document Viewer</DialogTitle>
+          </DialogHeader>
+          {pdfDialog && (
+            <PdfViewer
+              bucket={pdfDialog.bucket}
+              path={pdfDialog.path}
+              height="75vh"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -12,8 +12,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip, Clock, Download, Filter } from 'lucide-react';
 import jsPDF from 'jspdf';
+import PdfViewer from '@/components/PdfViewer';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -36,6 +38,7 @@ export default function AdminDetail() {
   const [commentHistory, setCommentHistory] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [pdfDialog, setPdfDialog] = useState<{ bucket: string; path: string } | null>(null);
 
   useEffect(() => {
     if (id && (role === 'admin' || role === 'super_admin')) {
@@ -206,55 +209,13 @@ export default function AdminDetail() {
     return matchesSearch && matchesStatus;
   });
 
-  const openFile = async (bucket: string, entryObj: any, fileName: string) => {
+  const openFile = (bucket: string, entryObj: any, fileName: string) => {
     const candidatePaths = [
       `${entryObj?.nsn}/${entryObj?.id}/${fileName}`,
       `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
     ].filter(Boolean) as string[];
 
-    // 1) Try direct download to blob (avoids top-level navigation to blocked domains)
-    for (const path of candidatePaths) {
-      try {
-        const { data } = await supabase.storage.from(bucket).download(path);
-        if (data) {
-          const blobUrl = URL.createObjectURL(data);
-          window.open(blobUrl, '_blank', 'noopener,noreferrer');
-          // Revoke after a minute
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
-          return;
-        }
-      } catch (_) {
-        // try next path
-      }
-    }
-
-    // 2) Fallback to signed URL, then fetch to blob (still avoids navigating to supabase.co)
-    for (const path of candidatePaths) {
-      try {
-        const { data: signed } = await supabase.storage.from(bucket).createSignedUrl(path, 300);
-        if (signed?.signedUrl) {
-          const res = await fetch(signed.signedUrl);
-          if (res.ok) {
-            const blob = await res.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            window.open(blobUrl, '_blank', 'noopener,noreferrer');
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
-            return;
-          }
-          // As a last resort, open the signed URL directly
-          window.open(signed.signedUrl, '_blank', 'noopener,noreferrer');
-          return;
-        }
-      } catch (_) {
-        // try next path
-      }
-    }
-
-    toast({
-      title: 'File not available',
-      description: 'Could not open the file from storage.',
-      variant: 'destructive',
-    });
+    setPdfDialog({ bucket, path: candidatePaths[0] });
   };
   const updateStatus = async (newStatus: string) => {
     if (!entry) return;
@@ -677,6 +638,21 @@ export default function AdminDetail() {
           </CardContent>
         </Card>
       </main>
+
+      <Dialog open={!!pdfDialog} onOpenChange={() => setPdfDialog(null)}>
+        <DialogContent className="max-w-5xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Document Viewer</DialogTitle>
+          </DialogHeader>
+          {pdfDialog && (
+            <PdfViewer
+              bucket={pdfDialog.bucket}
+              path={pdfDialog.path}
+              height="75vh"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
