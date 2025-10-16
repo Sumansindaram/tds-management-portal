@@ -373,6 +373,16 @@ export default function AdminDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 space-y-6">
+        {/* Back Button */}
+        <Button
+          onClick={() => navigate('/admin')}
+          variant="outline"
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Requests List
+        </Button>
+
         {/* Reference and Status at top */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="shadow-sm">
@@ -422,14 +432,14 @@ export default function AdminDetail() {
               <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">
                 Transportation Data
               </h3>
-              <div className="grid gap-3 md:grid-cols-4">
+              <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                 {TRANSPORT_GROUPS.map(group => {
                   const hasFiles = transportFiles[group] && transportFiles[group].length > 0;
                   return (
                     <Button
                       key={group}
                       variant={hasFiles ? "default" : "outline"}
-                      className={hasFiles ? "" : "opacity-40"}
+                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? "" : "opacity-40"}`}
                       disabled={!hasFiles}
                        onClick={() => {
                          if (hasFiles && entry) {
@@ -439,12 +449,14 @@ export default function AdminDetail() {
                          }
                        }}
                     >
-                      <FileText className="mr-2 h-4 w-4" />
-                      <span className="text-xs font-medium">{group}</span>
+                      <div className="flex items-center gap-2 w-full">
+                        <FileText className="h-4 w-4 shrink-0" />
+                        <span className="text-xs font-medium text-left truncate flex-1">{group}</span>
+                      </div>
                       {hasFiles && (
-                        <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center">
-                          {transportFiles[group].length}
-                        </Badge>
+                        <span className="text-[10px] text-primary-foreground/80 mt-1">
+                          {transportFiles[group].length} file{transportFiles[group].length > 1 ? 's' : ''}
+                        </span>
                       )}
                     </Button>
                   );

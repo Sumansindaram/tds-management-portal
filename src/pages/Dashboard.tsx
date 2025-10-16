@@ -37,12 +37,14 @@ export default function Dashboard() {
   }, [isAdmin, user]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <Header />
       <main className="container mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-primary">Welcome to TDS Portal</h1>
-          <p className="text-muted-foreground">
+        <div className="mb-10">
+          <h1 className="mb-3 text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Welcome to TDS Portal
+          </h1>
+          <p className="text-lg text-muted-foreground">
             {isAdmin
               ? 'Manage TDS requests and review submissions'
               : 'Submit new TDS requests for asset tie-down schemes'}
@@ -52,25 +54,25 @@ export default function Dashboard() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {!isAdmin && (
             <>
-              <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate('/form')}>
+              <Card className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-primary/20" onClick={() => navigate('/form')}>
                 <CardHeader>
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                    <PlusCircle className="h-6 w-6 text-primary-foreground" />
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+                    <PlusCircle className="h-7 w-7 text-primary-foreground" />
                   </div>
-                  <CardTitle>New Request</CardTitle>
+                  <CardTitle className="text-xl">New Request</CardTitle>
                   <CardDescription>Submit a new TDS entry request</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full">Create Request</Button>
+                  <Button className="w-full shadow-md">Create Request</Button>
                 </CardContent>
               </Card>
 
-              <Card className="transition-all hover:shadow-lg">
+              <Card className="transition-all hover:shadow-xl hover:-translate-y-1 border-primary/20">
                 <CardHeader>
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                    <List className="h-6 w-6 text-primary-foreground" />
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+                    <List className="h-7 w-7 text-primary-foreground" />
                   </div>
-                  <CardTitle>My Submissions</CardTitle>
+                  <CardTitle className="text-xl">My Submissions</CardTitle>
                   <CardDescription>Recent requests you've submitted</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -79,14 +81,14 @@ export default function Dashboard() {
                   ) : myEntries.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No submissions yet.</p>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                       {myEntries.map((e) => (
-                        <div key={e.id} className="flex items-center justify-between rounded-md border p-3">
-                          <div>
-                            <p className="font-medium">{e.reference}</p>
-                            <p className="text-xs text-muted-foreground">{e.short_name || e.nsn} • {new Date(e.created_at).toLocaleDateString()}</p>
+                        <div key={e.id} className="flex items-center justify-between rounded-lg border border-primary/10 bg-muted/30 p-3 transition-colors hover:bg-muted/50">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold truncate">{e.reference}</p>
+                            <p className="text-xs text-muted-foreground truncate">{e.short_name || e.nsn} • {new Date(e.created_at).toLocaleDateString()}</p>
                           </div>
-                          <Button size="sm" variant="outline" onClick={() => navigate(`/request/${e.id}`)}>
+                          <Button size="sm" variant="outline" className="ml-2 shrink-0" onClick={() => navigate(`/request/${e.id}`)}>
                             View
                           </Button>
                         </div>
@@ -100,43 +102,43 @@ export default function Dashboard() {
 
           {isAdmin && (
             <>
-              <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate('/admin')}>
+              <Card className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-primary/20" onClick={() => navigate('/admin')}>
                 <CardHeader>
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                    <List className="h-6 w-6 text-primary-foreground" />
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+                    <List className="h-7 w-7 text-primary-foreground" />
                   </div>
-                  <CardTitle>View All Requests</CardTitle>
+                  <CardTitle className="text-xl">View All Requests</CardTitle>
                   <CardDescription>Review and manage all TDS submissions</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full">View Requests</Button>
+                  <Button className="w-full shadow-md">View Requests</Button>
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate('/form')}>
+              <Card className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-primary/20" onClick={() => navigate('/form')}>
                 <CardHeader>
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                    <FileText className="h-6 w-6 text-primary-foreground" />
+                  <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+                    <FileText className="h-7 w-7 text-primary-foreground" />
                   </div>
-                  <CardTitle>Submit Request</CardTitle>
+                  <CardTitle className="text-xl">Submit Request</CardTitle>
                   <CardDescription>Create a new TDS entry</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full" variant="outline">New Entry</Button>
+                  <Button className="w-full shadow-md" variant="outline">New Entry</Button>
                 </CardContent>
               </Card>
 
               {isSuperAdmin && (
-                <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate('/users')}>
+                <Card className="cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-primary/20" onClick={() => navigate('/users')}>
                   <CardHeader>
-                    <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                      <Users className="h-6 w-6 text-primary-foreground" />
+                    <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+                      <Users className="h-7 w-7 text-primary-foreground" />
                     </div>
-                    <CardTitle>Manage Users</CardTitle>
+                    <CardTitle className="text-xl">Manage Users</CardTitle>
                     <CardDescription>Control user roles and permissions</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full" variant="outline">Manage Users</Button>
+                    <Button className="w-full shadow-md" variant="outline">Manage Users</Button>
                   </CardContent>
                 </Card>
               )}

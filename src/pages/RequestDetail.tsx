@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Paperclip } from 'lucide-react';
+import { FileText, Paperclip, ArrowLeft, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -17,12 +18,14 @@ const TRANSPORT_GROUPS = [
 
 export default function RequestDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [entry, setEntry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [transportFiles, setTransportFiles] = useState<Record<string, string[]>>({});
   const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
+  const [commentHistory, setCommentHistory] = useState<any[]>([]);
   const isReadOnly = true;
 
   useEffect(() => {
@@ -41,6 +44,7 @@ export default function RequestDetail() {
         }
         setEntry(data);
         await loadFiles(data.id, data.submitted_by, data.nsn);
+        await loadCommentHistory(data.id);
       } catch (e) {
         console.error(e);
         toast({ title: 'Error', description: 'Could not load request details', variant: 'destructive' });
@@ -102,6 +106,21 @@ export default function RequestDetail() {
     }
   };
 
+  const loadCommentHistory = async (entryId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('tds_entry_comments')
+        .select('*')
+        .eq('entry_id', entryId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCommentHistory(data || []);
+    } catch (error) {
+      console.error('Error loading comment history:', error);
+    }
+  };
+
   const openFile = async (bucket: string, entryObj: any, fileName: string) => {
     const candidatePaths = [
       `${entryObj?.nsn}/${entryObj?.id}/${fileName}`,
@@ -157,21 +176,56 @@ export default function RequestDetail() {
     );
   }
 
-  const fields = [
-    { label: 'Reference', value: entry.reference },
-    { label: 'Status', value: entry.status },
+  const basicFields = [
     { label: 'SSR Name', value: entry.ssr_name },
     { label: 'SSR Email', value: entry.ssr_email },
     { label: 'Designation', value: entry.designation },
     { label: 'NSN', value: entry.nsn },
     { label: 'Asset Code', value: entry.asset_code },
     { label: 'Short Name', value: entry.short_name },
+    { label: 'Length', value: entry.length },
+    { label: 'Width', value: entry.width },
+    { label: 'Height', value: entry.height },
+    { label: 'Unladen Weight', value: entry.unladen_weight },
+    { label: 'Laden Weight', value: entry.laden_weight },
+    { label: 'ALEST', value: entry.alest },
+    { label: 'LIMS 2.5', value: entry.lims_25 },
+    { label: 'LIMS 2.8', value: entry.lims_28 },
+    { label: 'Out of Service Date', value: entry.out_of_service_date },
+    { label: 'MLC', value: entry.mlc },
+    { label: 'Service', value: entry.service },
+    { label: 'Owner Nation', value: entry.owner_nation },
+    { label: 'RIC Code', value: entry.ric_code },
+    { label: 'Asset Type', value: entry.asset_type },
+  ];
+
+  const driverFields = [
+    { label: 'Licence', value: entry.licence },
+    { label: 'Crew Number', value: entry.crew_number },
+    { label: 'Passenger Capacity', value: entry.passenger_capacity },
+    { label: 'Range', value: entry.range },
+    { label: 'Fuel Capacity', value: entry.fuel_capacity },
+  ];
+
+  const adamsFields = [
+    { label: 'Single Carriage', value: entry.single_carriage },
+    { label: 'Dual Carriage', value: entry.dual_carriage },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 space-y-6">
+        {/* Back Button */}
+        <Button
+          onClick={() => navigate('/dashboard')}
+          variant="outline"
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Dashboard
+        </Button>
+
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="shadow-sm">
             <CardContent className="pt-6">
@@ -187,30 +241,61 @@ export default function RequestDetail() {
           </Card>
         </div>
 
-        <Card className={`shadow-lg ${isReadOnly ? 'opacity-90' : ''}`}>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-primary">Request Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 pointer-events-none">
-              {fields.map((field) => (
-                <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                  <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
-                </div>
-              ))}
+            {/* Basic Details */}
+            <div>
+              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">Basic Details</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {basicFields.map((field) => (
+                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
+                    <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
+            {/* Driver Information */}
+            <div>
+              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">Driver Information</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {driverFields.map((field) => (
+                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
+                    <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ADAMS Sections */}
+            <div>
+              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">ADAMS Sections</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {adamsFields.map((field) => (
+                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
+                    <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Transportation Data */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">Transportation Data</h3>
-              <div className="grid gap-3 md:grid-cols-4">
+              <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                 {TRANSPORT_GROUPS.map((group) => {
                   const hasFiles = transportFiles[group] && transportFiles[group].length > 0;
                   return (
                     <Button
                       key={group}
                       variant={hasFiles ? 'default' : 'outline'}
-                      className={hasFiles ? '' : 'opacity-40'}
+                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? '' : 'opacity-40'}`}
                       disabled={!hasFiles}
                       onClick={() => {
                         if (hasFiles && entry) {
@@ -220,14 +305,22 @@ export default function RequestDetail() {
                         }
                       }}
                     >
-                      <FileText className="mr-2 h-4 w-4" />
-                      <span className="text-xs font-medium">{group}</span>
+                      <div className="flex items-center gap-2 w-full">
+                        <FileText className="h-4 w-4 shrink-0" />
+                        <span className="text-xs font-medium text-left truncate flex-1">{group}</span>
+                      </div>
+                      {hasFiles && (
+                        <span className="text-[10px] text-primary-foreground/80 mt-1">
+                          {transportFiles[group].length} file{transportFiles[group].length > 1 ? 's' : ''}
+                        </span>
+                      )}
                     </Button>
                   );
                 })}
               </div>
             </div>
 
+            {/* Supporting Documents */}
             {supportingFiles.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">Supporting Documents</h3>
@@ -239,6 +332,47 @@ export default function RequestDetail() {
                     </Button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Comment History */}
+            {commentHistory.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Admin Comments & Updates ({commentHistory.length})
+                </h3>
+                <Accordion type="single" collapsible className="w-full">
+                  {commentHistory.map((item, idx) => (
+                    <AccordionItem key={item.id} value={`comment-${idx}`} className="border rounded-lg mb-3 px-4">
+                      <AccordionTrigger className="hover:no-underline py-4">
+                        <div className="flex flex-col items-start gap-2 text-left w-full pr-4">
+                          <div className="flex items-center gap-3 w-full justify-between">
+                            <Badge variant={
+                              item.status === 'Approved' ? 'default' :
+                              item.status === 'Rejected' ? 'destructive' :
+                              item.status === 'Returned' ? 'secondary' :
+                              'outline'
+                            }>
+                              {item.status}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(item.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            By: {item.admin_name}
+                          </p>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-2 pb-4">
+                        <div className="rounded-md bg-muted/50 p-4">
+                          <p className="text-sm whitespace-pre-wrap">{item.comment}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             )}
           </CardContent>
