@@ -373,16 +373,6 @@ export default function AdminDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 space-y-6">
-        {/* Back Button */}
-        <Button
-          onClick={() => navigate('/admin')}
-          variant="outline"
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Requests List
-        </Button>
-
         {/* Reference and Status at top */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="shadow-sm">
@@ -485,6 +475,49 @@ export default function AdminDetail() {
                       <span className="truncate text-xs">{fileName}</span>
                     </Button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Terms Acceptance */}
+            {entry && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">
+                  Declaration & Acknowledgement
+                </h3>
+                <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${entry.ssr_approval_confirmed ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                      {entry.ssr_approval_confirmed && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <p className="text-sm">
+                      SSR approval has been obtained and attached to this request, approved by the Senior Service Representative (SSR) or Service Representative (SR).
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${entry.authorised_person_confirmed ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                      {entry.authorised_person_confirmed && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <p className="text-sm">
+                      Confirmed as an authorised representative, duly appointed by the SSR/SR, to submit this Transportation Data Sheet (TDS) request.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${entry.data_responsibility_confirmed ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                      {entry.data_responsibility_confirmed && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <p className="text-sm">
+                      Acknowledged that the Deployment Team (DT) assumes full responsibility for data accuracy, and that QSEE bears no liability for any inaccuracies.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${entry.review_responsibility_confirmed ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                      {entry.review_responsibility_confirmed && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <p className="text-sm">
+                      Acknowledged that the Deployment Team (DT) is solely responsible for conducting thorough reviews of all TDS entries upon creation.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

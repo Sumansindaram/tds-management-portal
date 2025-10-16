@@ -47,8 +47,10 @@ export type Database = {
           alest: string
           asset_code: string
           asset_type: string
+          authorised_person_confirmed: boolean | null
           created_at: string | null
           crew_number: string | null
+          data_responsibility_confirmed: boolean | null
           designation: string
           dual_carriage: string | null
           fuel_capacity: string | null
@@ -67,10 +69,12 @@ export type Database = {
           passenger_capacity: string | null
           range: string | null
           reference: string
+          review_responsibility_confirmed: boolean | null
           ric_code: string
           service: string
           short_name: string
           single_carriage: string | null
+          ssr_approval_confirmed: boolean | null
           ssr_email: string
           ssr_name: string
           status: string
@@ -84,8 +88,10 @@ export type Database = {
           alest: string
           asset_code: string
           asset_type: string
+          authorised_person_confirmed?: boolean | null
           created_at?: string | null
           crew_number?: string | null
+          data_responsibility_confirmed?: boolean | null
           designation: string
           dual_carriage?: string | null
           fuel_capacity?: string | null
@@ -104,10 +110,12 @@ export type Database = {
           passenger_capacity?: string | null
           range?: string | null
           reference: string
+          review_responsibility_confirmed?: boolean | null
           ric_code: string
           service: string
           short_name: string
           single_carriage?: string | null
+          ssr_approval_confirmed?: boolean | null
           ssr_email: string
           ssr_name: string
           status?: string
@@ -121,8 +129,10 @@ export type Database = {
           alest?: string
           asset_code?: string
           asset_type?: string
+          authorised_person_confirmed?: boolean | null
           created_at?: string | null
           crew_number?: string | null
+          data_responsibility_confirmed?: boolean | null
           designation?: string
           dual_carriage?: string | null
           fuel_capacity?: string | null
@@ -141,10 +151,12 @@ export type Database = {
           passenger_capacity?: string | null
           range?: string | null
           reference?: string
+          review_responsibility_confirmed?: boolean | null
           ric_code?: string
           service?: string
           short_name?: string
           single_carriage?: string | null
+          ssr_approval_confirmed?: boolean | null
           ssr_email?: string
           ssr_name?: string
           status?: string

@@ -25,6 +25,12 @@ export default function Form() {
   const [transportFiles, setTransportFiles] = useState<Record<string, File | null>>({});
   const [supportingFiles, setSupportingFiles] = useState<FileList | null>(null);
   const [sessionId] = useState(() => `session-${Date.now()}-${Math.random()}`);
+  const [termsAccepted, setTermsAccepted] = useState({
+    ssrApproval: false,
+    authorisedPerson: false,
+    dataResponsibility: false,
+    reviewResponsibility: false,
+  });
 
   const [formData, setFormData] = useState({
     ssr_name: '',
@@ -157,9 +163,26 @@ export default function Form() {
     });
     setTransportFiles({});
     setSupportingFiles(null);
+    setTermsAccepted({
+      ssrApproval: false,
+      authorisedPerson: false,
+      dataResponsibility: false,
+      reviewResponsibility: false,
+    });
   };
 
   const handleSubmit = async () => {
+    // Validate terms and conditions
+    const allTermsAccepted = Object.values(termsAccepted).every(term => term === true);
+    if (!allTermsAccepted) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please accept all declarations and acknowledgements to proceed.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     // Validate supporting documents
     if (!supportingFiles || supportingFiles.length === 0) {
       toast({
@@ -186,6 +209,10 @@ export default function Form() {
           reference: refData,
           submitted_by: user?.id || null,
           status: 'Pending',
+          ssr_approval_confirmed: termsAccepted.ssrApproval,
+          authorised_person_confirmed: termsAccepted.authorisedPerson,
+          data_responsibility_confirmed: termsAccepted.dataResponsibility,
+          review_responsibility_confirmed: termsAccepted.reviewResponsibility,
         }])
         .select()
         .single();
@@ -432,15 +459,67 @@ export default function Form() {
                 Driver Information
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-                {['licence', 'crew_number', 'passenger_capacity', 'range', 'fuel_capacity', 'single_carriage', 'dual_carriage', 'max_speed'].map(field => (
-                  <div key={field}>
-                    <Label>{field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</Label>
-                    <Input
-                      value={formData[field as keyof typeof formData]}
-                      onChange={(e) => handleInputChange(field, e.target.value)}
-                    />
-                  </div>
-                ))}
+                <div>
+                  <Label>Licence</Label>
+                  <Input
+                    value={formData.licence}
+                    onChange={(e) => handleInputChange('licence', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Crew Number</Label>
+                  <Input
+                    value={formData.crew_number}
+                    onChange={(e) => handleInputChange('crew_number', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Passenger Capacity</Label>
+                  <Input
+                    value={formData.passenger_capacity}
+                    onChange={(e) => handleInputChange('passenger_capacity', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Range (km)</Label>
+                  <Input
+                    value={formData.range}
+                    onChange={(e) => handleInputChange('range', e.target.value)}
+                    placeholder="e.g., 500"
+                  />
+                </div>
+                <div>
+                  <Label>Fuel Capacity (L)</Label>
+                  <Input
+                    value={formData.fuel_capacity}
+                    onChange={(e) => handleInputChange('fuel_capacity', e.target.value)}
+                    placeholder="e.g., 100"
+                  />
+                </div>
+                <div>
+                  <Label>Single Carriage (km)</Label>
+                  <Input
+                    value={formData.single_carriage}
+                    onChange={(e) => handleInputChange('single_carriage', e.target.value)}
+                    placeholder="e.g., 300"
+                  />
+                </div>
+                <div>
+                  <Label>Dual Carriage (km)</Label>
+                  <Input
+                    value={formData.dual_carriage}
+                    onChange={(e) => handleInputChange('dual_carriage', e.target.value)}
+                    placeholder="e.g., 400"
+                  />
+                </div>
+                <div>
+                  <Label>Max Speed (km/h)</Label>
+                  <Input
+                    value={formData.max_speed}
+                    onChange={(e) => handleInputChange('max_speed', e.target.value)}
+                    placeholder="e.g., 120"
+                  />
+                </div>
               </div>
             </section>
 
@@ -551,6 +630,67 @@ export default function Form() {
                     />
                   </Label>
                 ))}
+              </div>
+            </section>
+
+            {/* Terms and Conditions */}
+            <section>
+              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+                Declaration and Acknowledgement *
+              </h3>
+              <div className="space-y-4 rounded-lg border-2 border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20 p-6">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="ssrApproval"
+                    checked={termsAccepted.ssrApproval}
+                    onChange={(e) => setTermsAccepted(prev => ({ ...prev, ssrApproval: e.target.checked }))}
+                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    required
+                  />
+                  <Label htmlFor="ssrApproval" className="cursor-pointer text-sm font-normal">
+                    I confirm that SSR/SR approval has been obtained and attached to this request, and that this submission has been duly approved by the Senior Service Representative (SSR) or Service Representative (SR).
+                  </Label>
+                </div>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="authorisedPerson"
+                    checked={termsAccepted.authorisedPerson}
+                    onChange={(e) => setTermsAccepted(prev => ({ ...prev, authorisedPerson: e.target.checked }))}
+                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    required
+                  />
+                  <Label htmlFor="authorisedPerson" className="cursor-pointer text-sm font-normal">
+                    I confirm that I am an authorised representative, duly appointed by the SSR/SR, to submit this Transportation Data Sheet (TDS) request on their behalf.
+                  </Label>
+                </div>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="dataResponsibility"
+                    checked={termsAccepted.dataResponsibility}
+                    onChange={(e) => setTermsAccepted(prev => ({ ...prev, dataResponsibility: e.target.checked }))}
+                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    required
+                  />
+                  <Label htmlFor="dataResponsibility" className="cursor-pointer text-sm font-normal">
+                    I acknowledge that the Deployment Team (DT) assumes full responsibility for the accuracy and completeness of all data provided in this submission, and that the Quality, Safety, Environment and Engineering (QSEE) team bears no liability for any inaccuracies or errors in the supplied information.
+                  </Label>
+                </div>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="reviewResponsibility"
+                    checked={termsAccepted.reviewResponsibility}
+                    onChange={(e) => setTermsAccepted(prev => ({ ...prev, reviewResponsibility: e.target.checked }))}
+                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    required
+                  />
+                  <Label htmlFor="reviewResponsibility" className="cursor-pointer text-sm font-normal">
+                    I acknowledge that the Deployment Team (DT) is solely responsible for conducting thorough reviews of all TDS entries upon creation to verify data accuracy and identify any discrepancies within the database.
+                  </Label>
+                </div>
               </div>
             </section>
 
