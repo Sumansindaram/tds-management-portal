@@ -55,7 +55,7 @@ export default function AdminDetail() {
       setEntry(data);
       
       // Load files from storage
-      await loadFiles(data.id, data.submitted_by);
+      await loadFiles(data.id, data.submitted_by, data.nsn);
       
       // Load comment history
       await loadCommentHistory(data.id);
@@ -71,16 +71,29 @@ export default function AdminDetail() {
     }
   };
 
-  const loadFiles = async (entryId: string, submittedBy: string) => {
+  const loadFiles = async (entryId: string, submittedBy: string, nsn?: string) => {
     try {
-      // Load transportation data files
-      const { data: transportData } = await supabase.storage
-        .from('transportation-data')
-        .list(`${submittedBy}/${entryId}`);
+      // Try NSN-based folder first, then fall back to legacy submittedBy-based folder
+      const transportPrefixNew = nsn ? `${nsn}/${entryId}` : undefined;
+      const transportPrefixOld = `${submittedBy}/${entryId}`;
+
+      let transportData = null as Awaited<ReturnType<typeof supabase.storage.from>> | any;
+      if (transportPrefixNew) {
+        const resNew = await supabase.storage
+          .from('transportation-data')
+          .list(transportPrefixNew);
+        if (resNew?.data && resNew.data.length > 0) transportData = resNew.data;
+      }
+      if (!transportData) {
+        const resOld = await supabase.storage
+          .from('transportation-data')
+          .list(transportPrefixOld);
+        transportData = resOld?.data || [];
+      }
 
       if (transportData) {
         const filesByCategory: Record<string, string[]> = {};
-        transportData.forEach(file => {
+        transportData.forEach((file: any) => {
           const category = TRANSPORT_GROUPS.find(g => file.name.startsWith(g));
           if (category) {
             if (!filesByCategory[category]) filesByCategory[category] = [];
@@ -90,13 +103,26 @@ export default function AdminDetail() {
         setTransportFiles(filesByCategory);
       }
 
-      // Load supporting documents
-      const { data: supportData } = await supabase.storage
-        .from('supporting-documents')
-        .list(`${submittedBy}/${entryId}`);
+      // Supporting documents
+      const supportPrefixNew = nsn ? `${nsn}/${entryId}` : undefined;
+      const supportPrefixOld = `${submittedBy}/${entryId}`;
+
+      let supportData = null as any;
+      if (supportPrefixNew) {
+        const resNew = await supabase.storage
+          .from('supporting-documents')
+          .list(supportPrefixNew);
+        if (resNew?.data && resNew.data.length > 0) supportData = resNew.data;
+      }
+      if (!supportData) {
+        const resOld = await supabase.storage
+          .from('supporting-documents')
+          .list(supportPrefixOld);
+        supportData = resOld?.data || [];
+      }
 
       if (supportData) {
-        setSupportingFiles(supportData.map(f => f.name));
+        setSupportingFiles(supportData.map((f: any) => f.name));
       }
     } catch (error) {
       console.error('Error loading files:', error);
@@ -181,39 +207,32 @@ export default function AdminDetail() {
     return matchesSearch && matchesStatus;
   });
 
-  const openFile = async (bucket: string, filePath: string) => {
-    try {
-      // Prefer blob download to avoid Edge/extension blocking cross-site tab opens
-      const { data: blobData, error: downloadError } = await supabase.storage
-        .from(bucket)
-        .download(filePath);
+  const openFile = async (bucket: string, entryObj: any, fileName: string) => {
+    const candidatePaths = [
+      `${entryObj?.nsn}/${entryObj?.id}/${fileName}`,
+      `${entryObj?.submitted_by}/${entryObj?.id}/${fileName}`,
+    ].filter(Boolean) as string[];
 
-      if (!downloadError && blobData) {
-        const url = URL.createObjectURL(blobData);
-        window.open(url, '_blank', 'noopener,noreferrer');
-        // Revoke after a minute to allow the user to keep the tab open
-        setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        return;
+    for (const path of candidatePaths) {
+      try {
+        // Prefer signed URL to avoid blob:// being blocked by some browsers/iframes
+        const { data: signed } = await supabase.storage
+          .from(bucket)
+          .createSignedUrl(path, 300);
+        if (signed?.signedUrl) {
+          window.open(signed.signedUrl, '_blank', 'noopener,noreferrer');
+          return;
+        }
+      } catch (e) {
+        // try next
       }
-
-      // Fallback to signed URL if blob download fails
-      const { data: signed, error: signError } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(filePath, 60);
-
-      if (signError) throw signError;
-      
-      if (signed?.signedUrl) {
-        window.open(signed.signedUrl, '_blank', 'noopener,noreferrer');
-      }
-    } catch (error: any) {
-      console.error('Error opening file:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to open file',
-        variant: 'destructive',
-      });
     }
+
+    toast({
+      title: 'File not available',
+      description: 'Could not open the file from storage.',
+      variant: 'destructive',
+    });
   };
 
   const updateStatus = async (newStatus: string) => {
@@ -417,7 +436,7 @@ export default function AdminDetail() {
                          if (hasFiles && entry) {
                            transportFiles[group].forEach((fileName, idx) => {
                              setTimeout(() => {
-                               openFile('transportation-data', `${entry.submitted_by}/${entry.id}/${fileName}`);
+                               openFile('transportation-data', entry, fileName);
                              }, idx * 200); // stagger to reduce popup blocking
                            });
                          }
@@ -447,11 +466,11 @@ export default function AdminDetail() {
                     <Button
                       key={idx}
                       variant="default"
-                      onClick={() => {
-                        if (entry) {
-                          openFile('supporting-documents', `${entry.submitted_by}/${entry.id}/${fileName}`);
-                        }
-                      }}
+                       onClick={() => {
+                         if (entry) {
+                           openFile('supporting-documents', entry, fileName);
+                         }
+                       }}
                     >
                       <Paperclip className="mr-2 h-4 w-4" />
                       <span className="truncate text-xs">{fileName}</span>

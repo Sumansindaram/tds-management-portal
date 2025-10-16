@@ -154,7 +154,7 @@ export default function Form() {
       // Transport files
       Object.entries(transportFiles).forEach(([category, file]) => {
         if (file) {
-          const path = `${uploaderId}/${entry.id}/${category}_${file.name}`;
+          const path = `${formData.nsn}/${entry.id}/${category}_${file.name}`;
           uploadPromises.push(
             supabase.storage
               .from('transportation-data')
@@ -166,7 +166,7 @@ export default function Form() {
       // Supporting files
       if (supportingFiles) {
         Array.from(supportingFiles).forEach(file => {
-          const path = `${uploaderId}/${entry.id}/${file.name}`;
+          const path = `${formData.nsn}/${entry.id}/${file.name}`;
           uploadPromises.push(
             supabase.storage
               .from('supporting-documents')
