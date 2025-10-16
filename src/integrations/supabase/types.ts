@@ -155,6 +155,44 @@ export type Database = {
         }
         Relationships: []
       }
+      tds_entry_comments: {
+        Row: {
+          admin_id: string
+          admin_name: string
+          comment: string
+          created_at: string
+          entry_id: string
+          id: string
+          status: string
+        }
+        Insert: {
+          admin_id: string
+          admin_name: string
+          comment: string
+          created_at?: string
+          entry_id: string
+          id?: string
+          status: string
+        }
+        Update: {
+          admin_id?: string
+          admin_name?: string
+          comment?: string
+          created_at?: string
+          entry_id?: string
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tds_entry_comments_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "tds_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

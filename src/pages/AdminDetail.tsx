@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Loader2, ArrowLeft, CheckCircle, XCircle, RotateCcw, Home, FileText, Paperclip, Clock } from 'lucide-react';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -29,6 +30,7 @@ export default function AdminDetail() {
   const [transportFiles, setTransportFiles] = useState<Record<string, string[]>>({});
   const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [commentHistory, setCommentHistory] = useState<any[]>([]);
 
   useEffect(() => {
     if (id && (role === 'admin' || role === 'super_admin')) {
@@ -49,6 +51,9 @@ export default function AdminDetail() {
       
       // Load files from storage
       await loadFiles(data.id, data.submitted_by);
+      
+      // Load comment history
+      await loadCommentHistory(data.id);
     } catch (error) {
       console.error('Error loading entry:', error);
       toast({
@@ -90,6 +95,21 @@ export default function AdminDetail() {
       }
     } catch (error) {
       console.error('Error loading files:', error);
+    }
+  };
+
+  const loadCommentHistory = async (entryId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('tds_entry_comments')
+        .select('*')
+        .eq('entry_id', entryId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCommentHistory(data || []);
+    } catch (error) {
+      console.error('Error loading comment history:', error);
     }
   };
 
@@ -142,6 +162,15 @@ export default function AdminDetail() {
 
     setUpdating(true);
     try {
+      // Get current user's profile for admin name
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user?.id)
+        .single();
+
+      // Update entry status and comment
       const { error } = await supabase
         .from('tds_entries')
         .update({
@@ -151,6 +180,24 @@ export default function AdminDetail() {
         .eq('id', entry.id);
 
       if (error) throw error;
+
+      // Insert comment into history
+      if (comment.trim()) {
+        const { error: historyError } = await supabase
+          .from('tds_entry_comments')
+          .insert({
+            entry_id: entry.id,
+            admin_id: user?.id,
+            admin_name: profile?.full_name || user?.email || 'Admin',
+            status: newStatus,
+            comment: comment,
+          });
+
+        if (historyError) console.error('Error saving comment history:', historyError);
+      }
+
+      // Reload comment history
+      await loadCommentHistory(entry.id);
 
       // Update local state immediately
       setEntry({ ...entry, status: newStatus, admin_comment: comment || null });
@@ -346,14 +393,52 @@ export default function AdminDetail() {
               </div>
             )}
 
+            {/* Comment History */}
+            {commentHistory.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Comment History
+                </h3>
+                <Accordion type="single" collapsible className="w-full">
+                  {commentHistory.map((historyItem, idx) => (
+                    <AccordionItem key={historyItem.id} value={`item-${idx}`}>
+                      <AccordionTrigger className="hover:no-underline">
+                        <div className="flex items-center gap-3 text-left">
+                          <Badge variant={
+                            historyItem.status === 'Approved' ? 'default' :
+                            historyItem.status === 'Rejected' ? 'destructive' :
+                            historyItem.status === 'Returned' ? 'secondary' : 'outline'
+                          }>
+                            {historyItem.status}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(historyItem.created_at).toLocaleString()}
+                          </span>
+                          <span className="text-sm font-medium">
+                            by {historyItem.admin_name}
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="rounded-lg bg-muted/50 p-4 mt-2">
+                          <p className="text-sm whitespace-pre-wrap">{historyItem.comment}</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            )}
+
             {entry.admin_comment && (
               <div className="rounded-lg bg-muted p-4">
-                <p className="mb-1 text-sm font-semibold">Previous Admin Comment:</p>
+                <p className="mb-1 text-sm font-semibold">Latest Admin Comment:</p>
                 <p className="text-sm">{entry.admin_comment}</p>
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className={`space-y-2 ${isReadOnly ? 'pointer-events-none opacity-60' : ''}`}>
               <Label htmlFor="comment">Admin Comment</Label>
               <Textarea
                 id="comment"
