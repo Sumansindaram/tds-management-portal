@@ -227,9 +227,7 @@ export default function Form() {
         description: `Request submitted with reference: ${refData}`,
       });
 
-      // Reset form before navigation/reload
-      handleReset();
-
+      // Navigate/reload without resetting immediately to preserve visual state until page change
       if (user) {
         navigate('/');
       } else {
@@ -518,24 +516,29 @@ export default function Form() {
                 {TRANSPORT_GROUPS.map(group => (
                   <Label
                     key={group}
-                    className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/30 p-4 text-center transition-colors hover:border-primary hover:bg-primary/5 min-h-[100px]"
+                    className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border-2 border-dashed border-primary/30 px-4 h-14 w-full transition-colors hover:border-primary hover:bg-primary/5"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className={transportFiles[group] ? "text-primary" : "text-muted-foreground"}
-                    >
-                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    <span className="text-sm font-medium">{group}</span>
+                    <div className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={transportFiles[group] ? "text-primary" : "text-muted-foreground"}
+                      >
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      <span className="text-sm font-medium whitespace-nowrap">{group}</span>
+                    </div>
+                    {transportFiles[group] && (
+                      <span className="text-xs text-primary font-medium whitespace-nowrap">✓ Uploaded</span>
+                    )}
                     <Input
                       type="file"
                       accept=".pdf"
@@ -546,11 +549,6 @@ export default function Form() {
                         }
                       }}
                     />
-                    {transportFiles[group] && (
-                      <span className="text-xs text-primary font-medium">
-                        ✓ {transportFiles[group]?.name.slice(0, 15)}...
-                      </span>
-                    )}
                   </Label>
                 ))}
               </div>
