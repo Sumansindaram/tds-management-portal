@@ -21,6 +21,13 @@ const TRANSPORT_GROUPS = [
   'MAN SV 9T MM', 'MAN SV 15T MM', 'PLS', 'MAN SV 9T IMM', 'AIR'
 ];
 
+const STATUS_COLORS: Record<string, string> = {
+  Pending: 'bg-badge-pending text-yellow-900',
+  Approved: 'bg-badge-approved text-white',
+  Rejected: 'bg-badge-rejected text-white',
+  Returned: 'bg-badge-returned text-white',
+};
+
 export default function AdminDetail() {
   const { id } = useParams();
   const { role } = useAuth();
@@ -370,37 +377,40 @@ export default function AdminDetail() {
  
    const isReadOnly = entry.status !== 'Pending' && !isEditing;
  
-   return (
-    <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
-      <main className="container mx-auto p-6 space-y-6">
-        {/* Reference and Status at top */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card className="shadow-sm">
+      <main className="container mx-auto p-6 lg:p-8 space-y-6">
+        {/* Reference and Status Cards */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="shadow-2xl border-primary/30 bg-gradient-to-br from-card to-primary/5">
             <CardContent className="pt-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-                Reference
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
+                Reference Number
               </p>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-3xl font-bold text-primary">
                 {entry.reference}
               </p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm">
+          <Card className="shadow-2xl border-primary/30 bg-gradient-to-br from-card to-accent/5">
             <CardContent className="pt-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-                Status
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
+                Current Status
               </p>
-              <Badge variant="outline" className="text-lg px-4 py-1">
+              <Badge 
+                variant="outline" 
+                className={`text-lg px-5 py-2 font-bold ${STATUS_COLORS[entry.status] || ''}`}
+              >
                 {entry.status}
               </Badge>
             </CardContent>
           </Card>
         </div>
 
-        <Card className={`shadow-lg ${entry.status !== 'Pending' && !isEditing ? 'opacity-60' : ''}`}>
-          <CardHeader>
-            <CardTitle className="text-primary">Request Details</CardTitle>
+        <Card className={`shadow-2xl border-primary/20 ${entry.status !== 'Pending' && !isEditing ? 'opacity-75' : ''}`}>
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b">
+            <CardTitle className="text-2xl text-primary">Request Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className={`grid gap-6 md:grid-cols-2 ${isReadOnly ? 'pointer-events-none' : ''}`}>

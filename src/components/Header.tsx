@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { LogOut, Shield, User, Users, Home, ChevronDown, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { supabase } from '@/lib/supabase';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +18,20 @@ import desLogo from '@/assets/des-logo.jfif';
 export function Header() {
   const { user, role, signOut } = useAuth();
   const navigate = useNavigate();
+  const [fullName, setFullName] = React.useState<string>('');
+
+  React.useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.full_name) setFullName(data.full_name);
+        });
+    }
+  }, [user?.id]);
 
   const getRoleBadge = () => {
     if (role === 'super_admin') {
@@ -85,7 +101,7 @@ export function Header() {
                       className="border-primary/30 hover:bg-primary/5 gap-1"
                     >
                       <User className="h-4 w-4 mr-1" />
-                      {user.email?.split('@')[0] || 'User'}
+                      {fullName || user.email?.split('@')[0] || 'User'}
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -100,7 +116,22 @@ export function Header() {
                     <DropdownMenuLabel className="font-normal bg-muted/30">
                       <div className="flex flex-col space-y-1 py-2">
                         <p className="text-sm font-semibold text-foreground">
-                          {user.email?.split('@')[0] || 'User'}
+                          {(() => {
+                            const [fullName, setFullName] = React.useState<string>('');
+                            React.useEffect(() => {
+                              if (user?.id) {
+                                supabase
+                                  .from('profiles')
+                                  .select('full_name')
+                                  .eq('id', user.id)
+                                  .single()
+                                  .then(({ data }) => {
+                                    if (data?.full_name) setFullName(data.full_name);
+                                  });
+                              }
+                            }, [user?.id]);
+                            return fullName || user.email?.split('@')[0] || 'User';
+                          })()}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground flex items-center gap-1">
                           <User className="h-3 w-3" />

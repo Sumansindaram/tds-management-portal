@@ -4,9 +4,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 interface TDSEntry {
   id: string;
@@ -27,7 +28,9 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function AdminList() {
   const [entries, setEntries] = useState<TDSEntry[]>([]);
+  const [filteredEntries, setFilteredEntries] = useState<TDSEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const { role } = useAuth();
 
@@ -37,7 +40,6 @@ export default function AdminList() {
     }
   }, [role]);
 
-  // Reload data when window regains focus (user navigates back)
   useEffect(() => {
     const handleFocus = () => {
       if (role === 'admin' || role === 'super_admin') {
@@ -49,6 +51,22 @@ export default function AdminList() {
     return () => window.removeEventListener('focus', handleFocus);
   }, [role]);
 
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredEntries(entries);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = entries.filter(entry =>
+        entry.reference.toLowerCase().includes(query) ||
+        entry.short_name.toLowerCase().includes(query) ||
+        entry.nsn.toLowerCase().includes(query) ||
+        entry.ssr_name.toLowerCase().includes(query) ||
+        entry.status.toLowerCase().includes(query)
+      );
+      setFilteredEntries(filtered);
+    }
+  }, [searchQuery, entries]);
+
   const loadEntries = async () => {
     try {
       const { data, error } = await supabase
@@ -58,6 +76,7 @@ export default function AdminList() {
 
       if (error) throw error;
       setEntries(data || []);
+      setFilteredEntries(data || []);
     } catch (error) {
       console.error('Error loading entries:', error);
     } finally {
@@ -65,54 +84,74 @@ export default function AdminList() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-GB', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
-      <main className="container mx-auto p-6">
-        <Card className="shadow-lg">
-          <div className="p-6">
-            <h2 className="mb-6 text-2xl font-bold text-primary">TDS Requests - Admin View</h2>
+      <main className="container mx-auto p-6 lg:p-8">
+        <Card className="shadow-2xl border-primary/20">
+          <div className="p-6 lg:p-8">
+            <div className="mb-6">
+              <h2 className="mb-2 text-3xl font-bold text-primary">TDS Requests - Admin View</h2>
+              <p className="text-muted-foreground">Search and manage all Tie Down Scheme submissions</p>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search by Reference, NSN, SSR Name, Short Name, or Status..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-12 text-base border-primary/30 focus:border-primary"
+                />
+              </div>
+            </div>
+
             {loading ? (
               <div className="flex justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            ) : entries.length === 0 ? (
+            ) : filteredEntries.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
-                No requests found
+                {searchQuery ? `No requests found matching "${searchQuery}"` : 'No requests found'}
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-primary/20">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-primary hover:bg-primary">
-                      <TableHead className="text-primary-foreground">Reference</TableHead>
-                      <TableHead className="text-primary-foreground">Short Name</TableHead>
-                      <TableHead className="text-primary-foreground">NSN</TableHead>
-                      <TableHead className="text-primary-foreground">SSR Name</TableHead>
-                      <TableHead className="text-primary-foreground">Submitted On</TableHead>
-                      <TableHead className="text-primary-foreground">Status</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Reference</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Short Name</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">NSN</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">SSR Name</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Submitted On</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {entries.map((entry) => (
+                    {filteredEntries.map((entry) => (
                       <TableRow
                         key={entry.id}
-                        className="cursor-pointer hover:bg-primary/5"
+                        className="cursor-pointer hover:bg-primary/10 transition-colors"
                         onClick={() => navigate(`/admin/detail/${entry.id}`)}
                       >
-                        <TableCell className="font-medium">{entry.reference}</TableCell>
-                        <TableCell>{entry.short_name}</TableCell>
+                        <TableCell className="font-semibold text-primary">{entry.reference}</TableCell>
+                        <TableCell className="font-medium">{entry.short_name}</TableCell>
                         <TableCell>{entry.nsn}</TableCell>
                         <TableCell>{entry.ssr_name}</TableCell>
-                        <TableCell>{formatDate(entry.created_at)}</TableCell>
+                        <TableCell className="text-sm">{formatDateTime(entry.created_at)}</TableCell>
                         <TableCell>
                           <Badge className={STATUS_COLORS[entry.status] || ''}>
                             {entry.status}
@@ -122,6 +161,12 @@ export default function AdminList() {
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+            )}
+
+            {!loading && filteredEntries.length > 0 && (
+              <div className="mt-4 text-sm text-muted-foreground text-right">
+                Showing {filteredEntries.length} of {entries.length} total requests
               </div>
             )}
           </div>
