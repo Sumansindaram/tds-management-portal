@@ -206,6 +206,39 @@ export default function Form() {
   };
 
   const handleSubmit = async () => {
+    // Validate all required fields
+    const requiredFields = [
+      { field: 'ssr_name', label: 'SSR/SR Name' },
+      { field: 'ssr_email', label: 'SSR/SR Email' },
+      { field: 'designation', label: 'Designation' },
+      { field: 'nsn', label: 'NSN' },
+      { field: 'asset_code', label: 'Asset Code' },
+      { field: 'short_name', label: 'Short Name' },
+      { field: 'length', label: 'Length' },
+      { field: 'width', label: 'Width' },
+      { field: 'height', label: 'Height' },
+      { field: 'unladen_weight', label: 'Unladen Weight' },
+      { field: 'laden_weight', label: 'Laden Weight' },
+      { field: 'out_of_service_date', label: 'Out of Service Date' },
+      { field: 'classification', label: 'Classification' },
+      { field: 'mlc', label: 'MLC' },
+      { field: 'service', label: 'Service' },
+      { field: 'owner_nation', label: 'Owner Nation' },
+      { field: 'ric_code', label: 'RIC Code' },
+      { field: 'asset_type', label: 'Asset Type' },
+    ];
+
+    const missingFields = requiredFields.filter(({ field }) => !formData[field as keyof typeof formData]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: 'Missing Required Fields',
+        description: `Please fill in: ${missingFields.map(f => f.label).join(', ')}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     // Validate terms and conditions
     const allTermsAccepted = Object.values(termsAccepted).every(term => term === true);
     if (!allTermsAccepted) {
@@ -221,7 +254,7 @@ export default function Form() {
     if (!supportingFiles || supportingFiles.length === 0) {
       toast({
         title: 'Validation Error',
-        description: 'Please attach at least one supporting document.',
+        description: 'Please attach SSR/SR email approval as a supporting document.',
         variant: 'destructive',
       });
       return;
@@ -700,7 +733,7 @@ export default function Form() {
                     required
                   />
                   <Label htmlFor="ssrApproval" className="cursor-pointer text-sm font-normal">
-                    I confirm that SSR/SR approval has been obtained and attached to this request, and that this submission has been duly approved by the Senior Service Representative (SSR) or Service Representative (SR).
+                    I confirm that Senior Safety Responsible or Safety Responsible (SSR/SR) approval has been obtained and attached to this request, and that this submission has been duly approved by them.
                   </Label>
                 </div>
                 <div className="flex items-start gap-3">
@@ -713,7 +746,7 @@ export default function Form() {
                     required
                   />
                   <Label htmlFor="authorisedPerson" className="cursor-pointer text-sm font-normal">
-                    I confirm that I am an authorised representative, duly appointed by the SSR/SR, to submit this Transportation Data Sheet (TDS) request on their behalf.
+                    I confirm that I am an authorised representative, duly appointed by the SSR/SR, to submit this Tie Down Scheme (TDS) entry request on their behalf.
                   </Label>
                 </div>
                 <div className="flex items-start gap-3">
@@ -776,7 +809,12 @@ export default function Form() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={
+                  loading || 
+                  !Object.values(termsAccepted).every(term => term === true) || 
+                  !supportingFiles || 
+                  supportingFiles.length === 0
+                }
                 size="lg"
                 className="min-w-32"
               >
