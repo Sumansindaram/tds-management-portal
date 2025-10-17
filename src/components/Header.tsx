@@ -93,6 +93,35 @@ export function Header() {
                 )}
                 {getRoleBadge()}
                 
+                {role === 'super_admin' && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-primary/30 hover:bg-primary/5 gap-1"
+                      >
+                        <Database className="h-4 w-4 mr-1" />
+                        Backend
+                        <ChevronDown className="h-3 w-3 ml-1" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64">
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-semibold text-foreground">Backend Access</p>
+                          <p className="text-xs text-muted-foreground">Manage database and system settings</p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer" onClick={() => window.open('https://lovable.dev', '_blank')}>
+                        <Database className="mr-2 h-4 w-4" />
+                        <span>Open Backend Dashboard</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
