@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, User, Users, Home, ChevronDown, Info } from 'lucide-react';
+import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -81,15 +81,26 @@ export function Header() {
                   Home
                 </Button>
                 {role === 'super_admin' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/users')}
-                    className="text-foreground hover:bg-primary/10 bg-secondary/50"
-                  >
-                    <Users className="mr-2 h-4 w-4" />
-                    Manage Users
-                  </Button>
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate('/users')}
+                      className="text-foreground hover:bg-primary/10 bg-secondary/50"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Manage Users
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(`https://ybqrysjtwynuzuqggtfs.supabase.co`, '_blank')}
+                      className="text-foreground hover:bg-primary/10 bg-secondary/50"
+                    >
+                      <Database className="mr-2 h-4 w-4" />
+                      Backend
+                    </Button>
+                  </>
                 )}
                 {getRoleBadge()}
                 
