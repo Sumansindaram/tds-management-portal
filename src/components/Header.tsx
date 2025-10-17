@@ -113,7 +113,7 @@ export function Header() {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => window.open('https://lovable.dev', '_blank')}>
+                      <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => window.open(`https://supabase.com/dashboard/project/ybqrysjtwynuzuqggtfs`, '_blank')}>
                         <Database className="mr-2 h-4 w-4" />
                         <span>Backend Dashboard</span>
                       </DropdownMenuItem>
