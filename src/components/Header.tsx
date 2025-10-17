@@ -75,7 +75,7 @@ export function Header() {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate('/')}
-                  className="text-foreground hover:bg-primary/5"
+                  className="text-foreground hover:bg-primary/10 bg-secondary/50"
                 >
                   <Home className="mr-2 h-4 w-4" />
                   Home
@@ -85,7 +85,7 @@ export function Header() {
                     variant="ghost"
                     size="sm"
                     onClick={() => navigate('/users')}
-                    className="text-foreground hover:bg-primary/5"
+                    className="text-foreground hover:bg-primary/10 bg-secondary/50"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Manage Users
@@ -116,22 +116,7 @@ export function Header() {
                     <DropdownMenuLabel className="font-normal bg-muted/30">
                       <div className="flex flex-col space-y-1 py-2">
                         <p className="text-sm font-semibold text-foreground">
-                          {(() => {
-                            const [fullName, setFullName] = React.useState<string>('');
-                            React.useEffect(() => {
-                              if (user?.id) {
-                                supabase
-                                  .from('profiles')
-                                  .select('full_name')
-                                  .eq('id', user.id)
-                                  .single()
-                                  .then(({ data }) => {
-                                    if (data?.full_name) setFullName(data.full_name);
-                                  });
-                              }
-                            }, [user?.id]);
-                            return fullName || user.email?.split('@')[0] || 'User';
-                          })()}
+                          {fullName || user.email?.split('@')[0] || 'User'}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground flex items-center gap-1">
                           <User className="h-3 w-3" />

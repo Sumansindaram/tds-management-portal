@@ -5,9 +5,11 @@ import { Header } from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, ArrowLeft } from 'lucide-react';
 
 interface TDSEntry {
   id: string;
@@ -31,6 +33,8 @@ export default function AdminList() {
   const [filteredEntries, setFilteredEntries] = useState<TDSEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
   const navigate = useNavigate();
   const { role } = useAuth();
 
@@ -65,7 +69,13 @@ export default function AdminList() {
       );
       setFilteredEntries(filtered);
     }
+    setCurrentPage(1);
   }, [searchQuery, entries]);
+
+  const totalPages = Math.ceil(filteredEntries.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentEntries = filteredEntries.slice(startIndex, endIndex);
 
   const loadEntries = async () => {
     try {
@@ -98,6 +108,17 @@ export default function AdminList() {
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
+        <div className="mb-6">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
             <div className="mb-6">
@@ -141,7 +162,7 @@ export default function AdminList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredEntries.map((entry) => (
+                    {currentEntries.map((entry) => (
                       <TableRow
                         key={entry.id}
                         className="cursor-pointer hover:bg-primary/10 transition-colors"
@@ -165,9 +186,54 @@ export default function AdminList() {
             )}
 
             {!loading && filteredEntries.length > 0 && (
-              <div className="mt-4 text-sm text-muted-foreground text-right">
-                Showing {filteredEntries.length} of {entries.length} total requests
-              </div>
+              <>
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredEntries.length)} of {filteredEntries.length} entries
+                  </div>
+                  {totalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                        {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                          let page;
+                          if (totalPages <= 7) {
+                            page = i + 1;
+                          } else if (currentPage <= 4) {
+                            page = i + 1;
+                          } else if (currentPage >= totalPages - 3) {
+                            page = totalPages - 6 + i;
+                          } else {
+                            page = currentPage - 3 + i;
+                          }
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => setCurrentPage(page)}
+                                isActive={currentPage === page}
+                                className="cursor-pointer"
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </Card>

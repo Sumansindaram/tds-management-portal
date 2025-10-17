@@ -366,9 +366,9 @@ export default function AdminDetail() {
     { label: 'ALEST', value: entry.alest },
     { label: 'LIMS 2.5', value: entry.lims_25 },
     { label: 'LIMS 2.8', value: entry.lims_28 },
-    { label: 'Out of Service Date', value: entry.out_of_service_date },
-    { label: 'Classification', value: entry.classification },
     { label: 'MLC', value: entry.mlc },
+    { label: 'Classification', value: entry.classification },
+    { label: 'Out of Service Date', value: entry.out_of_service_date },
     { label: 'Service', value: entry.service },
     { label: 'Owner Nation', value: entry.owner_nation },
     { label: 'RIC Code', value: entry.ric_code },
@@ -381,6 +381,17 @@ export default function AdminDetail() {
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
       <main className="container mx-auto p-6 lg:p-8 space-y-6">
+        <div className="mb-4">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/admin')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Admin List
+          </Button>
+        </div>
+
         {/* Reference and Status Cards */}
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="shadow-2xl border-primary/30 bg-gradient-to-br from-card to-primary/5">
@@ -413,15 +424,15 @@ export default function AdminDetail() {
             <CardTitle className="text-2xl text-primary">Request Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className={`grid gap-6 md:grid-cols-2 ${isReadOnly ? 'pointer-events-none' : ''}`}>
+            <div className={`grid gap-3 md:grid-cols-3 lg:grid-cols-4 ${isReadOnly ? 'pointer-events-none' : ''}`}>
               {fields
                 .filter(f => f.label !== 'Reference' && f.label !== 'Status')
                 .map(field => (
-                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                       {field.label}
                     </p>
-                    <p className="text-lg font-semibold text-foreground">
+                    <p className="text-sm font-semibold text-foreground break-words">
                       {field.value || '—'}
                     </p>
                   </div>

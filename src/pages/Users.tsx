@@ -187,6 +187,17 @@ export default function Users() {
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
+        <div className="mb-6">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
             <div className="mb-6">
@@ -243,7 +254,7 @@ export default function Users() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUsers.map((u) => (
+                    {currentUsers.map((u) => (
                       <TableRow 
                         key={u.id}
                         className="hover:bg-primary/10 transition-colors"
@@ -260,7 +271,7 @@ export default function Users() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleEdit(u)}
+                            onClick={() => openEditDialog(u)}
                             disabled={u.id === user?.id}
                             className="h-9 w-9 p-0 hover:bg-primary hover:text-primary-foreground"
                           >
@@ -275,9 +286,46 @@ export default function Users() {
             )}
             
             {!loading && filteredUsers.length > 0 && (
-              <div className="mt-4 text-sm text-muted-foreground text-right">
-                Showing {filteredUsers.length} of {users.length} users
-              </div>
+              <>
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} users
+                  </div>
+                  {totalPages > 1 && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                        {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                          let page = i + 1;
+                          if (totalPages > 7) {
+                            if (currentPage <= 4) page = i + 1;
+                            else if (currentPage >= totalPages - 3) page = totalPages - 6 + i;
+                            else page = currentPage - 3 + i;
+                          }
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink onClick={() => setCurrentPage(page)} isActive={currentPage === page} className="cursor-pointer">
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </Card>

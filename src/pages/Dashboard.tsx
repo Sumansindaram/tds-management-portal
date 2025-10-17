@@ -64,7 +64,7 @@ export default function Dashboard() {
               className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 group" 
               onClick={() => navigate('/form')}
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 bg-primary/5 rounded-t-lg">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
                   <PlusCircle className="h-8 w-8 text-primary-foreground" />
                 </div>
@@ -79,7 +79,7 @@ export default function Dashboard() {
             <Card 
               className="transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-accent/5 col-span-full md:col-span-2 lg:col-span-3"
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-3 bg-accent/5 rounded-t-lg">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent shadow-lg">
                     <List className="h-8 w-8 text-accent-foreground" />

@@ -10,6 +10,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
+const STATUS_COLORS: Record<string, string> = {
+  Pending: 'bg-badge-pending text-badge-pending-foreground',
+  Approved: 'bg-badge-approved text-badge-approved-foreground',
+  Rejected: 'bg-badge-rejected text-badge-rejected-foreground',
+  Returned: 'bg-badge-returned text-badge-returned-foreground',
+};
+
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
   'AMPHIBIOUS', 'SLINGING', 'ISO CONTAINER', 'MET', 'MAN SV 6T MM',
@@ -191,9 +198,9 @@ export default function RequestDetail() {
     { label: 'ALEST', value: entry.alest },
     { label: 'LIMS 2.5', value: entry.lims_25 },
     { label: 'LIMS 2.8', value: entry.lims_28 },
-    { label: 'Out of Service Date', value: entry.out_of_service_date },
-    { label: 'Classification', value: entry.classification },
     { label: 'MLC', value: entry.mlc },
+    { label: 'Classification', value: entry.classification },
+    { label: 'Out of Service Date', value: entry.out_of_service_date },
     { label: 'Service', value: entry.service },
     { label: 'Owner Nation', value: entry.owner_nation },
     { label: 'RIC Code', value: entry.ric_code },
@@ -217,17 +224,28 @@ export default function RequestDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 space-y-6">
+        <div className="mb-4">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-card/50">
             <CardContent className="pt-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Reference</p>
-              <p className="text-2xl font-bold text-foreground">{entry.reference}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Reference Number</p>
+              <p className="text-2xl font-bold text-primary">{entry.reference}</p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-card/50">
             <CardContent className="pt-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Status</p>
-              <Badge variant="outline" className="text-lg px-4 py-1">{entry.status}</Badge>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Current Status</p>
+              <Badge className={`text-sm px-4 py-1.5 ${STATUS_COLORS[entry.status] || 'bg-muted'}`}>{entry.status}</Badge>
             </CardContent>
           </Card>
         </div>
@@ -240,11 +258,11 @@ export default function RequestDetail() {
             {/* Basic Details */}
             <div>
               <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">Basic Details</h3>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
                 {basicFields.map((field) => (
-                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                    <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
+                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground break-words">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -253,11 +271,11 @@ export default function RequestDetail() {
             {/* Driver Information */}
             <div>
               <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">Driver Information</h3>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
                 {driverFields.map((field) => (
-                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                    <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
+                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground break-words">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -266,11 +284,11 @@ export default function RequestDetail() {
             {/* ADAMS Sections */}
             <div>
               <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">ADAMS Sections</h3>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2">
                 {adamsFields.map((field) => (
-                  <div key={field.label} className="space-y-1.5 rounded-lg border bg-muted/30 p-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                    <p className="text-lg font-semibold text-foreground">{field.value || '—'}</p>
+                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground break-words">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
