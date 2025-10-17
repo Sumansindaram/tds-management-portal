@@ -183,31 +183,33 @@ export default function RequestDetail() {
     );
   }
 
-  const basicFields = [
-    { label: 'SSR Name', value: entry.ssr_name },
+  const assetOwnerFields = [
+    { label: 'SSR/SR Name', value: entry.ssr_name },
     { label: 'SSR Email', value: entry.ssr_email },
+  ];
+
+  const assetDetailsFields = [
     { label: 'Designation', value: entry.designation },
     { label: 'NSN', value: entry.nsn },
     { label: 'Asset Code', value: entry.asset_code },
     { label: 'Short Name', value: entry.short_name },
-    { label: 'Length', value: entry.length },
-    { label: 'Width', value: entry.width },
-    { label: 'Height', value: entry.height },
-    { label: 'Unladen Weight', value: entry.unladen_weight },
-    { label: 'Laden Weight', value: entry.laden_weight },
+  ];
+
+  const basicDetailsFields = [
+    { label: 'Length (m)', value: entry.length },
+    { label: 'Width (m)', value: entry.width },
+    { label: 'Height (m)', value: entry.height },
+    { label: 'Unladen Weight (kg)', value: entry.unladen_weight },
+    { label: 'Laden Weight (kg)', value: entry.laden_weight },
     { label: 'ALEST', value: entry.alest },
     { label: 'LIMS 2.5', value: entry.lims_25 },
     { label: 'LIMS 2.8', value: entry.lims_28 },
-    { label: 'MLC', value: entry.mlc },
-    { label: 'Classification', value: entry.classification },
     { label: 'Out of Service Date', value: entry.out_of_service_date },
-    { label: 'Service', value: entry.service },
-    { label: 'Owner Nation', value: entry.owner_nation },
-    { label: 'RIC Code', value: entry.ric_code },
-    { label: 'Asset Type', value: entry.asset_type },
+    { label: 'Classification', value: entry.classification },
+    { label: 'MLC', value: entry.mlc },
   ];
 
-  const driverFields = [
+  const driverInfoFields = [
     { label: 'Licence', value: entry.licence },
     { label: 'Crew Number', value: entry.crew_number },
     { label: 'Passenger Capacity', value: entry.passenger_capacity },
@@ -218,6 +220,14 @@ export default function RequestDetail() {
   const adamsFields = [
     { label: 'Single Carriage', value: entry.single_carriage },
     { label: 'Dual Carriage', value: entry.dual_carriage },
+    { label: 'Max Speed', value: entry.max_speed },
+  ];
+
+  const serviceInfoFields = [
+    { label: 'Service', value: entry.service },
+    { label: 'Owner Nation', value: entry.owner_nation },
+    { label: 'RIC Code', value: entry.ric_code },
+    { label: 'Asset Type', value: entry.asset_type },
   ];
 
   return (
@@ -236,67 +246,127 @@ export default function RequestDetail() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="shadow-sm bg-card/50">
+          <Card className="shadow-sm border-2 border-primary/20">
             <CardContent className="pt-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Reference Number</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Reference Number</p>
               <p className="text-2xl font-bold text-primary">{entry.reference}</p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm bg-card/50">
+          <Card className="shadow-sm border-2 border-primary/20">
             <CardContent className="pt-6">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Current Status</p>
-              <Badge className={`text-sm px-4 py-1.5 ${STATUS_COLORS[entry.status] || 'bg-muted'}`}>{entry.status}</Badge>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Current Status</p>
+              <Badge className={`text-sm px-4 py-1.5 font-semibold ${STATUS_COLORS[entry.status] || 'bg-muted'}`}>{entry.status}</Badge>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-primary">Request Details</CardTitle>
+        <Card className="shadow-lg border-2">
+          <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
+            <CardTitle className="text-2xl text-primary">Request Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Basic Details */}
-            <div>
-              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">Basic Details</h3>
-              <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
-                {basicFields.map((field) => (
-                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground break-words">{field.value || '—'}</p>
+          <CardContent className="space-y-8 pt-6">
+            {/* Asset Owner Details */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">1</span>
+                Asset Owner Details
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {assetOwnerFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
+
+            {/* Asset Details */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">2</span>
+                Asset Details
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {assetDetailsFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Basic Details */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">3</span>
+                Basic Details
+              </h3>
+              <div className="grid gap-3 md:grid-cols-3">
+                {basicDetailsFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             {/* Driver Information */}
-            <div>
-              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">Driver Information</h3>
-              <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
-                {driverFields.map((field) => (
-                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground break-words">{field.value || '—'}</p>
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">4</span>
+                Driver Information
+              </h3>
+              <div className="grid gap-3 md:grid-cols-3">
+                {driverInfoFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
             {/* ADAMS Sections */}
-            <div>
-              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2 mb-4">ADAMS Sections</h3>
-              <div className="grid gap-3 md:grid-cols-2">
-                {adamsFields.map((field) => (
-                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground break-words">{field.value || '—'}</p>
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">5</span>
+                ADAMS Sections
+              </h3>
+              <div className="grid gap-3 md:grid-cols-3">
+                {adamsFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
+
+            {/* Service Information */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
+                Service Information
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {serviceInfoFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             {/* Transportation Data */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">Transportation Data</h3>
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
+                Transportation Data
+              </h3>
               <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                 {TRANSPORT_GROUPS.map((group) => {
                   const hasFiles = transportFiles[group] && transportFiles[group].length > 0;
@@ -327,12 +397,15 @@ export default function RequestDetail() {
                   );
                 })}
               </div>
-            </div>
+            </section>
 
             {/* Supporting Documents */}
             {supportingFiles.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">Supporting Documents</h3>
+              <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+                <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                  <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">8</span>
+                  Supporting Documents
+                </h3>
                 <div className="grid gap-3 md:grid-cols-3">
                   {supportingFiles.map((fileName, idx) => (
                     <Button key={idx} variant="default" onClick={() => entry && openFile('supporting-documents', entry, fileName)}>
@@ -341,7 +414,7 @@ export default function RequestDetail() {
                     </Button>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Terms Acceptance */}

@@ -349,26 +349,47 @@ export default function AdminDetail() {
     );
   }
 
-  const fields = [
-    { label: 'Reference', value: entry.reference },
-    { label: 'Status', value: entry.status },
-    { label: 'SSR Name', value: entry.ssr_name },
+  const assetOwnerFields = [
+    { label: 'SSR/SR Name', value: entry.ssr_name },
     { label: 'SSR Email', value: entry.ssr_email },
+  ];
+
+  const assetDetailsFields = [
     { label: 'Designation', value: entry.designation },
     { label: 'NSN', value: entry.nsn },
     { label: 'Asset Code', value: entry.asset_code },
     { label: 'Short Name', value: entry.short_name },
-    { label: 'Length', value: entry.length },
-    { label: 'Width', value: entry.width },
-    { label: 'Height', value: entry.height },
-    { label: 'Unladen Weight', value: entry.unladen_weight },
-    { label: 'Laden Weight', value: entry.laden_weight },
+  ];
+
+  const basicDetailsFields = [
+    { label: 'Length (m)', value: entry.length },
+    { label: 'Width (m)', value: entry.width },
+    { label: 'Height (m)', value: entry.height },
+    { label: 'Unladen Weight (kg)', value: entry.unladen_weight },
+    { label: 'Laden Weight (kg)', value: entry.laden_weight },
     { label: 'ALEST', value: entry.alest },
     { label: 'LIMS 2.5', value: entry.lims_25 },
     { label: 'LIMS 2.8', value: entry.lims_28 },
-    { label: 'MLC', value: entry.mlc },
-    { label: 'Classification', value: entry.classification },
     { label: 'Out of Service Date', value: entry.out_of_service_date },
+    { label: 'Classification', value: entry.classification },
+    { label: 'MLC', value: entry.mlc },
+  ];
+
+  const driverInfoFields = [
+    { label: 'Licence', value: entry.licence },
+    { label: 'Crew Number', value: entry.crew_number },
+    { label: 'Passenger Capacity', value: entry.passenger_capacity },
+    { label: 'Range', value: entry.range },
+    { label: 'Fuel Capacity', value: entry.fuel_capacity },
+  ];
+
+  const adamsFields = [
+    { label: 'Single Carriage', value: entry.single_carriage },
+    { label: 'Dual Carriage', value: entry.dual_carriage },
+    { label: 'Max Speed', value: entry.max_speed },
+  ];
+
+  const serviceInfoFields = [
     { label: 'Service', value: entry.service },
     { label: 'Owner Nation', value: entry.owner_nation },
     { label: 'RIC Code', value: entry.ric_code },
@@ -393,25 +414,24 @@ export default function AdminDetail() {
         </div>
 
         {/* Reference and Status Cards */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="shadow-2xl border-primary/30 bg-gradient-to-br from-card to-primary/5">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="shadow-sm border-2 border-primary/20">
             <CardContent className="pt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
                 Reference Number
               </p>
-              <p className="text-3xl font-bold text-primary">
+              <p className="text-2xl font-bold text-primary">
                 {entry.reference}
               </p>
             </CardContent>
           </Card>
-          <Card className="shadow-2xl border-primary/30 bg-gradient-to-br from-card to-accent/5">
+          <Card className="shadow-sm border-2 border-primary/20">
             <CardContent className="pt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
                 Current Status
               </p>
               <Badge 
-                variant="outline" 
-                className={`text-lg px-5 py-2 font-bold ${STATUS_COLORS[entry.status] || ''}`}
+                className={`text-sm px-4 py-1.5 font-semibold ${STATUS_COLORS[entry.status] || ''}`}
               >
                 {entry.status}
               </Badge>
@@ -419,29 +439,111 @@ export default function AdminDetail() {
           </Card>
         </div>
 
-        <Card className={`shadow-2xl border-primary/20 ${entry.status !== 'Pending' && !isEditing ? 'opacity-75' : ''}`}>
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b">
+        <Card className={`shadow-lg border-2 ${entry.status !== 'Pending' && !isEditing ? 'opacity-75' : ''}`}>
+          <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
             <CardTitle className="text-2xl text-primary">Request Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className={`grid gap-3 md:grid-cols-3 lg:grid-cols-4 ${isReadOnly ? 'pointer-events-none' : ''}`}>
-              {fields
-                .filter(f => f.label !== 'Reference' && f.label !== 'Status')
-                .map(field => (
-                  <div key={field.label} className="space-y-1 rounded-lg border bg-muted/30 p-3">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                      {field.label}
-                    </p>
-                    <p className="text-sm font-semibold text-foreground break-words">
-                      {field.value || '—'}
-                    </p>
+          <CardContent className="space-y-8 pt-6">
+            {/* Asset Owner Details */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">1</span>
+                Asset Owner Details
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {assetOwnerFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
-            </div>
+              </div>
+            </section>
+
+            {/* Asset Details */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">2</span>
+                Asset Details
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {assetDetailsFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Basic Details */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">3</span>
+                Basic Details
+              </h3>
+              <div className="grid gap-3 md:grid-cols-3">
+                {basicDetailsFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Driver Information */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">4</span>
+                Driver Information
+              </h3>
+              <div className="grid gap-3 md:grid-cols-3">
+                {driverInfoFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ADAMS Sections */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">5</span>
+                ADAMS Sections
+              </h3>
+              <div className="grid gap-3 md:grid-cols-3">
+                {adamsFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Service Information */}
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
+                Service Information
+              </h3>
+              <div className="grid gap-3 md:grid-cols-2">
+                {serviceInfoFields.map(field => (
+                  <div key={field.label} className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
             {/* Transportation Data Files */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
                 Transportation Data
               </h3>
               <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
@@ -474,12 +576,13 @@ export default function AdminDetail() {
                   );
                 })}
               </div>
-            </div>
+            </section>
 
             {/* Supporting Documents */}
             {supportingFiles.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-primary border-b-2 border-primary/20 pb-2">
+              <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+                <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                  <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">8</span>
                   Supporting Documents
                 </h3>
                 <div className="grid gap-3 md:grid-cols-3">
@@ -498,7 +601,7 @@ export default function AdminDetail() {
                     </Button>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Terms Acceptance */}
