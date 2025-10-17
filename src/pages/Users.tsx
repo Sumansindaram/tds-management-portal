@@ -198,17 +198,6 @@ export default function Users() {
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
-        <div className="mb-6">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </div>
-
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
             <div className="mb-6">
@@ -342,6 +331,18 @@ export default function Users() {
             )}
           </div>
         </Card>
+
+        {/* Back Button at Bottom */}
+        <div className="flex justify-center mt-6 pb-6">
+          <Button
+            onClick={() => navigate('/')}
+            variant="outline"
+            size="lg"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
       </main>
 
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
