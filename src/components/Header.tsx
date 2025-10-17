@@ -13,10 +13,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
 import desLogo from '@/assets/des-logo.jfif';
 
 export function Header() {
   const { user, role, signOut } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [fullName, setFullName] = React.useState<string>('');
 
@@ -113,7 +115,12 @@ export function Header() {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => window.open(`https://supabase.com/dashboard/project/ybqrysjtwynuzuqggtfs`, '_blank')}>
+                      <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => {
+                        toast({
+                          title: "Backend Access",
+                          description: "Please use the 'View Backend' button in chat to access the database dashboard.",
+                        });
+                      }}>
                         <Database className="mr-2 h-4 w-4" />
                         <span>Backend Dashboard</span>
                       </DropdownMenuItem>
