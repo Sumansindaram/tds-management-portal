@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import desLogo from '@/assets/des-logo.jfif';
 
 const TRANSPORT_GROUPS = [
   'BASIC DRAWING', 'PICTURES', 'ROAD', 'HET', 'EPLS', 'RAIL',
@@ -342,20 +343,23 @@ export default function Form() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       {user && <Header />}
       {!user && (
-        <header className="bg-primary text-primary-foreground shadow-lg">
-          <div className="container mx-auto px-4 py-6">
+        <header className="bg-white border-b-4 border-primary shadow-md">
+          <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-extrabold">JSP 800 Vol 7</h1>
-                <p className="text-sm opacity-90">Tie Down Scheme (TDS) Portal</p>
+              <div className="flex items-center gap-4">
+                <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-12" />
+                <div className="border-l-2 border-primary/30 pl-4">
+                  <h1 className="text-xl font-bold text-primary">TDS Management System</h1>
+                  <p className="text-xs text-muted-foreground">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
+                </div>
               </div>
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => navigate('/auth')}
-                className="text-primary-foreground hover:bg-primary-foreground/10"
+                className="border-primary/30 hover:bg-primary/5"
               >
                 Staff Login
               </Button>
@@ -364,14 +368,22 @@ export default function Form() {
         </header>
       )}
       <main className="container mx-auto p-6">
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-primary">TDS New Entry Request</CardTitle>
+        <Card className="shadow-2xl border-2 max-w-6xl mx-auto">
+          <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
+            <CardTitle className="text-3xl font-bold text-center">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Tie Down Scheme (TDS) Entry Request
+              </span>
+            </CardTitle>
+            <p className="text-center text-muted-foreground mt-2 text-sm">
+              Please complete all mandatory fields marked with <span className="text-destructive font-bold">*</span>
+            </p>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-8 pt-8">
             {/* Asset Owner Details */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">1</span>
                 Asset Owner Details
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
@@ -398,8 +410,9 @@ export default function Form() {
             </section>
 
             {/* Asset Details */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">2</span>
                 Asset Details
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
@@ -440,8 +453,9 @@ export default function Form() {
             </section>
 
             {/* Basic Details */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">3</span>
                 Basic Details
               </h3>
               <div className="grid gap-4 md:grid-cols-3">
@@ -538,8 +552,9 @@ export default function Form() {
             </section>
 
             {/* Driver Information */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">4</span>
                 Driver Information
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
@@ -608,8 +623,9 @@ export default function Form() {
             </section>
 
             {/* ADAMS */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">5</span>
                 ADAMS
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
@@ -671,8 +687,9 @@ export default function Form() {
             </section>
 
             {/* Transportation Data */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
                 Transportation Data
               </h3>
               <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
@@ -718,92 +735,127 @@ export default function Form() {
             </section>
 
             {/* Terms and Conditions */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-destructive/5 rounded-lg p-6 border-2 border-destructive/30 shadow-md">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-destructive flex items-center gap-3 border-b-2 border-destructive/20">
+                <span className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </span>
                 Declaration and Acknowledgement *
               </h3>
-              <div className="space-y-4 rounded-lg border-2 border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20 p-6">
-                <div className="flex items-start gap-3">
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
+                <p className="text-sm font-medium text-destructive flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  All declarations below must be acknowledged and at least one supporting document (SSR/SR email approval) must be attached before submission.
+                </p>
+              </div>
+              <div className="space-y-5">
+                <div className="flex items-start gap-3 bg-white rounded-lg p-4 border border-primary/20 hover:border-primary/40 transition-colors">
                   <input
                     type="checkbox"
                     id="ssrApproval"
                     checked={termsAccepted.ssrApproval}
                     onChange={(e) => setTermsAccepted(prev => ({ ...prev, ssrApproval: e.target.checked }))}
-                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary"
                     required
                   />
-                  <Label htmlFor="ssrApproval" className="cursor-pointer text-sm font-normal">
+                  <Label htmlFor="ssrApproval" className="cursor-pointer text-sm font-normal leading-relaxed">
                     I confirm that Senior Safety Responsible or Safety Responsible (SSR/SR) approval has been obtained and attached to this request, and that this submission has been duly approved by them.
                   </Label>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 bg-white rounded-lg p-4 border border-primary/20 hover:border-primary/40 transition-colors">
                   <input
                     type="checkbox"
                     id="authorisedPerson"
                     checked={termsAccepted.authorisedPerson}
                     onChange={(e) => setTermsAccepted(prev => ({ ...prev, authorisedPerson: e.target.checked }))}
-                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary"
                     required
                   />
-                  <Label htmlFor="authorisedPerson" className="cursor-pointer text-sm font-normal">
+                  <Label htmlFor="authorisedPerson" className="cursor-pointer text-sm font-normal leading-relaxed">
                     I confirm that I am an authorised representative, duly appointed by the SSR/SR, to submit this Tie Down Scheme (TDS) entry request on their behalf.
                   </Label>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 bg-white rounded-lg p-4 border border-primary/20 hover:border-primary/40 transition-colors">
                   <input
                     type="checkbox"
                     id="dataResponsibility"
                     checked={termsAccepted.dataResponsibility}
                     onChange={(e) => setTermsAccepted(prev => ({ ...prev, dataResponsibility: e.target.checked }))}
-                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary"
                     required
                   />
-                  <Label htmlFor="dataResponsibility" className="cursor-pointer text-sm font-normal">
-                    I acknowledge that the Deployment Team (DT) assumes full responsibility for the accuracy and completeness of all data provided in this submission, and that the Quality, Safety, Environment and Engineering (QSEE) team bears no liability for any inaccuracies or errors in the supplied information.
+                  <Label htmlFor="dataResponsibility" className="cursor-pointer text-sm font-normal leading-relaxed">
+                    I acknowledge that the Delivery Team (DT) assumes full responsibility for the accuracy and completeness of all data provided in this submission, and that the Quality, Safety, Environment and Engineering (QSEE) team bears no liability for any inaccuracies or errors in the supplied information.
                   </Label>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 bg-white rounded-lg p-4 border border-primary/20 hover:border-primary/40 transition-colors">
                   <input
                     type="checkbox"
                     id="reviewResponsibility"
                     checked={termsAccepted.reviewResponsibility}
                     onChange={(e) => setTermsAccepted(prev => ({ ...prev, reviewResponsibility: e.target.checked }))}
-                    className="mt-1 h-4 w-4 rounded border-gray-300"
+                    className="mt-1 h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary"
                     required
                   />
-                  <Label htmlFor="reviewResponsibility" className="cursor-pointer text-sm font-normal">
-                    I acknowledge that the Deployment Team (DT) is solely responsible for conducting thorough reviews of all TDS entries upon creation to verify data accuracy and identify any discrepancies within the database.
+                  <Label htmlFor="reviewResponsibility" className="cursor-pointer text-sm font-normal leading-relaxed">
+                    I acknowledge that the DT is solely responsible for conducting thorough reviews of all TDS entries upon creation to verify data accuracy and identify any discrepancies within the database.
                   </Label>
                 </div>
               </div>
             </section>
 
             {/* Supporting Documents */}
-            <section>
-              <h3 className="mb-4 border-b-2 border-primary/20 pb-2 text-lg font-bold text-primary">
+            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
+              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
                 Supporting Documents *
               </h3>
-              <Input
-                type="file"
-                multiple
-                onChange={(e) => setSupportingFiles(e.target.files)}
-              />
-              {supportingFiles && (
-                <div className="mt-2 text-sm text-muted-foreground">
-                  {Array.from(supportingFiles).map(f => (
-                    <div key={f.name}>• {f.name}</div>
-                  ))}
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 hover:border-primary/50 transition-colors bg-primary/5">
+                  <Input
+                    type="file"
+                    multiple
+                    onChange={(e) => setSupportingFiles(e.target.files)}
+                    className="cursor-pointer"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Please upload SSR/SR email approval and any other relevant documents
+                  </p>
                 </div>
-              )}
+                {supportingFiles && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-foreground">Uploaded files:</p>
+                    <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+                      {Array.from(supportingFiles).map(f => (
+                        <div key={f.name} className="text-sm flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                          </svg>
+                          {f.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </section>
 
-            <div className="flex justify-end gap-4 pt-4">
+            <div className="flex justify-end gap-4 pt-8 border-t-2 border-primary/10">
               <Button
                 onClick={handleReset}
                 disabled={loading}
                 variant="outline"
                 size="lg"
-                className="min-w-32"
+                className="min-w-32 border-2"
               >
                 Reset Form
               </Button>
@@ -816,11 +868,11 @@ export default function Form() {
                   supportingFiles.length === 0
                 }
                 size="lg"
-                className="min-w-32"
+                className="min-w-40 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Submitting...
                   </>
                 ) : (

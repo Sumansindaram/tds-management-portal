@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import desLogo from '@/assets/des-logo.jfif';
 
 export function Header() {
   const { user, role, signOut } = useAuth();
@@ -41,12 +42,15 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
-      <div className="container mx-auto px-4 py-4">
+    <header className="sticky top-0 z-50 bg-white border-b-4 border-primary shadow-md">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="cursor-pointer" onClick={() => navigate('/')}>
-            <h1 className="text-2xl font-extrabold">JSP 800 Vol 7</h1>
-            <p className="text-sm opacity-90">Tie Down Scheme (TDS) Portal</p>
+          <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/')}>
+            <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-14" />
+            <div className="border-l-2 border-primary/30 pl-4">
+              <h1 className="text-xl font-bold text-primary">TDS Management System</h1>
+              <p className="text-xs text-muted-foreground">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {user && (
@@ -55,7 +59,7 @@ export function Header() {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate('/')}
-                  className="text-primary-foreground hover:bg-primary-foreground/10"
+                  className="text-foreground hover:bg-primary/5"
                 >
                   <Home className="mr-2 h-4 w-4" />
                   Home
@@ -65,7 +69,7 @@ export function Header() {
                     variant="ghost"
                     size="sm"
                     onClick={() => navigate('/users')}
-                    className="text-primary-foreground hover:bg-primary-foreground/10"
+                    className="text-foreground hover:bg-primary/5"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Manage Users
@@ -76,46 +80,43 @@ export function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
-                      variant="ghost" 
+                      variant="outline" 
                       size="sm"
-                      className="text-primary-foreground hover:bg-primary-foreground/10 gap-1"
+                      className="border-primary/30 hover:bg-primary/5 gap-1"
                     >
+                      <User className="h-4 w-4 mr-1" />
                       {user.email?.split('@')[0] || 'User'}
-                      <ChevronDown className="h-3 w-3" />
+                      <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
-                    <div className="flex items-center gap-3 p-4 border-b">
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Shield className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">Ministry of Defence</div>
-                          <div className="text-xs text-muted-foreground">DE&S</div>
-                        </div>
+                    <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
+                      <img src={desLogo} alt="MOD & DE&S" className="h-12" />
+                      <div className="flex-1">
+                        <div className="font-semibold text-sm text-primary">Ministry of Defence</div>
+                        <div className="text-xs text-muted-foreground">Defence Equipment & Support</div>
                       </div>
                     </div>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
+                    <DropdownMenuLabel className="font-normal bg-muted/30">
+                      <div className="flex flex-col space-y-1 py-2">
+                        <p className="text-sm font-semibold text-foreground">
                           {user.email?.split('@')[0] || 'User'}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground">
+                        <p className="text-xs leading-none text-muted-foreground flex items-center gap-1">
+                          <User className="h-3 w-3" />
                           {user.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut}>
+                    <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive cursor-pointer my-1 mx-1">
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Logout</span>
+                      <span className="font-medium">Logout</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem disabled>
-                      <Info className="mr-2 h-4 w-4" />
-                      <span className="text-xs">Version 1.0.0</span>
-                    </DropdownMenuItem>
+                    <div className="px-3 py-2 text-xs text-center bg-muted/20 text-muted-foreground">
+                      <span className="font-medium">About:</span> Version 1.0.0
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
