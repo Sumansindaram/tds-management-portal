@@ -91,35 +91,44 @@ export function Header() {
                     Manage Users
                   </Button>
                 )}
-                {getRoleBadge()}
                 
-                {role === 'super_admin' && (
+                {role === 'super_admin' ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button 
-                        variant="outline" 
+                        variant="default" 
                         size="sm"
-                        className="border-primary/30 hover:bg-primary/5 gap-1"
+                        className="bg-badge-admin text-white hover:bg-badge-admin/90 gap-1"
                       >
-                        <Database className="h-4 w-4 mr-1" />
-                        Backend
+                        <Shield className="h-3 w-3 mr-1" />
+                        Super Admin
                         <ChevronDown className="h-3 w-3 ml-1" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-64">
+                    <DropdownMenuContent align="end" className="w-64 bg-background border-primary/20">
                       <DropdownMenuLabel className="font-normal">
                         <div className="flex flex-col space-y-1">
-                          <p className="text-sm font-semibold text-foreground">Backend Access</p>
-                          <p className="text-xs text-muted-foreground">Manage database and system settings</p>
+                          <p className="text-sm font-semibold text-foreground">Super Admin Tools</p>
+                          <p className="text-xs text-muted-foreground">System administration options</p>
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="cursor-pointer" onClick={() => window.open('https://lovable.dev', '_blank')}>
+                      <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => window.open('https://lovable.dev', '_blank')}>
                         <Database className="mr-2 h-4 w-4" />
-                        <span>Open Backend Dashboard</span>
+                        <span>Backend Dashboard</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                ) : role === 'admin' ? (
+                  <Badge variant="default" className="bg-badge-user text-white">
+                    <Shield className="mr-1 h-3 w-3" />
+                    Admin
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="bg-muted text-foreground">
+                    <User className="mr-1 h-3 w-3" />
+                    User
+                  </Badge>
                 )}
                 
                 <DropdownMenu>
