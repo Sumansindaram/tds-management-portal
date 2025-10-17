@@ -116,7 +116,11 @@ export function Header() {
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => {
-                        window.open('https://app.lovable.dev/projects/59206d9a-8cae-40eb-8751-7ba2fa34ed10/cloud', '_blank');
+                        toast({
+                          title: "Backend Access",
+                          description: "Click 'View Backend' in the Lovable chat to access the database dashboard.",
+                          duration: 5000,
+                        });
                       }}>
                         <Database className="mr-2 h-4 w-4" />
                         <span>Backend Dashboard</span>
