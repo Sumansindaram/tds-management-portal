@@ -107,7 +107,7 @@ export function Header() {
                         <ChevronDown className="h-3 w-3 ml-1" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-64 bg-background border-primary/20">
+                    <DropdownMenuContent align="end" className="z-50 w-64 bg-background border-primary/20">
                       <DropdownMenuLabel className="font-normal">
                         <div className="flex flex-col space-y-1">
                           <p className="text-sm font-semibold text-foreground">Super Admin Tools</p>
@@ -116,7 +116,7 @@ export function Header() {
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => {
-                        window.open('https://lovable.dev/projects/59206d9a-8cae-40eb-8751-7ba2fa34ed10/cloud', '_blank');
+                        window.open('https://app.lovable.dev/projects/59206d9a-8cae-40eb-8751-7ba2fa34ed10/cloud', '_blank');
                       }}>
                         <Database className="mr-2 h-4 w-4" />
                         <span>Backend Dashboard</span>
@@ -147,7 +147,7 @@ export function Header() {
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-80">
+                  <DropdownMenuContent align="end" className="z-50 w-80 bg-background">
                     <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
                       <img src={desLogo} alt="MOD & DE&S" className="h-12" />
                       <div className="flex-1">
