@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Search, ArrowLeft } from 'lucide-react';
+import { Loader2, Search, ArrowLeft, Database } from 'lucide-react';
 
 interface TDSEntry {
   id: string;
@@ -110,9 +110,23 @@ export default function AdminList() {
       <main className="container mx-auto p-6 lg:p-8">
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
-            <div className="mb-6">
-              <h2 className="mb-2 text-3xl font-bold text-primary">TDS Requests - Admin View</h2>
-              <p className="text-muted-foreground">Search and manage all Tie Down Scheme submissions</p>
+            <div className="mb-6 flex items-start justify-between">
+              <div>
+                <h2 className="mb-2 text-3xl font-bold text-primary">TDS Requests - Admin View</h2>
+                <p className="text-muted-foreground">Search and manage all Tie Down Scheme submissions</p>
+              </div>
+              {role === 'super_admin' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open('https://lovable.dev', '_blank')}
+                  className="border-primary/30 hover:bg-primary/10"
+                  title="Access Backend Database"
+                >
+                  <Database className="mr-2 h-4 w-4" />
+                  Backend
+                </Button>
+              )}
             </div>
 
             {/* Search Bar */}
