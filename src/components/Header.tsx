@@ -94,7 +94,7 @@ export function Header() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => window.open(`https://ybqrysjtwynuzuqggtfs.supabase.co`, '_blank')}
+                      onClick={() => window.open(`https://supabase.com/dashboard/project/ybqrysjtwynuzuqggtfs`, '_blank')}
                       className="text-foreground hover:bg-primary/10 bg-secondary/50"
                     >
                       <Database className="mr-2 h-4 w-4" />
