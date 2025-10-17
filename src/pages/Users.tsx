@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Pencil, Search } from 'lucide-react';
+import { Loader2, Pencil, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface UserWithRole {
   id: string;
@@ -18,7 +18,11 @@ interface UserWithRole {
   username: string | null;
   email: string;
   role: UserRole;
+  updated_at?: string;
 }
+
+type SortField = 'name' | 'recent';
+type SortDirection = 'asc' | 'desc';
 
 export default function Users() {
   const { user, role } = useAuth();
@@ -30,6 +34,8 @@ export default function Users() {
   const [editingUser, setEditingUser] = useState<UserWithRole | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('user');
   const [updating, setUpdating] = useState(false);
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   useEffect(() => {
     if (role === 'super_admin') {
@@ -38,26 +44,39 @@ export default function Users() {
   }, [role]);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredUsers(users);
-    } else {
+    let filtered = users;
+    
+    if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      setFilteredUsers(
-        users.filter(
-          u =>
-            u.full_name.toLowerCase().includes(query) ||
-            u.email.toLowerCase().includes(query) ||
-            u.username?.toLowerCase().includes(query)
-        )
+      filtered = users.filter(
+        u =>
+          u.full_name.toLowerCase().includes(query) ||
+          u.email.toLowerCase().includes(query) ||
+          u.username?.toLowerCase().includes(query)
       );
     }
-  }, [searchQuery, users]);
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortField === 'name') {
+        const comparison = a.full_name.localeCompare(b.full_name);
+        return sortDirection === 'asc' ? comparison : -comparison;
+      } else {
+        // Sort by recent changes (updated_at)
+        const aDate = new Date(a.updated_at || 0).getTime();
+        const bDate = new Date(b.updated_at || 0).getTime();
+        return sortDirection === 'asc' ? aDate - bDate : bDate - aDate;
+      }
+    });
+
+    setFilteredUsers(sorted);
+  }, [searchQuery, users, sortField, sortDirection]);
 
   const loadUsers = async () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, username, email');
+        .select('id, full_name, username, email, updated_at');
 
       if (profilesError) throw profilesError;
 
@@ -72,6 +91,7 @@ export default function Users() {
         return {
           ...profile,
           role: userRole?.role || 'user',
+          updated_at: profile.updated_at,
         };
       });
 
@@ -145,26 +165,60 @@ export default function Users() {
     }
   };
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 inline" />;
+    }
+    return sortDirection === 'asc' ? 
+      <ArrowUp className="ml-2 h-4 w-4 inline" /> : 
+      <ArrowDown className="ml-2 h-4 w-4 inline" />;
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
-      <main className="container mx-auto p-6">
-        <Card className="shadow-lg">
-          <div className="p-6">
+      <main className="container mx-auto p-6 lg:p-8">
+        <Card className="shadow-2xl border-primary/20">
+          <div className="p-6 lg:p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-primary">Users</h2>
-              <p className="text-sm text-muted-foreground">Manage user roles</p>
+              <h2 className="text-3xl font-bold text-primary mb-2">Users</h2>
+              <p className="text-muted-foreground">Manage user roles</p>
             </div>
 
-            <div className="mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="mb-6 flex gap-4 flex-wrap">
+              <div className="relative flex-1 min-w-[300px]">
+                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search for user..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 h-12 text-base border-primary/30 focus:border-primary"
                 />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant={sortField === 'name' ? 'default' : 'outline'}
+                  onClick={() => handleSort('name')}
+                  className="h-12"
+                >
+                  A-Z <SortIcon field="name" />
+                </Button>
+                <Button
+                  variant={sortField === 'recent' ? 'default' : 'outline'}
+                  onClick={() => handleSort('recent')}
+                  className="h-12"
+                >
+                  Recent <SortIcon field="recent" />
+                </Button>
               </div>
             </div>
 
@@ -177,31 +231,38 @@ export default function Users() {
                 {searchQuery ? 'No users found matching your search' : 'No users found'}
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-primary/20">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Display Name</TableHead>
-                      <TableHead>Username</TableHead>
-                      <TableHead>Email Address</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="bg-primary hover:bg-primary">
+                      <TableHead className="text-primary-foreground font-bold">Display Name</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Username</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Email Address</TableHead>
+                      <TableHead className="text-primary-foreground font-bold">Role</TableHead>
+                      <TableHead className="text-primary-foreground font-bold text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((u) => (
-                      <TableRow key={u.id}>
+                      <TableRow 
+                        key={u.id}
+                        className="hover:bg-primary/10 transition-colors"
+                      >
                         <TableCell className="font-medium">{u.full_name}</TableCell>
-                        <TableCell>{u.username || '—'}</TableCell>
+                        <TableCell>{u.username || u.full_name}</TableCell>
                         <TableCell>{u.email}</TableCell>
-                        <TableCell>{getRoleLabel(u.role)}</TableCell>
+                        <TableCell>
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+                            {getRoleLabel(u.role)}
+                          </span>
+                        </TableCell>
                         <TableCell className="text-right">
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEdit(u)}
                             disabled={u.id === user?.id}
-                            className="h-8 w-8 p-0"
+                            className="h-9 w-9 p-0 hover:bg-primary hover:text-primary-foreground"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -212,28 +273,31 @@ export default function Users() {
                 </Table>
               </div>
             )}
+            
+            {!loading && filteredUsers.length > 0 && (
+              <div className="mt-4 text-sm text-muted-foreground text-right">
+                Showing {filteredUsers.length} of {users.length} users
+              </div>
+            )}
           </div>
         </Card>
       </main>
 
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle className="text-primary">
+        <DialogContent className="sm:max-w-[600px] bg-background border-primary/20">
+          <DialogHeader className="bg-primary text-primary-foreground -m-6 mb-0 p-6 rounded-t-lg">
+            <DialogTitle className="text-xl">
               Edit User: {editingUser?.full_name}
             </DialogTitle>
-            <DialogDescription>
-              Change the user's role. You cannot edit your own role.
-            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+          <div className="space-y-6 py-6 px-6">
+            <div className="space-y-3">
+              <Label htmlFor="role" className="text-base font-semibold">Role</Label>
               <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)}>
-                <SelectTrigger id="role">
+                <SelectTrigger id="role" className="h-12 border-primary/30">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="user">User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="super_admin">Super Admin</SelectItem>
@@ -241,31 +305,42 @@ export default function Users() {
               </Select>
             </div>
             {editingUser && (
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  <strong>Username:</strong> {editingUser.username || '—'}
-                </p>
-                <p>
-                  <strong>Email:</strong> {editingUser.email}
-                </p>
-                <p>
-                  <strong>Current Role:</strong> {getRoleLabel(editingUser.role)}
-                </p>
+              <div className="space-y-3 rounded-lg bg-muted/50 p-4">
+                <div className="grid grid-cols-[120px_1fr] gap-2 text-sm">
+                  <span className="font-semibold">Username:</span>
+                  <span>{editingUser.username || editingUser.full_name}</span>
+                </div>
+                <div className="grid grid-cols-[120px_1fr] gap-2 text-sm">
+                  <span className="font-semibold">Email:</span>
+                  <span>{editingUser.email}</span>
+                </div>
+                <div className="grid grid-cols-[120px_1fr] gap-2 text-sm">
+                  <span className="font-semibold">Current Role:</span>
+                  <span>{getRoleLabel(editingUser.role)}</span>
+                </div>
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingUser(null)}>
-              Cancel
+          <DialogFooter className="bg-muted/30 -m-6 mt-0 p-6 rounded-b-lg">
+            <Button 
+              variant="outline" 
+              onClick={() => setEditingUser(null)}
+              className="h-12 px-6"
+            >
+              CANCEL
             </Button>
-            <Button onClick={handleSaveChanges} disabled={updating}>
+            <Button 
+              onClick={handleSaveChanges} 
+              disabled={updating}
+              className="h-12 px-6"
+            >
               {updating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
-                'Save Changes'
+                'SAVE CHANGES'
               )}
             </Button>
           </DialogFooter>
