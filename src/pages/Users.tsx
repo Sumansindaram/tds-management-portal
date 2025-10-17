@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase, UserRole } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Pencil, Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Loader2, Pencil, Search, ArrowUpDown, ArrowUp, ArrowDown, ArrowLeft } from 'lucide-react';
 
 interface UserWithRole {
   id: string;
@@ -27,6 +30,7 @@ type SortDirection = 'asc' | 'desc';
 export default function Users() {
   const { user, role } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +40,8 @@ export default function Users() {
   const [updating, setUpdating] = useState(false);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     if (role === 'super_admin') {
@@ -70,6 +76,7 @@ export default function Users() {
     });
 
     setFilteredUsers(sorted);
+    setCurrentPage(1);
   }, [searchQuery, users, sortField, sortDirection]);
 
   const loadUsers = async () => {
@@ -109,8 +116,7 @@ export default function Users() {
     }
   };
 
-  const handleEdit = (userToEdit: UserWithRole) => {
-    // Prevent editing self only
+  const openEditDialog = (userToEdit: UserWithRole) => {
     if (userToEdit.id === user?.id) {
       toast({
         title: 'Not Allowed',
@@ -119,7 +125,6 @@ export default function Users() {
       });
       return;
     }
-
     setEditingUser(userToEdit);
     setSelectedRole(userToEdit.role);
   };
@@ -183,6 +188,12 @@ export default function Users() {
       <ArrowDown className="ml-2 h-4 w-4 inline" />;
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = filteredUsers.slice(startIndex, endIndex);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
@@ -242,51 +253,49 @@ export default function Users() {
                 {searchQuery ? 'No users found matching your search' : 'No users found'}
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-lg border border-primary/20">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-primary hover:bg-primary">
-                      <TableHead className="text-primary-foreground font-bold">Display Name</TableHead>
-                      <TableHead className="text-primary-foreground font-bold">Username</TableHead>
-                      <TableHead className="text-primary-foreground font-bold">Email Address</TableHead>
-                      <TableHead className="text-primary-foreground font-bold">Role</TableHead>
-                      <TableHead className="text-primary-foreground font-bold text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentUsers.map((u) => (
-                      <TableRow 
-                        key={u.id}
-                        className="hover:bg-primary/10 transition-colors"
-                      >
-                        <TableCell className="font-medium">{u.full_name}</TableCell>
-                        <TableCell>{u.username || u.full_name}</TableCell>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell>
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
-                            {getRoleLabel(u.role)}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openEditDialog(u)}
-                            disabled={u.id === user?.id}
-                            className="h-9 w-9 p-0 hover:bg-primary hover:text-primary-foreground"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-            
-            {!loading && filteredUsers.length > 0 && (
               <>
+                <div className="overflow-x-auto rounded-lg border border-primary/20">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-primary hover:bg-primary">
+                        <TableHead className="text-primary-foreground font-bold">Display Name</TableHead>
+                        <TableHead className="text-primary-foreground font-bold">Username</TableHead>
+                        <TableHead className="text-primary-foreground font-bold">Email Address</TableHead>
+                        <TableHead className="text-primary-foreground font-bold">Role</TableHead>
+                        <TableHead className="text-primary-foreground font-bold text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {currentUsers.map((u) => (
+                        <TableRow 
+                          key={u.id}
+                          className="hover:bg-primary/10 transition-colors"
+                        >
+                          <TableCell className="font-medium">{u.full_name}</TableCell>
+                          <TableCell>{u.username || u.full_name}</TableCell>
+                          <TableCell>{u.email}</TableCell>
+                          <TableCell>
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+                              {getRoleLabel(u.role)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openEditDialog(u)}
+                              disabled={u.id === user?.id}
+                              className="h-9 w-9 p-0 hover:bg-primary hover:text-primary-foreground"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                
                 <div className="mt-6 flex flex-col items-center gap-4">
                   <div className="text-sm text-muted-foreground">
                     Showing {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} users
@@ -309,7 +318,11 @@ export default function Users() {
                           }
                           return (
                             <PaginationItem key={page}>
-                              <PaginationLink onClick={() => setCurrentPage(page)} isActive={currentPage === page} className="cursor-pointer">
+                              <PaginationLink 
+                                onClick={() => setCurrentPage(page)} 
+                                isActive={currentPage === page} 
+                                className="cursor-pointer"
+                              >
                                 {page}
                               </PaginationLink>
                             </PaginationItem>
