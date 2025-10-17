@@ -402,17 +402,6 @@ export default function AdminDetail() {
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
       <main className="container mx-auto p-6 lg:p-8 space-y-6">
-        <div className="mb-4">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/admin')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Admin List
-          </Button>
-        </div>
-
         {/* Reference and Status Cards */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="shadow-sm border-2 border-primary/20">

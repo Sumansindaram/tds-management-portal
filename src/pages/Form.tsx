@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import desLogo from '@/assets/des-logo.jfif';
 
@@ -849,36 +849,49 @@ export default function Form() {
               </div>
             </section>
 
-            <div className="flex justify-end gap-4 pt-8 border-t-2 border-primary/10">
-              <Button
-                onClick={handleReset}
-                disabled={loading}
-                variant="outline"
-                size="lg"
-                className="min-w-32 border-2"
-              >
-                Reset Form
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={
-                  loading || 
-                  !Object.values(termsAccepted).every(term => term === true) || 
-                  !supportingFiles || 
-                  supportingFiles.length === 0
-                }
-                size="lg"
-                className="min-w-40 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  'Submit Request'
-                )}
-              </Button>
+            <div className="flex justify-between items-center gap-4 pt-8 border-t-2 border-primary/10">
+              {user && (
+                <Button
+                  onClick={() => navigate('/')}
+                  variant="outline"
+                  size="lg"
+                  className="min-w-32 border-2"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Dashboard
+                </Button>
+              )}
+              <div className="flex gap-4 ml-auto">
+                <Button
+                  onClick={handleReset}
+                  disabled={loading}
+                  variant="outline"
+                  size="lg"
+                  className="min-w-32 border-2"
+                >
+                  Reset Form
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={
+                    loading || 
+                    !Object.values(termsAccepted).every(term => term === true) || 
+                    !supportingFiles || 
+                    supportingFiles.length === 0
+                  }
+                  size="lg"
+                  className="min-w-40 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Request'
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

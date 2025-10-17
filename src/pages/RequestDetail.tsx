@@ -234,17 +234,6 @@ export default function RequestDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 space-y-6">
-        <div className="mb-4">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </div>
-
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="shadow-sm border-2 border-primary/20">
             <CardContent className="pt-6">
