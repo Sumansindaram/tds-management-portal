@@ -206,6 +206,13 @@ export type Database = {
             referencedRelation: "tds_entries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "tds_entry_comments_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "user_tds_entries_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -231,7 +238,132 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_tds_entries_view: {
+        Row: {
+          admin_comment: string | null
+          alest: string | null
+          asset_code: string | null
+          asset_type: string | null
+          authorised_person_confirmed: boolean | null
+          classification: string | null
+          created_at: string | null
+          crew_number: string | null
+          data_responsibility_confirmed: boolean | null
+          designation: string | null
+          dual_carriage: string | null
+          fuel_capacity: string | null
+          height: string | null
+          id: string | null
+          laden_weight: string | null
+          length: string | null
+          licence: string | null
+          lims_25: string | null
+          lims_28: string | null
+          max_speed: string | null
+          mlc: string | null
+          nsn: string | null
+          out_of_service_date: string | null
+          owner_nation: string | null
+          passenger_capacity: string | null
+          range: string | null
+          reference: string | null
+          review_responsibility_confirmed: boolean | null
+          ric_code: string | null
+          service: string | null
+          short_name: string | null
+          single_carriage: string | null
+          ssr_approval_confirmed: boolean | null
+          ssr_name: string | null
+          status: string | null
+          submitted_by: string | null
+          unladen_weight: string | null
+          updated_at: string | null
+          width: string | null
+        }
+        Insert: {
+          admin_comment?: string | null
+          alest?: string | null
+          asset_code?: string | null
+          asset_type?: string | null
+          authorised_person_confirmed?: boolean | null
+          classification?: string | null
+          created_at?: string | null
+          crew_number?: string | null
+          data_responsibility_confirmed?: boolean | null
+          designation?: string | null
+          dual_carriage?: string | null
+          fuel_capacity?: string | null
+          height?: string | null
+          id?: string | null
+          laden_weight?: string | null
+          length?: string | null
+          licence?: string | null
+          lims_25?: string | null
+          lims_28?: string | null
+          max_speed?: string | null
+          mlc?: string | null
+          nsn?: string | null
+          out_of_service_date?: string | null
+          owner_nation?: string | null
+          passenger_capacity?: string | null
+          range?: string | null
+          reference?: string | null
+          review_responsibility_confirmed?: boolean | null
+          ric_code?: string | null
+          service?: string | null
+          short_name?: string | null
+          single_carriage?: string | null
+          ssr_approval_confirmed?: boolean | null
+          ssr_name?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          unladen_weight?: string | null
+          updated_at?: string | null
+          width?: string | null
+        }
+        Update: {
+          admin_comment?: string | null
+          alest?: string | null
+          asset_code?: string | null
+          asset_type?: string | null
+          authorised_person_confirmed?: boolean | null
+          classification?: string | null
+          created_at?: string | null
+          crew_number?: string | null
+          data_responsibility_confirmed?: boolean | null
+          designation?: string | null
+          dual_carriage?: string | null
+          fuel_capacity?: string | null
+          height?: string | null
+          id?: string | null
+          laden_weight?: string | null
+          length?: string | null
+          licence?: string | null
+          lims_25?: string | null
+          lims_28?: string | null
+          max_speed?: string | null
+          mlc?: string | null
+          nsn?: string | null
+          out_of_service_date?: string | null
+          owner_nation?: string | null
+          passenger_capacity?: string | null
+          range?: string | null
+          reference?: string | null
+          review_responsibility_confirmed?: boolean | null
+          ric_code?: string | null
+          service?: string | null
+          short_name?: string | null
+          single_carriage?: string | null
+          ssr_approval_confirmed?: boolean | null
+          ssr_name?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          unladen_weight?: string | null
+          updated_at?: string | null
+          width?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_tds_reference: {
