@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { listEntries } from "@/integrations/api";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
 type Row = {
@@ -22,16 +22,21 @@ export default function AdminList() {
     (async () => {
       try {
         setLoading(true);
-        const data = await listEntries(); // Expect an array of entries
-        // Map defensively to expected columns
+        const { data, error } = await supabase
+          .from('tds_entries')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
         const mapped = (data ?? []).map((d: any) => ({
-          id: String(d.id ?? d._id),
-          reference: d.reference ?? d.ref ?? null,
-          assetName: d.assetName ?? d.asset?.name ?? "",
-          assetOwnerName: d.assetOwnerName ?? d.owner?.name ?? "",
-          classification: d.classification ?? "Official",
-          transportMode: d.transportMode ?? d.mode ?? "",
-          createdAt: d.createdAt ?? d.created_at ?? null,
+          id: d.id,
+          reference: d.reference,
+          assetName: d.short_name || d.designation,
+          assetOwnerName: d.ssr_name,
+          classification: d.classification,
+          transportMode: d.service,
+          createdAt: d.created_at,
         })) as Row[];
         setRows(mapped);
       } catch (e: any) {

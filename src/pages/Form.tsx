@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { saveEntry } from "@/integrations/api";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Helpers
 const nameRegex = /^[A-Za-z]+(?:\.?\s[A-Za-z]+)*\.?$/; // letters, spaces, one optional dot segment (e.g., "Mr. John", "S Rani", "Rani")
@@ -33,6 +34,7 @@ type FormState = {
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
 export default function Form() {
+  const { user } = useAuth();
   const [values, setValues] = useState<FormState>({
     assetOwnerName: "",
     assetOwnerEmail: "",
@@ -121,21 +123,57 @@ export default function Form() {
     }
     setSubmitting(true);
     try {
-      // Prepare payload exactly as our API expects (flattened, serialisable)
-      const payload = {
-        ...values,
-        length_m: Number(values.length_m),
-        width_m: Number(values.width_m),
-        height_m: Number(values.height_m),
-        ...(values.weight_kg ? { weight_kg: Number(values.weight_kg) } : {}),
-        createdAt: new Date().toISOString(),
-      };
+      // Upload files to Supabase storage first
+      const uploadedFiles: string[] = [];
+      if (files.length > 0) {
+        for (const file of files) {
+          const fileName = `${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from('supporting-documents')
+            .upload(fileName, file);
+          
+          if (uploadError) throw uploadError;
+          uploadedFiles.push(fileName);
+        }
+      }
 
-      const result = await saveEntry(payload, files);
-      // Expecting { id, reference } or similar — store whatever reference we get
-      const reference = result?.reference ?? result?.id ?? null;
+      // Insert into tds_entries table
+      const { data, error: insertError } = await supabase
+        .from('tds_entries')
+        .insert({
+          submitted_by: user?.id,
+          short_name: values.assetName,
+          asset_code: values.assetCode || '',
+          designation: values.assetName,
+          nsn: '',
+          ssr_name: values.ssrName,
+          ssr_email: values.assetOwnerEmail,
+          classification: values.classification,
+          service: values.transportMode,
+          asset_type: values.transportMode,
+          owner_nation: '',
+          ric_code: '',
+          alest: '',
+          lims_25: '',
+          lims_28: '',
+          mlc: '',
+          length: values.length_m,
+          width: values.width_m,
+          height: values.height_m,
+          unladen_weight: values.weight_kg || '0',
+          laden_weight: values.weight_kg || '0',
+          out_of_service_date: values.requiredByDate || new Date().toISOString().split('T')[0],
+          status: 'Pending',
+        } as any)
+        .select('id, reference')
+        .single();
+
+      if (insertError) throw insertError;
+
+      const reference = data?.reference || data?.id;
       setRefId(reference);
-      // Optional: soft reset (keep SSR + driver so user doesn’t retype)
+      
+      // Reset form
       setValues(s => ({
         ...s,
         assetOwnerName: "",
