@@ -1,6 +1,9 @@
+// src/pages/Form.tsx
+
+// keep your alias if supported; otherwise switch to a relative import
+import { saveEntry } from "@/integrations/api";
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,14 +21,20 @@ const TRANSPORT_GROUPS = [
   'MAN SV 9T MM', 'MAN SV 15T MM', 'PLS', 'MAN SV 9T IMM', 'AIR'
 ];
 
+type SaveResponse = {
+  id: string;
+  reference: string; // e.g. TDS-2025-00123
+};
+
 export default function Form() {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [transportFiles, setTransportFiles] = useState<Record<string, File | null>>({});
   const [supportingFiles, setSupportingFiles] = useState<FileList | null>(null);
-  const [sessionId] = useState(() => `session-${Date.now()}-${Math.random()}`);
+
   const [termsAccepted, setTermsAccepted] = useState({
     ssrApproval: false,
     authorisedPerson: false,
@@ -65,6 +74,7 @@ export default function Form() {
     asset_type: 'A Vehicles',
   });
 
+  // Pre-fill email from logged-in user if present
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -74,6 +84,7 @@ export default function Form() {
     }
   }, [user]);
 
+  // ---------- Helpers for calculations ----------
   const parseM = (v: string): number => {
     if (!v) return NaN;
     return parseFloat(v.toLowerCase().replace(/\s*m$/,'').replace(',', '.'));
@@ -84,9 +95,7 @@ export default function Form() {
     return parseFloat(v.toLowerCase().replace(/\s*kg$/, '').replace(',', '.'));
   };
 
-  const fmt = (n: number): string => {
-    return isNaN(n) ? '' : (Math.round(n * 100) / 100).toString();
-  };
+  const fmt = (n: number): string => (isNaN(n) ? '' : (Math.round(n * 100) / 100).toString());
 
   const calcALEST = (l: number, w: number, h: number, kg: number): string => {
     if ([l, w, h].some(isNaN)) return '';
@@ -114,6 +123,7 @@ export default function Form() {
     return fmt(l);
   };
 
+  // Auto-calc ALEST/LIMS when inputs change
   useEffect(() => {
     const l = parseM(formData.length);
     const w = parseM(formData.width);
@@ -126,37 +136,37 @@ export default function Form() {
       lims_25: calcLIMS25(l, w),
       lims_28: calcLIMS28(l, w),
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.length, formData.width, formData.height, formData.unladen_weight]);
 
+  // ---------- Validation + change handlers ----------
   const handleInputChange = (field: string, value: string) => {
     let validatedValue = value;
 
-    // Validation rules
     switch (field) {
       case 'ssr_name':
-        // Only alphabetic characters and spaces
+        // letters + space only
         validatedValue = value.replace(/[^a-zA-Z\s]/g, '');
         break;
-      
+
       case 'length':
       case 'width':
       case 'height':
       case 'unladen_weight':
       case 'laden_weight':
-        // Numbers with max 2 decimal places
+        // numbers with up to 2 dp
         if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
           validatedValue = value;
         } else {
-          return; // Don't update if invalid format
+          return;
         }
         break;
-      
+
       case 'range':
       case 'fuel_capacity':
       case 'single_carriage':
       case 'dual_carriage':
       case 'max_speed':
-        // Whole numbers only
         validatedValue = value.replace(/[^0-9]/g, '');
         break;
     }
@@ -206,8 +216,9 @@ export default function Form() {
     });
   };
 
+  // ---------- Submit via saveEntry() ----------
   const handleSubmit = async () => {
-    // Validate all required fields
+    // Required fields
     const requiredFields = [
       { field: 'ssr_name', label: 'SSR/SR Name' },
       { field: 'ssr_email', label: 'SSR/SR Email' },
@@ -230,7 +241,6 @@ export default function Form() {
     ];
 
     const missingFields = requiredFields.filter(({ field }) => !formData[field as keyof typeof formData]);
-    
     if (missingFields.length > 0) {
       toast({
         title: 'Missing Required Fields',
@@ -240,8 +250,8 @@ export default function Form() {
       return;
     }
 
-    // Validate terms and conditions
-    const allTermsAccepted = Object.values(termsAccepted).every(term => term === true);
+    // Declarations
+    const allTermsAccepted = Object.values(termsAccepted).every(Boolean);
     if (!allTermsAccepted) {
       toast({
         title: 'Validation Error',
@@ -251,7 +261,7 @@ export default function Form() {
       return;
     }
 
-    // Validate supporting documents
+    // Supporting documents
     if (!supportingFiles || supportingFiles.length === 0) {
       toast({
         title: 'Validation Error',
@@ -263,70 +273,56 @@ export default function Form() {
 
     setLoading(true);
     try {
-      // Generate reference
-      const { data: refData, error: refError } = await supabase
-        .rpc('generate_tds_reference');
+      // Build payload expected by your API
+      const payload = {
+        ...formData,
+        submittedAt: new Date().toISOString(),
+        submitted_by_email: user?.email ?? null,
+        status: 'Pending',
+        ssr_approval_confirmed: termsAccepted.ssrApproval,
+        authorised_person_confirmed: termsAccepted.authorisedPerson,
+        data_responsibility_confirmed: termsAccepted.dataResponsibility,
+        review_responsibility_confirmed: termsAccepted.reviewResponsibility,
+      };
 
-      if (refError) throw refError;
+      // Collect files (prefix transport category in filename so admins can see context)
+      const fileBundle: File[] = [];
 
-      // Create entry (public submission - no auth required)
-      const { data: entry, error: entryError } = await supabase
-        .from('tds_entries')
-        .insert([{
-          ...formData,
-          reference: refData,
-          submitted_by: user?.id || null,
-          status: 'Pending',
-          ssr_approval_confirmed: termsAccepted.ssrApproval,
-          authorised_person_confirmed: termsAccepted.authorisedPerson,
-          data_responsibility_confirmed: termsAccepted.dataResponsibility,
-          review_responsibility_confirmed: termsAccepted.reviewResponsibility,
-        }])
-        .select()
-        .single();
-
-      if (entryError) throw entryError;
-
-      // Upload files using session ID for non-authenticated users
-      const uploadPromises: Promise<any>[] = [];
-      const uploaderId = user?.id || sessionId;
-
-      // Transport files
       Object.entries(transportFiles).forEach(([category, file]) => {
         if (file) {
-          const path = `${formData.nsn}/${entry.id}/${category}_${file.name}`;
-          uploadPromises.push(
-            supabase.storage
-              .from('transportation-data')
-              .upload(path, file)
-          );
+          const renamed = new File([file], `${category.replace(/\s+/g, '_')}-${file.name}`, { type: file.type });
+          fileBundle.push(renamed);
         }
       });
 
-      // Supporting files
       if (supportingFiles) {
-        Array.from(supportingFiles).forEach(file => {
-          const path = `${formData.nsn}/${entry.id}/${file.name}`;
-          uploadPromises.push(
-            supabase.storage
-              .from('supporting-documents')
-              .upload(path, file)
-          );
-        });
+        Array.from(supportingFiles).forEach((file) => fileBundle.push(file));
       }
 
-      await Promise.all(uploadPromises);
+      // ---- CALL YOUR INTEGRATION HELPER ----
+      // Preferred signature (recommended):
+      //   saveEntry(payload: Record<string, any>, files?: File[]): Promise<SaveResponse>
+      //
+      // If your saveEntry expects FormData instead, see the commented block below.
+
+      const res: SaveResponse = await saveEntry(payload, fileBundle);
+
+      /* -------------- ALTERNATIVE (if your saveEntry uses FormData) --------------
+      const fd = new FormData();
+      Object.entries(payload).forEach(([k, v]) => fd.append(k, String(v ?? "")));
+      fileBundle.forEach((f) => fd.append("files", f, f.name));
+      const res: SaveResponse = await saveEntry(fd) as any;
+      --------------------------------------------------------------------------- */
 
       toast({
         title: 'Success!',
-        description: `Request submitted with reference: ${refData}`,
+        description: `Request submitted with reference: ${res.reference}`,
       });
 
-      // Navigate/reload without resetting immediately to preserve visual state until page change
+      // Navigate like your original behaviour
       if (user) {
         navigate('/');
       } else {
-        // Small delay to show success message before reload
         setTimeout(() => {
           window.location.reload();
         }, 1500);
@@ -334,7 +330,7 @@ export default function Form() {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error?.message ?? 'Failed to submit. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -367,6 +363,7 @@ export default function Form() {
           </div>
         </header>
       )}
+
       <main className="container mx-auto p-6">
         <Card className="shadow-2xl border-2 max-w-6xl mx-auto">
           <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
@@ -379,8 +376,9 @@ export default function Form() {
               Please complete all mandatory fields marked with <span className="text-destructive font-bold">*</span>
             </p>
           </CardHeader>
+
           <CardContent className="space-y-8 pt-8">
-            {/* Asset Owner Details */}
+            {/* 1) Asset Owner Details */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">1</span>
@@ -409,7 +407,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* Asset Details */}
+            {/* 2) Asset Details */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">2</span>
@@ -452,7 +450,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* Basic Details */}
+            {/* 3) Basic Details */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">3</span>
@@ -551,7 +549,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* Driver Information */}
+            {/* 4) Driver Information */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">4</span>
@@ -622,7 +620,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* ADAMS */}
+            {/* 5) ADAMS */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">5</span>
@@ -686,7 +684,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* Transportation Data */}
+            {/* 6) Transportation Data */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
@@ -734,7 +732,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* Terms and Conditions */}
+            {/* 7) Terms and Conditions */}
             <section className="bg-destructive/5 rounded-lg p-6 border-2 border-destructive/30 shadow-md">
               <h3 className="mb-6 pb-3 text-xl font-bold text-destructive flex items-center gap-3 border-b-2 border-destructive/20">
                 <span className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -812,7 +810,7 @@ export default function Form() {
               </div>
             </section>
 
-            {/* Supporting Documents */}
+            {/* 8) Supporting Documents */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
@@ -849,6 +847,7 @@ export default function Form() {
               </div>
             </section>
 
+            {/* Footer buttons */}
             <div className="flex justify-between items-center gap-4 pt-8 border-t-2 border-primary/10">
               {user && (
                 <Button
@@ -874,9 +873,9 @@ export default function Form() {
                 <Button
                   onClick={handleSubmit}
                   disabled={
-                    loading || 
-                    !Object.values(termsAccepted).every(term => term === true) || 
-                    !supportingFiles || 
+                    loading ||
+                    !Object.values(termsAccepted).every(term => term === true) ||
+                    !supportingFiles ||
                     supportingFiles.length === 0
                   }
                   size="lg"
