@@ -215,15 +215,12 @@ export default function RequestDetail() {
     { label: 'Passenger Capacity', value: entry.passenger_capacity },
     { label: 'Range', value: entry.range },
     { label: 'Fuel Capacity', value: entry.fuel_capacity },
-  ];
-
-  const adamsFields = [
     { label: 'Single Carriage', value: entry.single_carriage },
     { label: 'Dual Carriage', value: entry.dual_carriage },
     { label: 'Max Speed', value: entry.max_speed },
   ];
 
-  const serviceInfoFields = [
+  const adamsDataFields = [
     { label: 'Service', value: entry.service },
     { label: 'Owner Nation', value: entry.owner_nation },
     { label: 'RIC Code', value: entry.ric_code },
@@ -318,30 +315,14 @@ export default function RequestDetail() {
               </div>
             </section>
 
-            {/* ADAMS Sections */}
+            {/* ADAMS Data */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                 <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">5</span>
-                ADAMS Sections
-              </h3>
-              <div className="grid gap-3 md:grid-cols-3">
-                {adamsFields.map(field => (
-                  <div key={field.label} className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Service Information */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
-                Service Information
+                ADAMS Data
               </h3>
               <div className="grid gap-3 md:grid-cols-2">
-                {serviceInfoFields.map(field => (
+                {adamsDataFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
                     <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
@@ -353,7 +334,7 @@ export default function RequestDetail() {
             {/* Transportation Data */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
                 Transportation Data
               </h3>
               <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
@@ -392,7 +373,7 @@ export default function RequestDetail() {
             {supportingFiles.length > 0 && (
               <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
                 <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                  <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">8</span>
+                  <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
                   Supporting Documents
                 </h3>
                 <div className="grid gap-3 md:grid-cols-3">
