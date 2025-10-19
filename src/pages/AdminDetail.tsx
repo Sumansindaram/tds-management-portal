@@ -313,9 +313,10 @@ export default function AdminDetail() {
         description: `Status updated to ${newStatus}`,
       });
     } catch (error: any) {
+      console.error('Status update error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: 'Unable to update status. Please try again or contact support if the issue persists.',
         variant: 'destructive',
       });
     } finally {

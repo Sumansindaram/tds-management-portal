@@ -149,9 +149,10 @@ export default function Users() {
       setEditingUser(null);
       loadUsers();
     } catch (error: any) {
+      console.error('Role update error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: 'Unable to update user role. Please try again or contact support if the issue persists.',
         variant: 'destructive',
       });
     } finally {

@@ -2,6 +2,20 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * ProtectedRoute - Client-side route protection component
+ * 
+ * SECURITY NOTE: This component provides UX-level route protection only.
+ * The actual security is enforced by Row Level Security (RLS) policies in the database.
+ * Client-side checks can be bypassed, but users cannot access data without proper RLS policies.
+ * 
+ * This component serves to:
+ * - Improve user experience by preventing unauthorized UI access
+ * - Reduce unnecessary API calls for unauthorized users
+ * - Provide clear navigation flow
+ * 
+ * Always ensure RLS policies are properly configured for true data security.
+ */
 interface ProtectedRouteProps {
   children: React.ReactNode;
   adminOnly?: boolean;

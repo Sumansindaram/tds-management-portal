@@ -332,9 +332,10 @@ export default function Form() {
         }, 1500);
       }
     } catch (error: any) {
+      console.error('Form submission error:', error);
       toast({
         title: 'Error',
-        description: error.message,
+        description: 'Unable to submit your request. Please try again or contact support if the issue persists.',
         variant: 'destructive',
       });
     } finally {

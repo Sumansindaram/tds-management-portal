@@ -56,7 +56,10 @@ JSP 800 Vol 7 Portal`;
   } catch (error: any) {
     console.error("Error in send-tds-notification:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: "Unable to send notification. Please try again later." 
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
