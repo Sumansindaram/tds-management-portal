@@ -145,8 +145,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Log without PII
-    console.log(`Notification requested - Reference: ${reference}, Status: ${status}`);
+    // Log without PII - only reference and status
+    console.log(`Notification requested - Reference: ${reference}, Status: ${status}, Admin: ${user.id}`);
 
     const subject = `TDS Request ${reference} - ${status}`;
     const body = `Dear ${name},
@@ -157,12 +157,7 @@ ${comment ? `Comments:\n${comment}\n\n` : ''}Kind regards,
 MOD TDS Team
 JSP 800 Vol 7 Portal`;
 
-    // Log email details for development
-    console.log("Email notification details:", {
-      to: email,
-      subject,
-      preview: body.substring(0, 100),
-    });
+    // No PII logging - email content prepared for sending
 
     // In production, integrate with email service (Resend, SendGrid, etc.)
     // For now, return success
