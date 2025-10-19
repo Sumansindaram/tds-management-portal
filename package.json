@@ -1,4 +1,11 @@
 {
+  "scripts": {
+    "build": "vite build",
+    "start": "node api/server.js",
+    "postinstall": "npm --prefix api ci"
+  }
+}
+{
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
