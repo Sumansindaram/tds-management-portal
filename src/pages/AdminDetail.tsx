@@ -400,16 +400,6 @@ export default function AdminDetail() {
     <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
       <Header />
       <main className="container mx-auto p-6 lg:p-8 space-y-6">
-        <div className="flex justify-end mb-4">
-          <Button
-            onClick={() => navigate('/admin')}
-            variant="outline"
-            size="sm"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to List
-          </Button>
-        </div>
         {/* Reference and Status Cards */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="shadow-sm border-2 border-primary/20">
@@ -788,6 +778,16 @@ export default function AdminDetail() {
             )}
           </CardContent>
         </Card>
+        <div className="mt-6 flex justify-start">
+          <Button
+            onClick={() => navigate('/admin')}
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to List
+          </Button>
+        </div>
       </main>
     </div>
   );

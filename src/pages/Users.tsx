@@ -201,19 +201,9 @@ export default function Users() {
       <main className="container mx-auto p-6 lg:p-8">
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-3xl font-bold text-primary mb-2">Users</h2>
-                <p className="text-muted-foreground">Manage user roles</p>
-              </div>
-              <Button
-                onClick={() => navigate('/')}
-                variant="outline"
-                size="sm"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-primary mb-2">Users</h2>
+              <p className="text-muted-foreground">Manage user roles</p>
             </div>
 
             <div className="mb-6 flex gap-4 flex-wrap">
@@ -342,6 +332,16 @@ export default function Users() {
             )}
           </div>
         </Card>
+        <div className="mt-6 flex justify-start">
+          <Button
+            onClick={() => navigate('/')}
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
       </main>
 
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>

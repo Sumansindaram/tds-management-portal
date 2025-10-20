@@ -110,19 +110,9 @@ export default function AdminList() {
       <main className="container mx-auto p-6 lg:p-8">
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="mb-2 text-3xl font-bold text-primary">TDS Requests - Admin View</h2>
-                <p className="text-muted-foreground">Search and manage all Tie Down Scheme submissions</p>
-              </div>
-              <Button
-                onClick={() => navigate('/')}
-                variant="outline"
-                size="sm"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
+            <div className="mb-6">
+              <h2 className="mb-2 text-3xl font-bold text-primary">TDS Requests - Admin View</h2>
+              <p className="text-muted-foreground">Search and manage all Tie Down Scheme submissions</p>
             </div>
 
             {/* Search Bar */}
@@ -236,6 +226,16 @@ export default function AdminList() {
             )}
           </div>
         </Card>
+        <div className="mt-6 flex justify-start">
+          <Button
+            onClick={() => navigate('/')}
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
       </main>
     </div>
   );
