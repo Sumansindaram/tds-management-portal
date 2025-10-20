@@ -87,40 +87,40 @@ export function Header() {
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-2">
                   <Button
-                    variant="default"
+                    variant="ghost"
                     size="sm"
                     onClick={() => navigate('/')}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                   >
                     <Home className="mr-2 h-4 w-4" />
                     Home
                   </Button>
                   {(role === 'admin' || role === 'super_admin') && (
                     <Button
-                      variant="default"
+                      variant="ghost"
                       size="sm"
                       onClick={() => navigate('/admin')}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
                       <Database className="mr-2 h-4 w-4" />
                       View All Requests
                     </Button>
                   )}
                   <Button
-                    variant="default"
+                    variant="ghost"
                     size="sm"
                     onClick={() => navigate('/form')}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Submit Request
                   </Button>
                   {role === 'super_admin' && (
                     <Button
-                      variant="default"
+                      variant="ghost"
                       size="sm"
                       onClick={() => navigate('/users')}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
                       <Users className="mr-2 h-4 w-4" />
                       Manage Users
