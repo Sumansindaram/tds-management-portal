@@ -720,7 +720,7 @@ export default function Form() {
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                         <polyline points="14 2 14 8 20 8" />
                       </svg>
-                      <span className="text-xs font-medium text-left truncate flex-1">{group}</span>
+                      <span className="text-xs font-medium text-foreground text-left truncate flex-1">{group}</span>
                     </div>
                     {transportFiles[group] && (
                       <span className="text-[10px] text-primary font-medium">✓ Uploaded</span>

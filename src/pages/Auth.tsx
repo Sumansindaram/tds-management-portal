@@ -185,19 +185,7 @@ export default function Auth() {
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                {!isSignUp && (
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="h-auto p-0 text-xs"
-                    onClick={handlePasswordReset}
-                  >
-                    Forgot Password?
-                  </Button>
-                )}
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -221,8 +209,8 @@ export default function Auth() {
                 
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full border-primary/30 hover:bg-primary/5"
+                  variant="secondary"
+                  className="w-full"
                   onClick={handleMicrosoftSignIn}
                   disabled={loading}
                 >
@@ -232,16 +220,31 @@ export default function Auth() {
               </>
             )}
             
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => setIsSignUp(!isSignUp)}
-            >
-              {isSignUp
-                ? 'Already have an account? Sign in'
-                : "Don't have an account? Sign up"}
-            </Button>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-auto p-0"
+                onClick={() => setIsSignUp(!isSignUp)}
+              >
+                {isSignUp
+                  ? 'Already have an account? Sign in'
+                  : "Don't have an account? Sign up"}
+              </Button>
+              {!isSignUp && (
+                <>
+                  <span className="text-muted-foreground">•</span>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto p-0"
+                    onClick={handlePasswordReset}
+                  >
+                    Forgot Password?
+                  </Button>
+                </>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>
