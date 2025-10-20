@@ -876,9 +876,9 @@ export default function Form() {
                 <Button
                   onClick={handleReset}
                   disabled={loading}
-                  variant="outline"
+                  variant="secondary"
                   size="lg"
-                  className="min-w-32 border-2"
+                  className="min-w-32"
                 >
                   Reset Form
                 </Button>

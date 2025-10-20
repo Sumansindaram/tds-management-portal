@@ -218,14 +218,14 @@ export default function Users() {
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant={sortField === 'name' ? 'default' : 'outline'}
+                  variant={sortField === 'name' ? 'default' : 'secondary'}
                   onClick={() => handleSort('name')}
                   className="h-12"
                 >
                   A-Z <SortIcon field="name" />
                 </Button>
                 <Button
-                  variant={sortField === 'recent' ? 'default' : 'outline'}
+                  variant={sortField === 'recent' ? 'default' : 'secondary'}
                   onClick={() => handleSort('recent')}
                   className="h-12"
                 >
@@ -256,10 +256,10 @@ export default function Users() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {currentUsers.map((u) => (
+                      {currentUsers.map((u, index) => (
                         <TableRow 
                           key={u.id}
-                          className="hover:bg-primary/10 transition-colors"
+                          className={`hover:bg-primary/10 transition-colors ${index % 2 === 1 ? 'bg-muted/30' : ''}`}
                         >
                           <TableCell className="font-medium">{u.full_name}</TableCell>
                           <TableCell>{u.username || u.full_name}</TableCell>

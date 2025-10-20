@@ -151,10 +151,10 @@ export default function AdminList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {currentEntries.map((entry) => (
+                    {currentEntries.map((entry, index) => (
                       <TableRow
                         key={entry.id}
-                        className="cursor-pointer hover:bg-primary/10 transition-colors"
+                        className={`cursor-pointer hover:bg-primary/10 transition-colors ${index % 2 === 1 ? 'bg-muted/30' : ''}`}
                         onClick={() => navigate(`/admin/detail/${entry.id}`)}
                       >
                         <TableCell className="font-semibold text-primary">{entry.reference}</TableCell>
