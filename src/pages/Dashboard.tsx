@@ -174,18 +174,18 @@ export default function Dashboard() {
 
             {isSuperAdmin && (
               <Card 
-                className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-success/5 group" 
+                className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-warning/5 group" 
                 onClick={() => navigate('/users')}
               >
                 <CardHeader className="pb-3">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-success shadow-lg group-hover:scale-110 transition-transform">
-                    <Users className="h-8 w-8 text-success-foreground" />
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-warning shadow-lg group-hover:scale-110 transition-transform">
+                    <Users className="h-8 w-8 text-warning-foreground" />
                   </div>
                   <CardTitle className="text-xl text-primary">Manage Users</CardTitle>
                   <CardDescription>Control user roles and permissions</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full shadow-md bg-success text-success-foreground hover:bg-success/90">Manage Users</Button>
+                  <Button className="w-full shadow-md bg-warning text-warning-foreground hover:bg-warning/90">Manage Users</Button>
                 </CardContent>
               </Card>
             )}

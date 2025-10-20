@@ -120,7 +120,7 @@ export function Header() {
                       variant="default"
                       size="sm"
                       onClick={() => navigate('/users')}
-                      className="bg-muted text-foreground hover:bg-muted/80"
+                      className="bg-warning text-warning-foreground hover:bg-warning/80"
                     >
                       <Users className="mr-2 h-4 w-4" />
                       Manage Users
@@ -228,7 +228,7 @@ export function Header() {
                         <>
                           <Button
                             variant="default"
-                            className="w-full justify-start bg-muted text-foreground"
+                            className="w-full justify-start bg-warning text-warning-foreground"
                             onClick={() => {
                               navigate('/users');
                               setMobileMenuOpen(false);
