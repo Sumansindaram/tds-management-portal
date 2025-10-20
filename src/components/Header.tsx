@@ -307,7 +307,7 @@ export function Header() {
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="z-50 w-80 bg-background">
+                  <DropdownMenuContent align="end" className="z-50 w-80 bg-popover border-2">
                     <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
                       <img src={desLogo} alt="MOD & DE&S" className="h-12" />
                       <div className="flex-1">
@@ -317,7 +317,7 @@ export function Header() {
                     </div>
                     <DropdownMenuLabel className="font-normal bg-muted/30">
                       <div className="flex flex-col space-y-1 py-2">
-                        <p className="text-sm font-semibold text-foreground">
+                        <p className="text-sm font-semibold text-card-foreground">
                           {fullName || user.email?.split('@')[0] || 'User'}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground flex items-center gap-1">

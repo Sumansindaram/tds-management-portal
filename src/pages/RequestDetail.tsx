@@ -244,7 +244,7 @@ export default function RequestDetail() {
           <Card className="shadow-sm border-2 border-primary/20">
             <CardContent className="pt-4 sm:pt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Reference Number</p>
-              <p className="text-xl sm:text-2xl font-bold text-primary break-all">{entry.reference}</p>
+              <p className="text-xl sm:text-2xl font-bold text-card-foreground break-all">{entry.reference}</p>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-2 border-primary/20">
@@ -257,7 +257,7 @@ export default function RequestDetail() {
 
         <Card className="shadow-lg border-2">
           <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
-            <CardTitle className="text-xl sm:text-2xl text-primary">Request Details</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl text-card-foreground">Request Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 sm:space-y-8 pt-4 sm:pt-6">
             {/* Two Column Layout for Details Sections */}
@@ -507,8 +507,9 @@ export default function RequestDetail() {
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t flex justify-start">
               <Button
                 onClick={() => navigate('/')}
-                variant="outline"
+                variant="default"
                 size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="text-xs sm:text-sm">Back to Dashboard</span>

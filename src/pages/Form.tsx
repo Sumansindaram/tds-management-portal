@@ -864,9 +864,9 @@ export default function Form() {
               {user && (
                 <Button
                   onClick={() => navigate('/')}
-                  variant="outline"
+                  variant="default"
                   size="lg"
-                  className="min-w-32 border-2"
+                  className="min-w-32 border-2 bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Dashboard

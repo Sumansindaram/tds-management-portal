@@ -105,13 +105,13 @@ export default function AdminList() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
         <Card className="shadow-2xl border-primary/20">
           <div className="p-6 lg:p-8">
             <div className="mb-6">
-              <h2 className="mb-2 text-3xl font-bold text-primary">TDS Requests - Admin View</h2>
+              <h2 className="mb-2 text-3xl font-bold text-card-foreground">TDS Requests - Admin View</h2>
               <p className="text-muted-foreground">Search and manage all Tie Down Scheme submissions</p>
             </div>
 
@@ -228,8 +228,9 @@ export default function AdminList() {
             <div className="mt-8 pt-6 border-t flex justify-start">
               <Button
                 onClick={() => navigate('/')}
-                variant="outline"
+                variant="default"
                 size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
