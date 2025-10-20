@@ -82,6 +82,26 @@ export function Header() {
                   <Home className="mr-2 h-4 w-4" />
                   Home
                 </Button>
+                {(role === 'admin' || role === 'super_admin') && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/admin')}
+                    className="text-foreground hover:bg-primary/10 bg-secondary/50"
+                  >
+                    <Database className="mr-2 h-4 w-4" />
+                    View All Requests
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/form')}
+                  className="text-foreground hover:bg-primary/10 bg-secondary/50"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Submit Request
+                </Button>
                 {role === 'super_admin' && (
                   <Button
                     variant="ghost"

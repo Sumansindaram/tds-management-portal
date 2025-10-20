@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { FileText, List, PlusCircle, Users, Calculator, Search, BookOpen, MessageSquare, History, Shield } from 'lucide-react';
+import { FileText, List, PlusCircle, Users, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -189,37 +189,6 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             )}
-
-            {/* Information Tiles */}
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-muted/30">
-              <CardHeader className="pb-3">
-                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-muted">
-                  <Calculator className="h-7 w-7 text-primary" />
-                </div>
-                <CardTitle className="text-lg text-primary">User Calculations</CardTitle>
-                <CardDescription className="text-xs">Quick reference for TDS calculations</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-muted/30">
-              <CardHeader className="pb-3">
-                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-muted">
-                  <BookOpen className="h-7 w-7 text-primary" />
-                </div>
-                <CardTitle className="text-lg text-primary">Asset History</CardTitle>
-                <CardDescription className="text-xs">View change history for assets</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-muted/30">
-              <CardHeader className="pb-3">
-                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-muted">
-                  <MessageSquare className="h-7 w-7 text-primary" />
-                </div>
-                <CardTitle className="text-lg text-primary">Contact Details</CardTitle>
-                <CardDescription className="text-xs">Get in touch with the TDS team</CardDescription>
-              </CardHeader>
-            </Card>
           </div>
         )}
       </main>
