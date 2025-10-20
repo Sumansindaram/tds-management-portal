@@ -62,7 +62,7 @@ export function Header() {
       );
     }
     return (
-      <Badge variant="secondary" className="bg-muted text-foreground">
+      <Badge variant="secondary" className="bg-badge-user text-white">
         <User className="mr-1 h-3 w-3" />
         User
       </Badge>
@@ -166,7 +166,7 @@ export function Header() {
                       Admin
                     </Badge>
                   ) : (
-                    <Badge variant="secondary" className="bg-muted text-foreground">
+                    <Badge variant="secondary" className="bg-badge-user text-white">
                       <User className="mr-1 h-3 w-3" />
                       User
                     </Badge>
@@ -267,7 +267,7 @@ export function Header() {
                             Admin
                           </Badge>
                         ) : (
-                          <Badge variant="secondary" className="bg-muted text-foreground mb-3 w-full justify-center py-2">
+                          <Badge variant="secondary" className="bg-badge-user text-white mb-3 w-full justify-center py-2">
                             <User className="mr-1 h-3 w-3" />
                             User
                           </Badge>

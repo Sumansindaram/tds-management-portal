@@ -441,7 +441,7 @@ export default function AdminDetail() {
                 {assetOwnerFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -457,7 +457,7 @@ export default function AdminDetail() {
                 {assetDetailsFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -473,7 +473,7 @@ export default function AdminDetail() {
                 {basicDetailsFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -489,7 +489,7 @@ export default function AdminDetail() {
                 {driverInfoFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -505,7 +505,7 @@ export default function AdminDetail() {
                 {adamsDataFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -523,7 +523,7 @@ export default function AdminDetail() {
                   return (
                     <Button
                       key={group}
-                      variant={hasFiles ? "default" : "outline"}
+                      variant={hasFiles ? "default" : "secondary"}
                       className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? "" : "opacity-40"}`}
                       disabled={!hasFiles}
                        onClick={() => {
@@ -780,7 +780,7 @@ export default function AdminDetail() {
             <div className="mt-8 pt-6 border-t flex justify-start">
               <Button
                 onClick={() => navigate('/admin')}
-                variant="outline"
+                variant="secondary"
                 size="sm"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />

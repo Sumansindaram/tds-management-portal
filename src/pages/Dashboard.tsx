@@ -68,7 +68,7 @@ export default function Dashboard() {
                 <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
                   <PlusCircle className="h-10 w-10 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-xl text-foreground">New Request</CardTitle>
+                <CardTitle className="text-xl text-card-foreground">New Request</CardTitle>
                 <CardDescription>Submit a new TDS entry request</CardDescription>
               </CardHeader>
               <CardContent>
@@ -85,7 +85,7 @@ export default function Dashboard() {
                     <List className="h-10 w-10 text-primary-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl text-foreground">My Submissions</CardTitle>
+                    <CardTitle className="text-xl text-card-foreground">My Submissions</CardTitle>
                     <CardDescription>View and track your recent TDS requests</CardDescription>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function Dashboard() {
                 <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
                   <Search className="h-10 w-10 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-xl text-foreground">View All Requests</CardTitle>
+                <CardTitle className="text-xl text-card-foreground">View All Requests</CardTitle>
                 <CardDescription>Search and review all TDS submissions</CardDescription>
               </CardHeader>
               <CardContent>
@@ -157,7 +157,7 @@ export default function Dashboard() {
                 <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
                   <FileText className="h-10 w-10 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-xl text-foreground">Submit Request</CardTitle>
+                <CardTitle className="text-xl text-card-foreground">Submit Request</CardTitle>
                 <CardDescription>Create a new TDS entry</CardDescription>
               </CardHeader>
               <CardContent>
@@ -174,7 +174,7 @@ export default function Dashboard() {
                   <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
                     <Users className="h-10 w-10 text-primary-foreground" />
                   </div>
-                  <CardTitle className="text-xl text-foreground">Manage Users</CardTitle>
+                  <CardTitle className="text-xl text-card-foreground">Manage Users</CardTitle>
                   <CardDescription>Control user roles and permissions</CardDescription>
                 </CardHeader>
                 <CardContent>
