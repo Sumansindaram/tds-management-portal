@@ -625,7 +625,6 @@ export default function Form() {
                   />
                 </div>
               </div>
-              </div>
             </section>
 
             {/* ADAMS */}
@@ -634,8 +633,7 @@ export default function Form() {
                 <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">5</span>
                 ADAMS
               </h3>
-              <div className="p-6">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="p-6 grid gap-4 md:grid-cols-2">
                 <div>
                   <Label>Service *</Label>
                   <Select value={formData.service} onValueChange={(v) => handleInputChange('service', v)}>
@@ -694,11 +692,12 @@ export default function Form() {
             </section>
 
             {/* Transportation Data */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">6</span>
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">6</span>
                 Transportation Data
               </h3>
+              <div className="p-6">
               <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
                 {TRANSPORT_GROUPS.map(group => (
                   <Label
@@ -739,13 +738,14 @@ export default function Form() {
                   </Label>
                 ))}
               </div>
+              </div>
             </section>
 
             {/* Terms and Conditions */}
-            <section className="bg-destructive/5 rounded-lg p-6 border-2 border-destructive/30 shadow-md">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-destructive flex items-center gap-3 border-b-2 border-destructive/20">
-                <span className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <section className="bg-card rounded-lg border-2 border-success/30 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -753,6 +753,7 @@ export default function Form() {
                 </span>
                 Declaration and Acknowledgement *
               </h3>
+              <div className="p-6 space-y-4">
               <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
                 <p className="text-sm font-medium text-destructive flex items-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
@@ -817,14 +818,16 @@ export default function Form() {
                   </Label>
                 </div>
               </div>
+              </div>
             </section>
 
             {/* Supporting Documents */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">7</span>
-                Supporting Documents *
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">7</span>
+                Supporting Documents (incl. .msg files) *
               </h3>
+              <div className="p-6">
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 hover:border-primary/50 transition-colors bg-primary/5">
                   <Input
@@ -853,6 +856,7 @@ export default function Form() {
                     </div>
                   </div>
                 )}
+              </div>
               </div>
             </section>
 
