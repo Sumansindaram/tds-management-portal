@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database } from 'lucide-react';
+import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -13,14 +13,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import desLogo from '@/assets/des-logo.jfif';
 
 export function Header() {
   const { user, role, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [fullName, setFullName] = React.useState<string>('');
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (user?.id) {
@@ -63,111 +73,237 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-white border-b-4 border-primary shadow-md">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/')}>
-            <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-14" />
-            <div className="border-l-2 border-primary/30 pl-4">
-              <h1 className="text-xl font-bold text-primary">TDS Management System</h1>
-              <p className="text-xs text-muted-foreground">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
+          <div className="flex items-center gap-2 sm:gap-4 cursor-pointer flex-1 min-w-0" onClick={() => navigate('/')}>
+            <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-10 sm:h-14 shrink-0" />
+            <div className="border-l-2 border-primary/30 pl-2 sm:pl-4 min-w-0">
+              <h1 className="text-sm sm:text-xl font-bold text-primary truncate">TDS Management System</h1>
+              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex items-center gap-2">
             {user && (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/')}
-                  className="text-foreground hover:bg-primary/10 bg-secondary/50"
-                >
-                  <Home className="mr-2 h-4 w-4" />
-                  Home
-                </Button>
-                {(role === 'admin' || role === 'super_admin') && (
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex items-center gap-2">
                   <Button
-                    variant="ghost"
+                    variant="default"
                     size="sm"
-                    onClick={() => navigate('/admin')}
-                    className="text-foreground hover:bg-primary/10 bg-secondary/50"
+                    onClick={() => navigate('/')}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    <Database className="mr-2 h-4 w-4" />
-                    View All Requests
+                    <Home className="mr-2 h-4 w-4" />
+                    Home
                   </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/form')}
-                  className="text-foreground hover:bg-primary/10 bg-secondary/50"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Submit Request
-                </Button>
-                {role === 'super_admin' && (
+                  {(role === 'admin' || role === 'super_admin') && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => navigate('/admin')}
+                      className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    >
+                      <Database className="mr-2 h-4 w-4" />
+                      View All Requests
+                    </Button>
+                  )}
                   <Button
-                    variant="ghost"
+                    variant="default"
                     size="sm"
-                    onClick={() => navigate('/users')}
-                    className="text-foreground hover:bg-primary/10 bg-secondary/50"
+                    onClick={() => navigate('/form')}
+                    className="bg-accent text-accent-foreground hover:bg-accent/80"
                   >
-                    <Users className="mr-2 h-4 w-4" />
-                    Manage Users
+                    <User className="mr-2 h-4 w-4" />
+                    Submit Request
                   </Button>
-                )}
-                
-                {role === 'super_admin' ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="default" 
-                        size="sm"
-                        className="bg-badge-admin text-white hover:bg-badge-admin/90 gap-1"
+                  {role === 'super_admin' && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => navigate('/users')}
+                      className="bg-muted text-foreground hover:bg-muted/80"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Manage Users
+                    </Button>
+                  )}
+                  
+                  {role === 'super_admin' ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          className="bg-badge-admin text-white hover:bg-badge-admin/90 gap-1"
+                        >
+                          <Shield className="h-3 w-3 mr-1" />
+                          Super Admin
+                          <ChevronDown className="h-3 w-3 ml-1" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="z-50 w-64 bg-background border-primary/20">
+                        <DropdownMenuLabel className="font-normal">
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-semibold text-foreground">Super Admin Tools</p>
+                            <p className="text-xs text-muted-foreground">System administration options</p>
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => {
+                          toast({
+                            title: "Backend Access",
+                            description: "Click 'View Backend' in the Lovable chat to access the database dashboard.",
+                            duration: 5000,
+                          });
+                        }}>
+                          <Database className="mr-2 h-4 w-4" />
+                          <span>Backend Dashboard</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : role === 'admin' ? (
+                    <Badge variant="default" className="bg-badge-user text-white">
+                      <Shield className="mr-1 h-3 w-3" />
+                      Admin
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="bg-muted text-foreground">
+                      <User className="mr-1 h-3 w-3" />
+                      User
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Mobile Menu */}
+                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="lg:hidden"
+                    >
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[280px] sm:w-[350px]">
+                    <SheetHeader>
+                      <SheetTitle className="text-left">Navigation Menu</SheetTitle>
+                    </SheetHeader>
+                    <div className="flex flex-col gap-3 mt-6">
+                      <Button
+                        variant="default"
+                        className="w-full justify-start bg-primary text-primary-foreground"
+                        onClick={() => {
+                          navigate('/');
+                          setMobileMenuOpen(false);
+                        }}
                       >
-                        <Shield className="h-3 w-3 mr-1" />
-                        Super Admin
-                        <ChevronDown className="h-3 w-3 ml-1" />
+                        <Home className="mr-2 h-4 w-4" />
+                        Home
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="z-50 w-64 bg-background border-primary/20">
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="flex flex-col space-y-1">
-                          <p className="text-sm font-semibold text-foreground">Super Admin Tools</p>
-                          <p className="text-xs text-muted-foreground">System administration options</p>
+                      {(role === 'admin' || role === 'super_admin') && (
+                        <Button
+                          variant="default"
+                          className="w-full justify-start bg-secondary text-secondary-foreground"
+                          onClick={() => {
+                            navigate('/admin');
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          <Database className="mr-2 h-4 w-4" />
+                          View All Requests
+                        </Button>
+                      )}
+                      <Button
+                        variant="default"
+                        className="w-full justify-start bg-accent text-accent-foreground"
+                        onClick={() => {
+                          navigate('/form');
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Submit Request
+                      </Button>
+                      {role === 'super_admin' && (
+                        <>
+                          <Button
+                            variant="default"
+                            className="w-full justify-start bg-muted text-foreground"
+                            onClick={() => {
+                              navigate('/users');
+                              setMobileMenuOpen(false);
+                            }}
+                          >
+                            <Users className="mr-2 h-4 w-4" />
+                            Manage Users
+                          </Button>
+                          <Button
+                            variant="default"
+                            className="w-full justify-start bg-badge-admin text-white"
+                            onClick={() => {
+                              toast({
+                                title: "Backend Access",
+                                description: "Click 'View Backend' in the Lovable chat to access the database dashboard.",
+                                duration: 5000,
+                              });
+                              setMobileMenuOpen(false);
+                            }}
+                          >
+                            <Database className="mr-2 h-4 w-4" />
+                            Backend Dashboard
+                          </Button>
+                        </>
+                      )}
+                      
+                      <div className="border-t pt-3 mt-3">
+                        {role === 'super_admin' ? (
+                          <Badge variant="default" className="bg-badge-admin text-white mb-3 w-full justify-center py-2">
+                            <Shield className="mr-1 h-3 w-3" />
+                            Super Admin
+                          </Badge>
+                        ) : role === 'admin' ? (
+                          <Badge variant="default" className="bg-badge-user text-white mb-3 w-full justify-center py-2">
+                            <Shield className="mr-1 h-3 w-3" />
+                            Admin
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-muted text-foreground mb-3 w-full justify-center py-2">
+                            <User className="mr-1 h-3 w-3" />
+                            User
+                          </Badge>
+                        )}
+                        
+                        <div className="bg-muted/30 rounded-lg p-3 mb-3">
+                          <p className="text-sm font-semibold">{fullName || user.email?.split('@')[0] || 'User'}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => {
-                        toast({
-                          title: "Backend Access",
-                          description: "Click 'View Backend' in the Lovable chat to access the database dashboard.",
-                          duration: 5000,
-                        });
-                      }}>
-                        <Database className="mr-2 h-4 w-4" />
-                        <span>Backend Dashboard</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : role === 'admin' ? (
-                  <Badge variant="default" className="bg-badge-user text-white">
-                    <Shield className="mr-1 h-3 w-3" />
-                    Admin
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="bg-muted text-foreground">
-                    <User className="mr-1 h-3 w-3" />
-                    User
-                  </Badge>
-                )}
+                        
+                        <Button
+                          variant="destructive"
+                          className="w-full"
+                          onClick={() => {
+                            signOut();
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Logout
+                        </Button>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
                 
+                {/* User Dropdown - Desktop Only */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger asChild className="hidden lg:flex">
                     <Button 
                       variant="outline" 
                       size="sm"
                       className="border-primary/30 hover:bg-primary/5 gap-1"
                     >
                       <User className="h-4 w-4 mr-1" />
-                      {fullName || user.email?.split('@')[0] || 'User'}
+                      <span className="hidden xl:inline">{fullName || user.email?.split('@')[0] || 'User'}</span>
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
