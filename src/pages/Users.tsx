@@ -330,18 +330,19 @@ export default function Users() {
                 </div>
               </>
             )}
+            
+            <div className="mt-8 pt-6 border-t flex justify-start">
+              <Button
+                onClick={() => navigate('/')}
+                variant="outline"
+                size="sm"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </div>
           </div>
         </Card>
-        <div className="mt-6 flex justify-start">
-          <Button
-            onClick={() => navigate('/')}
-            variant="outline"
-            size="sm"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </div>
       </main>
 
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>

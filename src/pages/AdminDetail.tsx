@@ -776,18 +776,19 @@ export default function AdminDetail() {
                 </Button>
               </div>
             )}
+            
+            <div className="mt-8 pt-6 border-t flex justify-start">
+              <Button
+                onClick={() => navigate('/admin')}
+                variant="outline"
+                size="sm"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to List
+              </Button>
+            </div>
           </CardContent>
         </Card>
-        <div className="mt-6 flex justify-start">
-          <Button
-            onClick={() => navigate('/admin')}
-            variant="outline"
-            size="sm"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to List
-          </Button>
-        </div>
       </main>
     </div>
   );
