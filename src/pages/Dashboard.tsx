@@ -45,12 +45,12 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto p-6 lg:p-8 bg-contentBg/5">
+      <main className="container mx-auto p-6 lg:p-8">
         <div className="mb-10">
-          <h1 className="mb-3 text-4xl font-bold text-primary">
+          <h1 className="mb-3 text-4xl font-bold text-foreground">
             {isAdmin ? 'TDS Admin Dashboard' : 'TDS Management Portal'}
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-foreground/80">
             {isAdmin
               ? 'Manage and review Tie Down Scheme submissions'
               : 'Submit and track your Tie Down Scheme requests'}

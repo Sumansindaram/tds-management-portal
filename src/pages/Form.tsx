@@ -344,10 +344,10 @@ export default function Form() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
+    <div className="min-h-screen bg-background">
       {user && <Header />}
       {!user && (
-        <header className="bg-white border-b-4 border-primary shadow-md">
+        <header className="bg-card border-b-4 border-primary shadow-md">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
