@@ -114,6 +114,36 @@ export default function Auth() {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: 'Email Required',
+        description: 'Please enter your email address to reset your password.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Password Reset Email Sent',
+        description: 'Check your email for a link to reset your password.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to send password reset email',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 p-4">
       <Card className="w-full max-w-md border-primary/20 shadow-xl">
@@ -155,7 +185,19 @@ export default function Auth() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                {!isSignUp && (
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto p-0 text-xs"
+                    onClick={handlePasswordReset}
+                  >
+                    Forgot Password?
+                  </Button>
+                )}
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -185,7 +227,7 @@ export default function Auth() {
                   disabled={loading}
                 >
                   <Building2 className="mr-2 h-5 w-5" />
-                  Sign in with Microsoft
+                  Sign in SSO
                 </Button>
               </>
             )}
