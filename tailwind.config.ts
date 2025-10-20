@@ -63,6 +63,11 @@ export default {
           rejected: "hsl(var(--badge-rejected))",
           returned: "hsl(var(--badge-returned))",
         },
+        ribbon: {
+          DEFAULT: "hsl(var(--ribbon))",
+          foreground: "hsl(var(--ribbon-foreground))",
+        },
+        contentBg: "hsl(var(--content-bg))",
       },
       borderRadius: {
         lg: "var(--radius)",

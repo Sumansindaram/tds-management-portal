@@ -43,9 +43,9 @@ export default function Dashboard() {
   }, [isAdmin, user]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
+    <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto p-6 lg:p-8">
+      <main className="container mx-auto p-6 lg:p-8 bg-contentBg/5">
         <div className="mb-10">
           <h1 className="mb-3 text-4xl font-bold text-primary">
             {isAdmin ? 'TDS Admin Dashboard' : 'TDS Management Portal'}
@@ -157,18 +157,18 @@ export default function Dashboard() {
             </Card>
 
             <Card 
-              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-accent/5 group" 
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-secondary/5 group" 
               onClick={() => navigate('/form')}
             >
               <CardHeader className="pb-3">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent shadow-lg group-hover:scale-110 transition-transform">
-                  <FileText className="h-8 w-8 text-accent-foreground" />
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary shadow-lg group-hover:scale-110 transition-transform">
+                  <FileText className="h-8 w-8 text-secondary-foreground" />
                 </div>
                 <CardTitle className="text-xl text-primary">Submit Request</CardTitle>
                 <CardDescription>Create a new TDS entry</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full shadow-md" variant="outline">New Entry</Button>
+                <Button className="w-full shadow-md bg-secondary text-secondary-foreground hover:bg-secondary/90">New Entry</Button>
               </CardContent>
             </Card>
 
@@ -185,7 +185,7 @@ export default function Dashboard() {
                   <CardDescription>Control user roles and permissions</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full shadow-md" variant="outline">Manage Users</Button>
+                  <Button className="w-full shadow-md bg-success text-success-foreground hover:bg-success/90">Manage Users</Button>
                 </CardContent>
               </Card>
             )}

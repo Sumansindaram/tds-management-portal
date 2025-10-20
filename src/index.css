@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
+    --background: 0 0% 96%;
     --foreground: 210 30% 15%;
 
     --card: 0 0% 100%;
@@ -17,16 +17,16 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 210 30% 15%;
 
-    --primary: 215 45% 35%;
+    --primary: 290 40% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 92%;
-    --secondary-foreground: 210 30% 20%;
+    --secondary: 290 30% 50%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 210 10% 95%;
     --muted-foreground: 210 15% 45%;
 
-    --accent: 215 55% 45%;
+    --accent: 215 55% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 55%;
@@ -34,7 +34,7 @@ All colors MUST be HSL.
 
     --border: 210 15% 88%;
     --input: 210 10% 92%;
-    --ring: 215 45% 35%;
+    --ring: 290 40% 35%;
 
     --radius: 0.5rem;
 
@@ -44,14 +44,19 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --badge-admin: 215 45% 35%;
+    --ribbon: 290 40% 35%;
+    --ribbon-foreground: 0 0% 100%;
+    
+    --content-bg: 210 20% 25%;
+    
+    --badge-admin: 290 40% 35%;
     --badge-user: 215 40% 45%;
     --badge-pending: 43 74% 66%;
     --badge-approved: 142 71% 45%;
     --badge-rejected: 0 72% 51%;
     --badge-returned: 32 95% 44%;
     
-    --gradient-primary: linear-gradient(135deg, hsl(215 45% 35%), hsl(215 55% 45%));
+    --gradient-primary: linear-gradient(135deg, hsl(290 40% 35%), hsl(290 35% 45%));
     --shadow-md: 0 4px 6px -1px hsl(210 30% 15% / 0.1), 0 2px 4px -2px hsl(210 30% 15% / 0.1);
     --shadow-lg: 0 10px 15px -3px hsl(210 30% 15% / 0.1), 0 4px 6px -4px hsl(210 30% 15% / 0.1);
   }
@@ -66,11 +71,11 @@ All colors MUST be HSL.
     --popover: 210 25% 16%;
     --popover-foreground: 210 10% 95%;
 
-    --primary: 215 50% 50%;
+    --primary: 290 40% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 25% 25%;
-    --secondary-foreground: 210 10% 95%;
+    --secondary: 290 30% 55%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 210 20% 22%;
     --muted-foreground: 210 15% 60%;
@@ -83,15 +88,20 @@ All colors MUST be HSL.
 
     --border: 210 20% 28%;
     --input: 210 20% 28%;
-    --ring: 215 50% 50%;
+    --ring: 290 40% 45%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
+    
+    --ribbon: 290 40% 45%;
+    --ribbon-foreground: 0 0% 100%;
+    
+    --content-bg: 210 25% 20%;
 
-    --badge-admin: 215 50% 50%;
+    --badge-admin: 290 40% 45%;
     --badge-user: 215 40% 55%;
     --badge-pending: 43 74% 66%;
     --badge-approved: 142 71% 45%;

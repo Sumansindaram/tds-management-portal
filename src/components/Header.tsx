@@ -70,14 +70,14 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b-4 border-primary shadow-md">
+    <header className="sticky top-0 z-50 bg-ribbon border-b-4 border-primary shadow-md">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4 cursor-pointer flex-1 min-w-0" onClick={() => navigate('/')}>
             <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-10 sm:h-14 shrink-0" />
-            <div className="border-l-2 border-primary/30 pl-2 sm:pl-4 min-w-0">
-              <h1 className="text-sm sm:text-xl font-bold text-primary truncate">TDS Management System</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
+            <div className="border-l-2 border-ribbon-foreground/30 pl-2 sm:pl-4 min-w-0">
+              <h1 className="text-sm sm:text-xl font-bold text-ribbon-foreground truncate">TDS Management System</h1>
+              <p className="text-[10px] sm:text-xs text-ribbon-foreground/80 hidden sm:block">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
             </div>
           </div>
           

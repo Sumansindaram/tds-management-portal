@@ -382,11 +382,12 @@ export default function Form() {
           </CardHeader>
           <CardContent className="space-y-8 pt-8">
             {/* Asset Owner Details */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">1</span>
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">1</span>
                 Asset Owner Details
               </h3>
+              <div className="p-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <Label htmlFor="ssr_name">SSR/SR Name *</Label>
@@ -408,14 +409,16 @@ export default function Form() {
                   />
                 </div>
               </div>
+              </div>
             </section>
 
             {/* Asset Details */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">2</span>
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">2</span>
                 Asset Details
               </h3>
+              <div className="p-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <Label>Designation *</Label>
@@ -451,15 +454,16 @@ export default function Form() {
                   />
                 </div>
               </div>
+              </div>
             </section>
 
             {/* Basic Details */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">3</span>
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">3</span>
                 Basic Details
               </h3>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="p-6 grid gap-4 md:grid-cols-3">
                 <div>
                   <Label>Length (m) *</Label>
                   <Input
@@ -621,14 +625,16 @@ export default function Form() {
                   />
                 </div>
               </div>
+              </div>
             </section>
 
             {/* ADAMS */}
-            <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
-              <h3 className="mb-6 pb-3 text-xl font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">5</span>
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">5</span>
                 ADAMS
               </h3>
+              <div className="p-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <Label>Service *</Label>
