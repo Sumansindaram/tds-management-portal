@@ -524,7 +524,7 @@ export default function AdminDetail() {
                     <Button
                       key={group}
                       variant={hasFiles ? "default" : "secondary"}
-                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? "" : "opacity-40"}`}
+                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : "opacity-40"}`}
                       disabled={!hasFiles}
                        onClick={() => {
                          if (hasFiles && entry) {
@@ -539,7 +539,7 @@ export default function AdminDetail() {
                         <span className="text-xs font-medium text-left truncate flex-1">{group}</span>
                       </div>
                       {hasFiles && (
-                        <span className="text-[10px] text-primary-foreground/80 mt-1">
+                        <span className="text-[10px] opacity-80 mt-1">
                           {transportFiles[group].length} file{transportFiles[group].length > 1 ? 's' : ''}
                         </span>
                       )}

@@ -274,7 +274,7 @@ export default function RequestDetail() {
                     {assetOwnerFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border break-all">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border break-all">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -290,7 +290,7 @@ export default function RequestDetail() {
                     {basicDetailsFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -306,7 +306,7 @@ export default function RequestDetail() {
                     {adamsDataFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -325,7 +325,7 @@ export default function RequestDetail() {
                     {assetDetailsFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -341,7 +341,7 @@ export default function RequestDetail() {
                     {driverInfoFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -362,7 +362,7 @@ export default function RequestDetail() {
                     <Button
                       key={group}
                       variant={hasFiles ? 'default' : 'outline'}
-                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs ${hasFiles ? '' : 'opacity-40'}`}
+                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : 'opacity-40'}`}
                       disabled={!hasFiles}
                       onClick={() => {
                         if (hasFiles && entry) {
@@ -377,7 +377,7 @@ export default function RequestDetail() {
                         <span className="text-[10px] sm:text-xs font-medium text-left truncate flex-1">{group}</span>
                       </div>
                       {hasFiles && (
-                        <span className="text-[9px] sm:text-[10px] text-primary-foreground/80 mt-1">
+                        <span className="text-[9px] sm:text-[10px] opacity-80 mt-1">
                           {transportFiles[group].length} file{transportFiles[group].length > 1 ? 's' : ''}
                         </span>
                       )}

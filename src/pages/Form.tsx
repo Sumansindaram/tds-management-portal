@@ -702,7 +702,11 @@ export default function Form() {
                 {TRANSPORT_GROUPS.map(group => (
                   <Label
                     key={group}
-                    className="flex cursor-pointer flex-col items-start justify-center gap-2 rounded-lg border-2 border-dashed border-primary/30 px-3 py-2 h-auto min-h-[3rem] w-full transition-colors hover:border-primary hover:bg-primary/5"
+                    className={`flex cursor-pointer flex-col items-start justify-center gap-2 rounded-lg border-2 px-3 py-2 h-auto min-h-[3rem] w-full transition-colors ${
+                      transportFiles[group] 
+                        ? 'border-[hsl(var(--maroon))] bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' 
+                        : 'border-dashed border-primary/30 hover:border-primary hover:bg-primary/5'
+                    }`}
                   >
                     <div className="flex items-center gap-2 w-full">
                       <svg
@@ -715,15 +719,15 @@ export default function Form() {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className={transportFiles[group] ? "text-primary shrink-0" : "text-muted-foreground shrink-0"}
+                        className="shrink-0"
                       >
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                         <polyline points="14 2 14 8 20 8" />
                       </svg>
-                      <span className="text-xs font-medium text-foreground text-left truncate flex-1">{group}</span>
+                      <span className="text-xs font-medium text-left truncate flex-1">{group}</span>
                     </div>
                     {transportFiles[group] && (
-                      <span className="text-[10px] text-primary font-medium">✓ Uploaded</span>
+                      <span className="text-[10px] font-medium">✓ Uploaded</span>
                     )}
                     <Input
                       type="file"
