@@ -274,7 +274,7 @@ export default function RequestDetail() {
                     {assetOwnerFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border break-all">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border break-all">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -290,7 +290,7 @@ export default function RequestDetail() {
                     {basicDetailsFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -306,7 +306,7 @@ export default function RequestDetail() {
                     {adamsDataFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -325,7 +325,7 @@ export default function RequestDetail() {
                     {assetDetailsFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>
@@ -341,7 +341,7 @@ export default function RequestDetail() {
                     {driverInfoFields.map(field => (
                       <div key={field.label} className="space-y-1">
                         <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
                       </div>
                     ))}
                   </div>

@@ -140,15 +140,15 @@ export function Header() {
                           <ChevronDown className="h-3 w-3 ml-1" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="z-50 w-64 bg-background border-primary/20">
+                      <DropdownMenuContent align="end" className="z-50 w-64 bg-card border-2">
                         <DropdownMenuLabel className="font-normal">
                           <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-semibold text-foreground">Super Admin Tools</p>
+                            <p className="text-sm font-semibold text-card-foreground">Super Admin Tools</p>
                             <p className="text-xs text-muted-foreground">System administration options</p>
                           </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer hover:bg-primary/10" onClick={() => {
+                        <DropdownMenuItem className="cursor-pointer hover:bg-primary/10 text-card-foreground" onClick={() => {
                           toast({
                             title: "Backend Access",
                             description: "Click 'View Backend' in the Lovable chat to access the database dashboard.",
@@ -300,7 +300,7 @@ export function Header() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="border-primary/30 hover:bg-primary/5 gap-1"
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 gap-1"
                     >
                       <User className="h-4 w-4 mr-1" />
                       <span className="hidden xl:inline">{fullName || user.email?.split('@')[0] || 'User'}</span>

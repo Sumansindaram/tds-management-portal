@@ -142,10 +142,7 @@ export default function Dashboard() {
                   <Search className="h-10 w-10 text-primary-foreground" />
                 </div>
                 <CardTitle className="text-xl text-foreground">View All Requests</CardTitle>
-                <CardDescription className="text-base">Search and review all TDS submissions</CardDescription>
-                {totalEntries > 0 && (
-                  <p className="text-sm font-semibold text-foreground/80 mt-2">{totalEntries} Total Entries</p>
-                )}
+                <CardDescription>Search and review all TDS submissions</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View All Requests</Button>
