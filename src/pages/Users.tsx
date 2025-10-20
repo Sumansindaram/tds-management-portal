@@ -259,7 +259,7 @@ export default function Users() {
                       {currentUsers.map((u, index) => (
                         <TableRow 
                           key={u.id}
-                          className={`hover:bg-primary/10 transition-colors ${index % 2 === 1 ? 'bg-muted/30' : ''}`}
+                          className={`hover:bg-primary/10 transition-colors ${index % 2 === 1 ? 'bg-muted/50' : ''}`}
                         >
                           <TableCell className="font-medium">{u.full_name}</TableCell>
                           <TableCell>{u.username || u.full_name}</TableCell>
