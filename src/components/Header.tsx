@@ -307,7 +307,7 @@ export function Header() {
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="z-50 w-80 bg-popover border-2">
+                  <DropdownMenuContent align="end" className="z-50 w-80 bg-card border-2">
                     <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
                       <img src={desLogo} alt="MOD & DE&S" className="h-12" />
                       <div className="flex-1">
