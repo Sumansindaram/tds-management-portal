@@ -26,7 +26,7 @@ jobs:
 
       - name: Build frontend
         env:
-          VITE_API_BASE_URL: https://tds-des-mod-uk.azurewebsites.net
+          VITE_API_BASE_URL: https://tds-resources-fkhyf0f6bwe2b8h7.uksouth-01.azurewebsites.net
         run: npm run build
 
       # Prepare backend
@@ -57,7 +57,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'tds-des-mod-uk'
+          app-name: 'TDS-resources'
           slot-name: 'Production'
           package: azure-backend/deploy.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B022F352D5064C748775869EABE5302E }}
