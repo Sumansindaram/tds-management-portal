@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield } from 'lucide-react';
+import { Shield, Building2 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
@@ -92,6 +93,27 @@ export default function Auth() {
     }
   };
 
+  const handleMicrosoftSignIn = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'azure',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to sign in with Microsoft',
+        variant: 'destructive',
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5 p-4">
       <Card className="w-full max-w-md border-primary/20 shadow-xl">
@@ -145,6 +167,29 @@ export default function Auth() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Please wait...' : isSignUp ? 'Sign Up' : 'Sign In'}
             </Button>
+            
+            {!isSignUp && (
+              <>
+                <div className="relative my-4">
+                  <Separator />
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+                    OR
+                  </span>
+                </div>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-primary/30 hover:bg-primary/5"
+                  onClick={handleMicrosoftSignIn}
+                  disabled={loading}
+                >
+                  <Building2 className="mr-2 h-5 w-5" />
+                  Sign in with Microsoft
+                </Button>
+              </>
+            )}
+            
             <Button
               type="button"
               variant="ghost"
