@@ -49,7 +49,7 @@ jobs:
         working-directory: ./azure-backend
         run: |
           mkdir -p deploy
-          cp -r dist node_modules package.json package-lock.json public deploy/
+          cp -r dist node_modules package.json package-lock.json public web.config deploy/
           cd deploy
           zip -r ../deploy.zip .
 
