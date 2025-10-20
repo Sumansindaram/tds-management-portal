@@ -68,24 +68,24 @@ export default function Dashboard() {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
                   <PlusCircle className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-xl text-primary">New Request</CardTitle>
+                <CardTitle className="text-xl text-foreground">New Request</CardTitle>
                 <CardDescription>Submit a new TDS entry request</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full shadow-md">Create Request</Button>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Create Request</Button>
               </CardContent>
             </Card>
 
             <Card 
-              className="transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-accent/5 col-span-full md:col-span-2 lg:col-span-3"
+              className="transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 col-span-full md:col-span-2 lg:col-span-3"
             >
-              <CardHeader className="pb-3 bg-accent/5 rounded-t-lg">
+              <CardHeader className="pb-3 bg-primary/5 rounded-t-lg">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent shadow-lg">
-                    <List className="h-8 w-8 text-accent-foreground" />
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg">
+                    <List className="h-8 w-8 text-primary-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl text-primary">My Submissions</CardTitle>
+                    <CardTitle className="text-xl text-foreground">My Submissions</CardTitle>
                     <CardDescription>View and track your recent TDS requests</CardDescription>
                   </div>
                 </div>
@@ -131,10 +131,10 @@ export default function Dashboard() {
         )}
 
         {isAdmin && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Admin Tiles */}
             <Card 
-              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 group col-span-full md:col-span-2" 
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 group md:col-span-2" 
               onClick={() => navigate('/admin')}
             >
               <CardHeader className="pb-3">
@@ -143,49 +143,49 @@ export default function Dashboard() {
                     <Search className="h-10 w-10 text-primary-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl text-primary">View All Requests</CardTitle>
+                    <CardTitle className="text-2xl text-foreground">View All Requests</CardTitle>
                     <CardDescription className="text-base">Search and review all TDS submissions</CardDescription>
                     {totalEntries > 0 && (
-                      <p className="text-sm font-semibold text-primary mt-1">{totalEntries} Total Entries</p>
+                      <p className="text-sm font-semibold text-foreground mt-1">{totalEntries} Total Entries</p>
                     )}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <Button className="w-full shadow-md" size="lg">View All Requests</Button>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90" size="lg">View All Requests</Button>
               </CardContent>
             </Card>
 
             <Card 
-              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-secondary/5 group" 
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 group" 
               onClick={() => navigate('/form')}
             >
               <CardHeader className="pb-3">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary shadow-lg group-hover:scale-110 transition-transform">
-                  <FileText className="h-8 w-8 text-secondary-foreground" />
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
+                  <FileText className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-xl text-primary">Submit Request</CardTitle>
+                <CardTitle className="text-xl text-foreground">Submit Request</CardTitle>
                 <CardDescription>Create a new TDS entry</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full shadow-md bg-secondary text-secondary-foreground hover:bg-secondary/90">New Entry</Button>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">New Entry</Button>
               </CardContent>
             </Card>
 
             {isSuperAdmin && (
               <Card 
-                className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-warning/5 group" 
+                className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 group" 
                 onClick={() => navigate('/users')}
               >
                 <CardHeader className="pb-3">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-warning shadow-lg group-hover:scale-110 transition-transform">
-                    <Users className="h-8 w-8 text-warning-foreground" />
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
+                    <Users className="h-8 w-8 text-primary-foreground" />
                   </div>
-                  <CardTitle className="text-xl text-primary">Manage Users</CardTitle>
+                  <CardTitle className="text-xl text-foreground">Manage Users</CardTitle>
                   <CardDescription>Control user roles and permissions</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full shadow-md bg-warning text-warning-foreground hover:bg-warning/90">Manage Users</Button>
+                  <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Manage Users</Button>
                 </CardContent>
               </Card>
             )}

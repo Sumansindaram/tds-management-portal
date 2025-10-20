@@ -100,7 +100,7 @@ export function Header() {
                       variant="default"
                       size="sm"
                       onClick={() => navigate('/admin')}
-                      className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       <Database className="mr-2 h-4 w-4" />
                       View All Requests
@@ -110,7 +110,7 @@ export function Header() {
                     variant="default"
                     size="sm"
                     onClick={() => navigate('/form')}
-                    className="bg-accent text-accent-foreground hover:bg-accent/80"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Submit Request
@@ -120,7 +120,7 @@ export function Header() {
                       variant="default"
                       size="sm"
                       onClick={() => navigate('/users')}
-                      className="bg-warning text-warning-foreground hover:bg-warning/80"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       <Users className="mr-2 h-4 w-4" />
                       Manage Users
@@ -203,7 +203,7 @@ export function Header() {
                       {(role === 'admin' || role === 'super_admin') && (
                         <Button
                           variant="default"
-                          className="w-full justify-start bg-secondary text-secondary-foreground"
+                          className="w-full justify-start bg-primary text-primary-foreground"
                           onClick={() => {
                             navigate('/admin');
                             setMobileMenuOpen(false);
@@ -215,7 +215,7 @@ export function Header() {
                       )}
                       <Button
                         variant="default"
-                        className="w-full justify-start bg-accent text-accent-foreground"
+                        className="w-full justify-start bg-primary text-primary-foreground"
                         onClick={() => {
                           navigate('/form');
                           setMobileMenuOpen(false);
@@ -228,7 +228,7 @@ export function Header() {
                         <>
                           <Button
                             variant="default"
-                            className="w-full justify-start bg-warning text-warning-foreground"
+                            className="w-full justify-start bg-primary text-primary-foreground"
                             onClick={() => {
                               navigate('/users');
                               setMobileMenuOpen(false);
