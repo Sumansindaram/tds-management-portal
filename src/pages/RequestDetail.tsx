@@ -361,8 +361,8 @@ export default function RequestDetail() {
                   return (
                     <Button
                       key={group}
-                      variant={hasFiles ? 'default' : 'outline'}
-                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : 'opacity-40'}`}
+                      variant={hasFiles ? 'default' : 'secondary'}
+                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : 'bg-muted text-card-foreground'}`}
                       disabled={!hasFiles}
                       onClick={() => {
                         if (hasFiles && entry) {
