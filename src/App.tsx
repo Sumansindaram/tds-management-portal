@@ -13,6 +13,7 @@ import AdminDetail from "./pages/AdminDetail";
 import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 import RequestDetail from "./pages/RequestDetail";
+import MySubmissions from "./pages/MySubmissions";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,14 @@ const App = () => (
             />
             {/* Public form - no auth required */}
             <Route path="/form" element={<Form />} />
+            <Route
+              path="/my-submissions"
+              element={
+                <ProtectedRoute>
+                  <MySubmissions />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin"
               element={

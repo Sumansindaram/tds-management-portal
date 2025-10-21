@@ -77,54 +77,20 @@ export default function Dashboard() {
             </Card>
 
             <Card 
-              className="transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 md:col-span-2"
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-gradient-to-br from-card to-primary/5 group"
+              onClick={() => navigate('/my-submissions')}
             >
               <CardHeader className="pb-3 bg-primary/5 rounded-t-lg">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg">
-                    <List className="h-10 w-10 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl text-card-foreground">My Submissions</CardTitle>
-                    <CardDescription>View and track your recent TDS requests</CardDescription>
-                  </div>
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform">
+                  <List className="h-10 w-10 text-primary-foreground" />
                 </div>
+                <CardTitle className="text-xl text-card-foreground">My Submissions</CardTitle>
+                <CardDescription>View and track your TDS requests</CardDescription>
               </CardHeader>
               <CardContent>
-                {loadingMy ? (
-                  <p className="text-sm text-muted-foreground">Loading...</p>
-                ) : myEntries.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No submissions yet.</p>
-                    <Button variant="outline" className="mt-4" onClick={() => navigate('/form')}>
-                      Create Your First Request
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                    {myEntries.map((e) => (
-                      <div 
-                        key={e.id} 
-                        className="flex flex-col rounded-xl border-2 border-primary/20 bg-card p-4 transition-all hover:border-primary/40 hover:shadow-lg cursor-pointer"
-                        onClick={() => navigate(`/request/${e.id}`)}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <p className="font-bold text-primary">{e.reference}</p>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            e.status === 'Approved' ? 'bg-success/20 text-success' :
-                            e.status === 'Pending' ? 'bg-warning/20 text-warning' :
-                            e.status === 'Rejected' ? 'bg-destructive/20 text-destructive' :
-                            'bg-muted text-muted-foreground'
-                          }`}>
-                            {e.status}
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground truncate mb-1">{e.short_name || e.nsn}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleDateString()}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">
+                  View Submissions ({myEntries.length})
+                </Button>
               </CardContent>
             </Card>
           </div>

@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X } from 'lucide-react';
+import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X, List } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -87,43 +87,55 @@ export function Header() {
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-2">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate('/')}
-                    className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                   >
                     <Home className="mr-2 h-4 w-4" />
                     Home
                   </Button>
                   {(role === 'admin' || role === 'super_admin') && (
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() => navigate('/admin')}
-                      className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
                       <Database className="mr-2 h-4 w-4" />
                       View All Requests
                     </Button>
                   )}
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate('/form')}
-                    className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                   >
                     <User className="mr-2 h-4 w-4" />
-                    Submit Request
+                    {(role === 'admin' || role === 'super_admin') ? 'Submit Request' : 'Create Request'}
                   </Button>
-                  {role === 'super_admin' && (
+                  {(role === 'admin' || role === 'super_admin') ? (
+                    role === 'super_admin' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate('/users')}
+                        className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                      >
+                        <Users className="mr-2 h-4 w-4" />
+                        Manage Users
+                      </Button>
+                    )
+                  ) : (
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      onClick={() => navigate('/users')}
-                      className="text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                      onClick={() => navigate('/my-submissions')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
-                      <Users className="mr-2 h-4 w-4" />
-                      Manage Users
+                      <List className="mr-2 h-4 w-4" />
+                      My Submissions
                     </Button>
                   )}
                   
@@ -222,8 +234,21 @@ export function Header() {
                         }}
                       >
                         <User className="mr-2 h-4 w-4" />
-                        Submit Request
+                        {(role === 'admin' || role === 'super_admin') ? 'Submit Request' : 'Create Request'}
                       </Button>
+                      {!(role === 'admin' || role === 'super_admin') && (
+                        <Button
+                          variant="default"
+                          className="w-full justify-start bg-primary text-primary-foreground"
+                          onClick={() => {
+                            navigate('/my-submissions');
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          <List className="mr-2 h-4 w-4" />
+                          My Submissions
+                        </Button>
+                      )}
                       {role === 'super_admin' && (
                         <>
                           <Button
