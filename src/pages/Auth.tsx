@@ -209,7 +209,6 @@ export default function Auth() {
                 
                 <Button
                   type="button"
-                  variant="secondary"
                   className="w-full"
                   onClick={handleMicrosoftSignIn}
                   disabled={loading}

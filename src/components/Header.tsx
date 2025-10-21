@@ -73,79 +73,85 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-ribbon border-b-4 border-primary shadow-md">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-4 cursor-pointer flex-1 min-w-0" onClick={() => navigate('/')}>
-            <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-10 sm:h-14 shrink-0" />
-            <div className="border-l-2 border-ribbon-foreground/30 pl-2 sm:pl-4 min-w-0">
-              <h1 className="text-sm sm:text-xl font-bold text-ribbon-foreground truncate">TDS Management System</h1>
-              <p className="text-[10px] sm:text-xs text-ribbon-foreground/80 hidden sm:block">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+              <img src={desLogo} alt="Ministry of Defence & DE&S" className="h-10 sm:h-14 shrink-0" />
+              <div className="border-l-2 border-ribbon-foreground/30 pl-2 sm:pl-4 min-w-0">
+                <h1 className="text-sm sm:text-xl font-bold text-ribbon-foreground truncate">TDS Management System</h1>
+                <p className="text-[10px] sm:text-xs text-ribbon-foreground/80 hidden sm:block">JSP 800 Vol 7 - Tie Down Scheme Portal</p>
+              </div>
             </div>
+            
+            {/* Desktop Navigation - Left Side */}
+            {user && (
+              <div className="hidden lg:flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/')}
+                  className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                >
+                  <Home className="mr-2 h-4 w-4" />
+                  Home
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/form')}
+                  className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  {(role === 'admin' || role === 'super_admin') ? 'Submit Request' : 'Create Request'}
+                </Button>
+                {!(role === 'admin' || role === 'super_admin') && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/my-submissions')}
+                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                  >
+                    <List className="mr-2 h-4 w-4" />
+                    My Submissions
+                  </Button>
+                )}
+                {(role === 'admin' || role === 'super_admin') && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/admin')}
+                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                  >
+                    <Database className="mr-2 h-4 w-4" />
+                    View All Requests
+                  </Button>
+                )}
+                {role === 'super_admin' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/users')}
+                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Manage Users
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-2">
             {user && (
               <>
-                {/* Desktop Navigation */}
+                {/* Desktop Navigation - Right Side */}
                 <div className="hidden lg:flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate('/')}
-                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                  >
-                    <Home className="mr-2 h-4 w-4" />
-                    Home
-                  </Button>
-                  {(role === 'admin' || role === 'super_admin') && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate('/admin')}
-                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                    >
-                      <Database className="mr-2 h-4 w-4" />
-                      View All Requests
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate('/form')}
-                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    {(role === 'admin' || role === 'super_admin') ? 'Submit Request' : 'Create Request'}
-                  </Button>
-                  {(role === 'admin' || role === 'super_admin') ? (
-                    role === 'super_admin' && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate('/users')}
-                        className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                      >
-                        <Users className="mr-2 h-4 w-4" />
-                        Manage Users
-                      </Button>
-                    )
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate('/my-submissions')}
-                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                    >
-                      <List className="mr-2 h-4 w-4" />
-                      My Submissions
-                    </Button>
-                  )}
-                  
                   {role === 'super_admin' ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button 
-                          variant="default" 
+                          variant="outline" 
                           size="sm"
-                          className="bg-badge-admin text-white hover:bg-badge-admin/90 gap-1"
+                          className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 gap-1"
                         >
                           <Shield className="h-3 w-3 mr-1" />
                           Super Admin
@@ -173,15 +179,23 @@ export function Header() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : role === 'admin' ? (
-                    <Badge variant="default" className="bg-badge-user text-white">
-                      <Shield className="mr-1 h-3 w-3" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 gap-1"
+                    >
+                      <Shield className="h-3 w-3 mr-1" />
                       Admin
-                    </Badge>
+                    </Button>
                   ) : (
-                    <Badge variant="secondary" className="bg-muted text-muted-foreground">
-                      <User className="mr-1 h-3 w-3" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 gap-1"
+                    >
+                      <User className="h-3 w-3 mr-1" />
                       User
-                    </Badge>
+                    </Button>
                   )}
                 </div>
 
