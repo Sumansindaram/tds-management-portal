@@ -82,6 +82,7 @@ export type Database = {
           submitted_by: string
           unladen_weight: string
           updated_at: string | null
+          user_comment: string | null
           width: string
         }
         Insert: {
@@ -124,6 +125,7 @@ export type Database = {
           submitted_by: string
           unladen_weight: string
           updated_at?: string | null
+          user_comment?: string | null
           width: string
         }
         Update: {
@@ -166,6 +168,7 @@ export type Database = {
           submitted_by?: string
           unladen_weight?: string
           updated_at?: string | null
+          user_comment?: string | null
           width?: string
         }
         Relationships: []
@@ -366,10 +369,7 @@ export type Database = {
       }
     }
     Functions: {
-      generate_tds_reference: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_tds_reference: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -377,10 +377,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_super_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user" | "super_admin"

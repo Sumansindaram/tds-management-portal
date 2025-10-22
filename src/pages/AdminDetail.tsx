@@ -705,6 +705,19 @@ export default function AdminDetail() {
               </div>
             )}
 
+            {/* User Comment from Submission */}
+            {entry?.user_comment && (
+              <div className="space-y-2 bg-accent/10 rounded-lg p-4 border-2 border-accent/30">
+                <h3 className="text-lg font-bold text-accent flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  User Comment
+                </h3>
+                <div className="rounded-md bg-card p-4 border">
+                  <p className="text-sm whitespace-pre-wrap text-foreground">{entry.user_comment}</p>
+                </div>
+              </div>
+            )}
+
             {entry.admin_comment && (
               <div className="rounded-lg bg-muted p-4">
                 <p className="mb-1 text-sm font-semibold">Latest Admin Comment:</p>

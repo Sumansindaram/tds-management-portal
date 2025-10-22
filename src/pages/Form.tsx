@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -32,6 +33,7 @@ export default function Form() {
     dataResponsibility: false,
     reviewResponsibility: false,
   });
+  const [userComment, setUserComment] = useState('');
 
   const [formData, setFormData] = useState({
     ssr_name: '',
@@ -204,6 +206,7 @@ export default function Form() {
       dataResponsibility: false,
       reviewResponsibility: false,
     });
+    setUserComment('');
   };
 
   const handleSubmit = async () => {
@@ -281,6 +284,7 @@ export default function Form() {
           authorised_person_confirmed: termsAccepted.authorisedPerson,
           data_responsibility_confirmed: termsAccepted.dataResponsibility,
           review_responsibility_confirmed: termsAccepted.reviewResponsibility,
+          user_comment: userComment || null,
         }])
         .select()
         .single();
@@ -861,6 +865,27 @@ export default function Form() {
                   </div>
                 )}
               </div>
+              </div>
+            </section>
+
+            {/* Optional User Comment */}
+            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">8</span>
+                Optional Comment for Admin
+              </h3>
+              <div className="p-6">
+                <Label htmlFor="userComment" className="text-sm font-medium mb-2 block">
+                  Add any additional comments or notes for the admin reviewing your request (optional)
+                </Label>
+                <Textarea
+                  id="userComment"
+                  value={userComment}
+                  onChange={(e) => setUserComment(e.target.value)}
+                  placeholder="Enter any additional information, clarifications, or special requests..."
+                  rows={4}
+                  className="w-full"
+                />
               </div>
             </section>
 

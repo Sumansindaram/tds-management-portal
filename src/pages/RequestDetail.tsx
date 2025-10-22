@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { FileText, Paperclip, ArrowLeft, Clock, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -266,6 +267,7 @@ export default function RequestDetail() {
         .update({
           ...formData,
           status: 'Pending',
+          user_comment: formData.user_comment || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', entry.id);
@@ -716,6 +718,51 @@ export default function RequestDetail() {
                   )}
                 </div>
               </section>
+            )}
+
+            {/* User Comment from Submission */}
+            {entry?.user_comment && (
+              <div className="space-y-2 bg-accent/10 rounded-lg p-4 border-2 border-accent/30">
+                <h3 className="text-base sm:text-lg font-bold text-accent flex items-center gap-2">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-sm sm:text-base">User Comment</span>
+                </h3>
+                <div className="rounded-md bg-card p-3 sm:p-4 border">
+                  <p className="text-xs sm:text-sm whitespace-pre-wrap text-foreground">{entry.user_comment}</p>
+                </div>
+              </div>
+            )}
+
+            {entry?.user_comment && isEditMode && (
+              <div className="space-y-2">
+                <Label htmlFor="userComment" className="text-sm font-medium">
+                  Update Your Comment (optional)
+                </Label>
+                <Textarea
+                  id="userComment"
+                  value={formData.user_comment || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, user_comment: e.target.value }))}
+                  placeholder="Update your comment for the admin..."
+                  rows={4}
+                  className="w-full"
+                />
+              </div>
+            )}
+
+            {!entry?.user_comment && isEditMode && (
+              <div className="space-y-2">
+                <Label htmlFor="userComment" className="text-sm font-medium">
+                  Add Comment for Admin (optional)
+                </Label>
+                <Textarea
+                  id="userComment"
+                  value={formData.user_comment || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, user_comment: e.target.value }))}
+                  placeholder="Add a comment to explain your changes or provide additional information..."
+                  rows={4}
+                  className="w-full"
+                />
+              </div>
             )}
 
             {/* Terms Acceptance */}
