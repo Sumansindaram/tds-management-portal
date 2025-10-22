@@ -4,7 +4,9 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Paperclip, ArrowLeft, Clock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { FileText, Paperclip, ArrowLeft, Clock, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -33,7 +35,11 @@ export default function RequestDetail() {
   const [transportFiles, setTransportFiles] = useState<Record<string, string[]>>({});
   const [supportingFiles, setSupportingFiles] = useState<string[]>([]);
   const [commentHistory, setCommentHistory] = useState<any[]>([]);
-  const isReadOnly = true;
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [formData, setFormData] = useState<any>({});
+  const [newTransportFiles, setNewTransportFiles] = useState<Record<string, File[]>>({});
+  const [newSupportingFiles, setNewSupportingFiles] = useState<File[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -50,6 +56,7 @@ export default function RequestDetail() {
           return;
         }
         setEntry(data);
+        setFormData(data);
         await loadFiles(data.id, data.submitted_by, data.nsn);
         await loadCommentHistory(data.id);
       } catch (e) {
@@ -157,6 +164,112 @@ export default function RequestDetail() {
     });
   };
 
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleTransportFileSelect = (group: string, files: FileList | null) => {
+    if (!files) return;
+    const fileArray = Array.from(files);
+    setNewTransportFiles(prev => ({
+      ...prev,
+      [group]: [...(prev[group] || []), ...fileArray]
+    }));
+  };
+
+  const handleSupportingFileSelect = (files: FileList | null) => {
+    if (!files) return;
+    const fileArray = Array.from(files);
+    setNewSupportingFiles(prev => [...prev, ...fileArray]);
+  };
+
+  const removeTransportFile = (group: string, idx: number) => {
+    setNewTransportFiles(prev => ({
+      ...prev,
+      [group]: prev[group].filter((_, i) => i !== idx)
+    }));
+  };
+
+  const removeSupportingFile = (idx: number) => {
+    setNewSupportingFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleResubmit = async () => {
+    if (!entry || !user) return;
+
+    setSubmitting(true);
+    try {
+      // Upload new transport files
+      for (const [group, files] of Object.entries(newTransportFiles)) {
+        for (const file of files) {
+          const fileName = `${group}_${file.name}`;
+          const filePath = `${entry.nsn || user.id}/${entry.id}/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('transportation-data')
+            .upload(filePath, file, { upsert: true });
+          
+          if (uploadError) throw uploadError;
+        }
+      }
+
+      // Upload new supporting files
+      for (const file of newSupportingFiles) {
+        const filePath = `${entry.nsn || user.id}/${entry.id}/${file.name}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('supporting-documents')
+          .upload(filePath, file, { upsert: true });
+        
+        if (uploadError) throw uploadError;
+      }
+
+      // Update entry with new data and status
+      const { error: updateError } = await supabase
+        .from('tds_entries')
+        .update({
+          ...formData,
+          status: 'Pending',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', entry.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: 'Success',
+        description: 'Your request has been resubmitted successfully.',
+      });
+
+      // Reload the entry
+      const { data: updatedEntry } = await supabase
+        .from('tds_entries')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (updatedEntry) {
+        setEntry(updatedEntry);
+        setFormData(updatedEntry);
+      }
+
+      setIsEditMode(false);
+      setNewTransportFiles({});
+      setNewSupportingFiles([]);
+      await loadFiles(entry.id, entry.submitted_by, entry.nsn);
+      await loadCommentHistory(entry.id);
+    } catch (error: any) {
+      console.error('Resubmit error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to resubmit request',
+        variant: 'destructive'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -251,6 +364,16 @@ export default function RequestDetail() {
             <CardContent className="pt-4 sm:pt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Current Status</p>
               <Badge className={`text-sm px-4 py-1.5 font-semibold ${STATUS_COLORS[entry.status] || 'bg-muted'}`}>{entry.status}</Badge>
+              {entry.status === 'Returned' && !isEditMode && (
+                <Button
+                  onClick={() => setIsEditMode(true)}
+                  variant="default"
+                  size="sm"
+                  className="ml-4"
+                >
+                  Edit & Resubmit
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -273,8 +396,16 @@ export default function RequestDetail() {
                   <div className="grid gap-3">
                     {assetOwnerFields.map(field => (
                       <div key={field.label} className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border break-all">{field.value || '—'}</p>
+                        <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
+                        {isEditMode ? (
+                          <Input
+                            value={formData[field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email'] || ''}
+                            onChange={(e) => handleInputChange(field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email', e.target.value)}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border break-all">{field.value || '—'}</p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -287,12 +418,24 @@ export default function RequestDetail() {
                     <span className="text-sm sm:text-base">Basic Details</span>
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    {basicDetailsFields.map(field => (
-                      <div key={field.label} className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                      </div>
-                    ))}
+                    {basicDetailsFields.map(field => {
+                      const fieldKey = field.label.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                      return (
+                        <div key={field.label} className="space-y-1">
+                          <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
+                          {isEditMode ? (
+                            <Input
+                              value={formData[fieldKey] || ''}
+                              onChange={(e) => handleInputChange(fieldKey, e.target.value)}
+                              className="text-sm"
+                              type={field.label.includes('Date') ? 'date' : 'text'}
+                            />
+                          ) : (
+                            <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </section>
 
@@ -303,12 +446,23 @@ export default function RequestDetail() {
                     <span className="text-sm sm:text-base">ADAMS Data</span>
                   </h3>
                   <div className="grid gap-3">
-                    {adamsDataFields.map(field => (
-                      <div key={field.label} className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                      </div>
-                    ))}
+                    {adamsDataFields.map(field => {
+                      const fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
+                      return (
+                        <div key={field.label} className="space-y-1">
+                          <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
+                          {isEditMode ? (
+                            <Input
+                              value={formData[fieldKey] || ''}
+                              onChange={(e) => handleInputChange(fieldKey, e.target.value)}
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </section>
               </div>
@@ -322,12 +476,23 @@ export default function RequestDetail() {
                     <span className="text-sm sm:text-base">Asset Details</span>
                   </h3>
                   <div className="grid gap-3">
-                    {assetDetailsFields.map(field => (
-                      <div key={field.label} className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                      </div>
-                    ))}
+                    {assetDetailsFields.map(field => {
+                      const fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
+                      return (
+                        <div key={field.label} className="space-y-1">
+                          <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
+                          {isEditMode ? (
+                            <Input
+                              value={formData[fieldKey] || ''}
+                              onChange={(e) => handleInputChange(fieldKey, e.target.value)}
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </section>
 
@@ -338,12 +503,23 @@ export default function RequestDetail() {
                     <span className="text-sm sm:text-base">Driver Information</span>
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    {driverInfoFields.map(field => (
-                      <div key={field.label} className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                        <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                      </div>
-                    ))}
+                    {driverInfoFields.map(field => {
+                      const fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
+                      return (
+                        <div key={field.label} className="space-y-1">
+                          <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
+                          {isEditMode ? (
+                            <Input
+                              value={formData[fieldKey] || ''}
+                              onChange={(e) => handleInputChange(fieldKey, e.target.value)}
+                              className="text-sm"
+                            />
+                          ) : (
+                            <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </section>
               </div>
@@ -358,54 +534,124 @@ export default function RequestDetail() {
               <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                 {TRANSPORT_GROUPS.map((group) => {
                   const hasFiles = transportFiles[group] && transportFiles[group].length > 0;
+                  const hasNewFiles = newTransportFiles[group] && newTransportFiles[group].length > 0;
                   return (
-                    <Button
-                      key={group}
-                      variant={hasFiles ? 'default' : 'secondary'}
-                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : 'bg-muted text-card-foreground'}`}
-                      disabled={!hasFiles}
-                      onClick={() => {
-                        if (hasFiles && entry) {
-                          transportFiles[group].forEach((fileName, idx) => {
-                            setTimeout(() => openFile('transportation-data', entry, fileName), idx * 200);
-                          });
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-1 sm:gap-2 w-full">
-                        <FileText className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-                        <span className="text-[10px] sm:text-xs font-medium text-left truncate flex-1">{group}</span>
-                      </div>
-                      {hasFiles && (
-                        <span className="text-[9px] sm:text-[10px] opacity-80 mt-1">
-                          {transportFiles[group].length} file{transportFiles[group].length > 1 ? 's' : ''}
-                        </span>
+                    <div key={group} className="space-y-2">
+                      <Button
+                        variant={hasFiles ? 'default' : 'secondary'}
+                        className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs w-full ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : 'bg-muted text-card-foreground'}`}
+                        disabled={!hasFiles}
+                        onClick={() => {
+                          if (hasFiles && entry) {
+                            transportFiles[group].forEach((fileName, idx) => {
+                              setTimeout(() => openFile('transportation-data', entry, fileName), idx * 200);
+                            });
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-1 sm:gap-2 w-full">
+                          <FileText className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span className="text-[10px] sm:text-xs font-medium text-left truncate flex-1">{group}</span>
+                        </div>
+                        {hasFiles && (
+                          <span className="text-[9px] sm:text-[10px] opacity-80 mt-1">
+                            {transportFiles[group].length} file{transportFiles[group].length > 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </Button>
+                      {isEditMode && (
+                        <>
+                          <label className="cursor-pointer">
+                            <div className="flex items-center justify-center gap-2 p-2 border-2 border-dashed rounded hover:bg-accent text-xs">
+                              <Upload className="h-3 w-3" />
+                              <span>Add Files</span>
+                            </div>
+                            <input
+                              type="file"
+                              multiple
+                              className="hidden"
+                              onChange={(e) => handleTransportFileSelect(group, e.target.files)}
+                            />
+                          </label>
+                          {hasNewFiles && (
+                            <div className="space-y-1">
+                              {newTransportFiles[group].map((file, idx) => (
+                                <div key={idx} className="flex items-center gap-1 text-[10px] bg-accent/50 p-1 rounded">
+                                  <span className="flex-1 truncate">{file.name}</span>
+                                  <button
+                                    onClick={() => removeTransportFile(group, idx)}
+                                    className="text-destructive hover:text-destructive/80"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       )}
-                    </Button>
+                    </div>
                   );
                 })}
               </div>
             </section>
 
             {/* Supporting Documents */}
-            {supportingFiles.length > 0 && (
+            {(supportingFiles.length > 0 || isEditMode) && (
               <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
                 <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
                   <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">7</span>
                   <span className="text-sm sm:text-base">Supporting Documents (incl. .msg files)</span>
                 </h3>
-                <div className="grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {supportingFiles.map((fileName, idx) => (
-                    <Button 
-                      key={idx} 
-                      variant="default" 
-                      className="h-auto py-2 px-3 justify-start"
-                      onClick={() => entry && openFile('supporting-documents', entry, fileName)}
-                    >
-                      <Paperclip className="mr-2 h-4 w-4 shrink-0" />
-                      <span className="truncate text-xs text-left">{fileName}</span>
-                    </Button>
-                  ))}
+                <div className="space-y-4">
+                  {supportingFiles.length > 0 && (
+                    <div className="grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {supportingFiles.map((fileName, idx) => (
+                        <Button 
+                          key={idx} 
+                          variant="default" 
+                          className="h-auto py-2 px-3 justify-start"
+                          onClick={() => entry && openFile('supporting-documents', entry, fileName)}
+                        >
+                          <Paperclip className="mr-2 h-4 w-4 shrink-0" />
+                          <span className="truncate text-xs text-left">{fileName}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                  {isEditMode && (
+                    <div className="space-y-2">
+                      <label className="cursor-pointer">
+                        <div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded hover:bg-accent">
+                          <Upload className="h-4 w-4" />
+                          <span className="text-sm">Add Supporting Documents</span>
+                        </div>
+                        <input
+                          type="file"
+                          multiple
+                          className="hidden"
+                          onChange={(e) => handleSupportingFileSelect(e.target.files)}
+                        />
+                      </label>
+                      {newSupportingFiles.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-xs font-medium text-muted-foreground">New files to upload:</p>
+                          {newSupportingFiles.map((file, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-sm bg-accent/50 p-2 rounded">
+                              <Paperclip className="h-4 w-4 shrink-0" />
+                              <span className="flex-1 truncate">{file.name}</span>
+                              <button
+                                onClick={() => removeSupportingFile(idx)}
+                                className="text-destructive hover:text-destructive/80"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </section>
             )}
@@ -504,7 +750,7 @@ export default function RequestDetail() {
               </div>
             )}
             
-            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t flex justify-start">
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t flex justify-between items-center gap-4">
               <Button
                 onClick={() => navigate('/my-submissions')}
                 variant="default"
@@ -514,6 +760,31 @@ export default function RequestDetail() {
                 <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="text-xs sm:text-sm">Back to List</span>
               </Button>
+              {isEditMode && (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      setIsEditMode(false);
+                      setFormData(entry);
+                      setNewTransportFiles({});
+                      setNewSupportingFiles([]);
+                    }}
+                    variant="secondary"
+                    size="sm"
+                    disabled={submitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleResubmit}
+                    variant="default"
+                    size="sm"
+                    disabled={submitting}
+                  >
+                    {submitting ? 'Resubmitting...' : 'Resubmit Request'}
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
