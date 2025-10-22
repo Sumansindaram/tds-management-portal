@@ -40,6 +40,8 @@ export default function RequestDetail() {
   const [newTransportFiles, setNewTransportFiles] = useState<Record<string, File[]>>({});
   const [newSupportingFiles, setNewSupportingFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [deletedTransportFiles, setDeletedTransportFiles] = useState<Record<string, string[]>>({});
+  const [deletedSupportingFiles, setDeletedSupportingFiles] = useState<string[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -183,15 +185,31 @@ export default function RequestDetail() {
     setNewSupportingFiles(prev => [...prev, ...fileArray]);
   };
 
-  const removeTransportFile = (group: string, idx: number) => {
+  const removeNewTransportFile = (group: string, idx: number) => {
     setNewTransportFiles(prev => ({
       ...prev,
       [group]: prev[group].filter((_, i) => i !== idx)
     }));
   };
 
-  const removeSupportingFile = (idx: number) => {
+  const removeExistingTransportFile = (group: string, fileName: string) => {
+    setDeletedTransportFiles(prev => ({
+      ...prev,
+      [group]: [...(prev[group] || []), fileName]
+    }));
+    setTransportFiles(prev => ({
+      ...prev,
+      [group]: prev[group].filter(f => f !== fileName)
+    }));
+  };
+
+  const removeNewSupportingFile = (idx: number) => {
     setNewSupportingFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const removeExistingSupportingFile = (fileName: string) => {
+    setDeletedSupportingFiles(prev => [...prev, fileName]);
+    setSupportingFiles(prev => prev.filter(f => f !== fileName));
   };
 
   const handleResubmit = async () => {
@@ -199,6 +217,24 @@ export default function RequestDetail() {
 
     setSubmitting(true);
     try {
+      // Delete removed transport files
+      for (const [group, fileNames] of Object.entries(deletedTransportFiles)) {
+        for (const fileName of fileNames) {
+          const filePath = `${entry.nsn || user.id}/${entry.id}/${fileName}`;
+          await supabase.storage
+            .from('transportation-data')
+            .remove([filePath]);
+        }
+      }
+
+      // Delete removed supporting files
+      for (const fileName of deletedSupportingFiles) {
+        const filePath = `${entry.nsn || user.id}/${entry.id}/${fileName}`;
+        await supabase.storage
+          .from('supporting-documents')
+          .remove([filePath]);
+      }
+
       // Upload new transport files
       for (const [group, files] of Object.entries(newTransportFiles)) {
         for (const file of files) {
@@ -256,6 +292,8 @@ export default function RequestDetail() {
       setIsEditMode(false);
       setNewTransportFiles({});
       setNewSupportingFiles([]);
+      setDeletedTransportFiles({});
+      setDeletedSupportingFiles([]);
       await loadFiles(entry.id, entry.submitted_by, entry.nsn);
       await loadCommentHistory(entry.id);
     } catch (error: any) {
@@ -399,7 +437,7 @@ export default function RequestDetail() {
                         <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
                         {isEditMode ? (
                           <Input
-                            value={formData[field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email'] || ''}
+                            value={formData[field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email'] !== undefined ? formData[field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email'] : (field.value || '')}
                             onChange={(e) => handleInputChange(field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email', e.target.value)}
                             className="text-sm"
                           />
@@ -423,9 +461,9 @@ export default function RequestDetail() {
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
-                          {isEditMode ? (
+                           {isEditMode ? (
                             <Input
-                              value={formData[fieldKey] || ''}
+                              value={formData[fieldKey] !== undefined ? formData[fieldKey] : (field.value || '')}
                               onChange={(e) => handleInputChange(fieldKey, e.target.value)}
                               className="text-sm"
                               type={field.label.includes('Date') ? 'date' : 'text'}
@@ -451,9 +489,9 @@ export default function RequestDetail() {
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
-                          {isEditMode ? (
+                           {isEditMode ? (
                             <Input
-                              value={formData[fieldKey] || ''}
+                              value={formData[fieldKey] !== undefined ? formData[fieldKey] : (field.value || '')}
                               onChange={(e) => handleInputChange(fieldKey, e.target.value)}
                               className="text-sm"
                             />
@@ -481,9 +519,9 @@ export default function RequestDetail() {
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
-                          {isEditMode ? (
+                           {isEditMode ? (
                             <Input
-                              value={formData[fieldKey] || ''}
+                              value={formData[fieldKey] !== undefined ? formData[fieldKey] : (field.value || '')}
                               onChange={(e) => handleInputChange(fieldKey, e.target.value)}
                               className="text-sm"
                             />
@@ -508,9 +546,9 @@ export default function RequestDetail() {
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
-                          {isEditMode ? (
+                           {isEditMode ? (
                             <Input
-                              value={formData[fieldKey] || ''}
+                              value={formData[fieldKey] !== undefined ? formData[fieldKey] : (field.value || '')}
                               onChange={(e) => handleInputChange(fieldKey, e.target.value)}
                               className="text-sm"
                             />
@@ -561,6 +599,21 @@ export default function RequestDetail() {
                       </Button>
                       {isEditMode && (
                         <>
+                          {hasFiles && (
+                            <div className="space-y-1">
+                              {transportFiles[group].map((fileName, idx) => (
+                                <div key={idx} className="flex items-center gap-1 text-[10px] bg-[hsl(var(--maroon))]/20 p-1 rounded">
+                                  <span className="flex-1 truncate">{fileName}</span>
+                                  <button
+                                    onClick={() => removeExistingTransportFile(group, fileName)}
+                                    className="text-destructive hover:text-destructive/80"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                           <label className="cursor-pointer">
                             <div className="flex items-center justify-center gap-2 p-2 border-2 border-dashed rounded hover:bg-accent text-xs">
                               <Upload className="h-3 w-3" />
@@ -579,7 +632,7 @@ export default function RequestDetail() {
                                 <div key={idx} className="flex items-center gap-1 text-[10px] bg-accent/50 p-1 rounded">
                                   <span className="flex-1 truncate">{file.name}</span>
                                   <button
-                                    onClick={() => removeTransportFile(group, idx)}
+                                    onClick={() => removeNewTransportFile(group, idx)}
                                     className="text-destructive hover:text-destructive/80"
                                   >
                                     <X className="h-3 w-3" />
@@ -607,15 +660,24 @@ export default function RequestDetail() {
                   {supportingFiles.length > 0 && (
                     <div className="grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {supportingFiles.map((fileName, idx) => (
-                        <Button 
-                          key={idx} 
-                          variant="default" 
-                          className="h-auto py-2 px-3 justify-start"
-                          onClick={() => entry && openFile('supporting-documents', entry, fileName)}
-                        >
-                          <Paperclip className="mr-2 h-4 w-4 shrink-0" />
-                          <span className="truncate text-xs text-left">{fileName}</span>
-                        </Button>
+                        <div key={idx} className="flex items-center gap-2">
+                          <Button 
+                            variant="default" 
+                            className="h-auto py-2 px-3 justify-start flex-1"
+                            onClick={() => entry && openFile('supporting-documents', entry, fileName)}
+                          >
+                            <Paperclip className="mr-2 h-4 w-4 shrink-0" />
+                            <span className="truncate text-xs text-left">{fileName}</span>
+                          </Button>
+                          {isEditMode && (
+                            <button
+                              onClick={() => removeExistingSupportingFile(fileName)}
+                              className="text-destructive hover:text-destructive/80 p-2"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}
@@ -641,7 +703,7 @@ export default function RequestDetail() {
                               <Paperclip className="h-4 w-4 shrink-0" />
                               <span className="flex-1 truncate">{file.name}</span>
                               <button
-                                onClick={() => removeSupportingFile(idx)}
+                                onClick={() => removeNewSupportingFile(idx)}
                                 className="text-destructive hover:text-destructive/80"
                               >
                                 <X className="h-4 w-4" />
