@@ -266,8 +266,8 @@ export default function RequestDetail() {
               <div className="space-y-6">
                 {/* Asset Owner Details */}
                 <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">1</span>
+                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">1</span>
                     <span className="text-sm sm:text-base">Asset Owner Details</span>
                   </h3>
                   <div className="grid gap-3">
@@ -282,8 +282,8 @@ export default function RequestDetail() {
 
                 {/* Basic Details */}
                 <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">3</span>
+                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">3</span>
                     <span className="text-sm sm:text-base">Basic Details</span>
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -298,8 +298,8 @@ export default function RequestDetail() {
 
                 {/* ADAMS Data */}
                 <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">5</span>
+                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">5</span>
                     <span className="text-sm sm:text-base">ADAMS Data</span>
                   </h3>
                   <div className="grid gap-3">
@@ -317,8 +317,8 @@ export default function RequestDetail() {
               <div className="space-y-6">
                 {/* Asset Details */}
                 <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">2</span>
+                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">2</span>
                     <span className="text-sm sm:text-base">Asset Details</span>
                   </h3>
                   <div className="grid gap-3">
@@ -333,8 +333,8 @@ export default function RequestDetail() {
 
                 {/* Driver Information */}
                 <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">4</span>
+                  <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                    <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">4</span>
                     <span className="text-sm sm:text-base">Driver Information</span>
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -351,10 +351,10 @@ export default function RequestDetail() {
 
             {/* Transportation Data */}
             <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-              <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">6</span>
-                <span className="text-sm sm:text-base">Transportation Data</span>
-              </h3>
+                <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                  <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">6</span>
+                  <span className="text-sm sm:text-base">Transportation Data</span>
+                </h3>
               <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                 {TRANSPORT_GROUPS.map((group) => {
                   const hasFiles = transportFiles[group] && transportFiles[group].length > 0;
@@ -390,8 +390,8 @@ export default function RequestDetail() {
             {/* Supporting Documents */}
             {supportingFiles.length > 0 && (
               <section className="bg-card rounded-lg p-4 sm:p-6 border-2 shadow-sm">
-                <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-foreground flex items-center gap-3 border-b-2 border-primary/20">
-                  <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-foreground">7</span>
+                <h3 className="mb-4 pb-3 text-base sm:text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
+                  <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary">7</span>
                   <span className="text-sm sm:text-base">Supporting Documents (incl. .msg files)</span>
                 </h3>
                 <div className="grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">

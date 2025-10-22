@@ -628,9 +628,9 @@ export default function AdminDetail() {
                   </h3>
                   <Button
                     onClick={exportToPDF}
-                    variant="secondary"
+                    variant="default"
                     size="sm"
-                    className="border-2"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Export to PDF
@@ -657,12 +657,12 @@ export default function AdminDetail() {
                       <SelectTrigger id="status-filter">
                         <SelectValue placeholder="All statuses" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All statuses</SelectItem>
-                        <SelectItem value="Approved">Approved</SelectItem>
-                        <SelectItem value="Rejected">Rejected</SelectItem>
-                        <SelectItem value="Returned">Returned</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectContent className="bg-card text-card-foreground border-primary/20">
+                        <SelectItem value="all" className="text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">All statuses</SelectItem>
+                        <SelectItem value="Approved" className="text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">Approved</SelectItem>
+                        <SelectItem value="Rejected" className="text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">Rejected</SelectItem>
+                        <SelectItem value="Returned" className="text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">Returned</SelectItem>
+                        <SelectItem value="Pending" className="text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">Pending</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -774,8 +774,8 @@ export default function AdminDetail() {
                         setIsEditing(false);
                         setComment('');
                       }}
-                      variant="secondary"
-                      className="border-2"
+                      variant="default"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       Cancel Edit
                     </Button>

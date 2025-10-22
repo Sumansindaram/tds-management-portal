@@ -360,10 +360,10 @@ export default function Users() {
                 <SelectTrigger id="role" className="h-12 border-primary/30">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-primary/20">
-                  <SelectItem value="user" className="cursor-pointer hover:bg-primary/10 focus:bg-primary/10">User</SelectItem>
-                  <SelectItem value="admin" className="cursor-pointer hover:bg-primary/10 focus:bg-primary/10">Admin</SelectItem>
-                  <SelectItem value="super_admin" className="cursor-pointer hover:bg-primary/10 focus:bg-primary/10">Super Admin</SelectItem>
+                <SelectContent className="bg-card text-card-foreground border-primary/20">
+                  <SelectItem value="user" className="cursor-pointer text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">User</SelectItem>
+                  <SelectItem value="admin" className="cursor-pointer text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">Admin</SelectItem>
+                  <SelectItem value="super_admin" className="cursor-pointer text-card-foreground data-[highlighted]:bg-primary/10 data-[highlighted]:text-card-foreground">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
