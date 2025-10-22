@@ -422,7 +422,7 @@ export default function RequestDetail() {
                       {entry.ssr_approval_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-xs sm:text-sm">
-                      SSR approval has been obtained and attached to this request, approved by the Senior Service Representative (SSR) or Service Representative (SR).
+                      I confirm that Senior Safety Responsible or Safety Responsible (SSR/SR) approval has been obtained and attached to this request, and that this submission has been duly approved by them.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -430,7 +430,7 @@ export default function RequestDetail() {
                       {entry.authorised_person_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-xs sm:text-sm">
-                      Confirmed as an authorised representative, duly appointed by the SSR/SR, to submit this Transportation Data Sheet (TDS) request.
+                      I confirm that I am an authorised representative, duly appointed by the SSR/SR, to submit this Tie Down Scheme (TDS) entry request on their behalf.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -438,7 +438,7 @@ export default function RequestDetail() {
                       {entry.data_responsibility_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-xs sm:text-sm">
-                      Acknowledged that the Deployment Team (DT) assumes full responsibility for data accuracy, and that QSEE bears no liability for any inaccuracies.
+                      I acknowledge that the Delivery Team (DT) assumes full responsibility for the accuracy and completeness of all data provided in this submission, and that the Quality, Safety, Environment and Engineering (QSEE) team bears no liability for any inaccuracies or errors in the supplied information.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -446,7 +446,7 @@ export default function RequestDetail() {
                       {entry.review_responsibility_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-xs sm:text-sm">
-                      Acknowledged that the Deployment Team (DT) is solely responsible for conducting thorough reviews of all TDS entries upon creation.
+                      I acknowledge that the DT is solely responsible for conducting thorough reviews of all TDS entries upon creation to verify data accuracy and identify any discrepancies within the database.
                     </p>
                   </div>
                   {!declarationComplete && (
@@ -506,13 +506,13 @@ export default function RequestDetail() {
             
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t flex justify-start">
               <Button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/my-submissions')}
                 variant="default"
                 size="sm"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="text-xs sm:text-sm">Back to Dashboard</span>
+                <span className="text-xs sm:text-sm">Back to List</span>
               </Button>
             </div>
           </CardContent>

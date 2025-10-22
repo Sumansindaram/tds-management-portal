@@ -605,7 +605,7 @@ export default function Form() {
                   <Input
                     value={formData.single_carriage}
                     onChange={(e) => handleInputChange('single_carriage', e.target.value)}
-                    placeholder="e.g., 300"
+                    placeholder="e.g., 60"
                   />
                 </div>
                 <div>
@@ -613,7 +613,7 @@ export default function Form() {
                   <Input
                     value={formData.dual_carriage}
                     onChange={(e) => handleInputChange('dual_carriage', e.target.value)}
-                    placeholder="e.g., 400"
+                    placeholder="e.g., 120"
                   />
                 </div>
                 <div>

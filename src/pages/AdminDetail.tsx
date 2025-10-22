@@ -587,7 +587,7 @@ export default function AdminDetail() {
                       {entry.ssr_approval_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-sm">
-                      SSR approval has been obtained and attached to this request, approved by the Senior Service Representative (SSR) or Service Representative (SR).
+                      I confirm that Senior Safety Responsible or Safety Responsible (SSR/SR) approval has been obtained and attached to this request, and that this submission has been duly approved by them.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -595,7 +595,7 @@ export default function AdminDetail() {
                       {entry.authorised_person_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-sm">
-                      Confirmed as an authorised representative, duly appointed by the SSR/SR, to submit this Transportation Data Sheet (TDS) request.
+                      I confirm that I am an authorised representative, duly appointed by the SSR/SR, to submit this Tie Down Scheme (TDS) entry request on their behalf.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -603,7 +603,7 @@ export default function AdminDetail() {
                       {entry.data_responsibility_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-sm">
-                      Acknowledged that the Deployment Team (DT) assumes full responsibility for data accuracy, and that QSEE bears no liability for any inaccuracies.
+                      I acknowledge that the Delivery Team (DT) assumes full responsibility for the accuracy and completeness of all data provided in this submission, and that the Quality, Safety, Environment and Engineering (QSEE) team bears no liability for any inaccuracies or errors in the supplied information.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -611,7 +611,7 @@ export default function AdminDetail() {
                       {entry.review_responsibility_confirmed && <span className="text-white text-xs">✓</span>}
                     </div>
                     <p className="text-sm">
-                      Acknowledged that the Deployment Team (DT) is solely responsible for conducting thorough reviews of all TDS entries upon creation.
+                      I acknowledge that the DT is solely responsible for conducting thorough reviews of all TDS entries upon creation to verify data accuracy and identify any discrepancies within the database.
                     </p>
                   </div>
                 </div>
@@ -628,8 +628,9 @@ export default function AdminDetail() {
                   </h3>
                   <Button
                     onClick={exportToPDF}
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
+                    className="border-2"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Export to PDF
@@ -750,15 +751,35 @@ export default function AdminDetail() {
                   Return
                 </Button>
                 {isEditing && (
-                  <Button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setComment('');
-                    }}
-                    variant="outline"
-                  >
-                    Cancel Edit
-                  </Button>
+                  <>
+                    <Button
+                      onClick={async () => {
+                        if (comment.trim()) {
+                          await updateStatus(entry.status);
+                        } else {
+                          toast({
+                            title: 'Comment Required',
+                            description: 'Please enter a comment to update.',
+                            variant: 'destructive',
+                          });
+                        }
+                      }}
+                      disabled={updating || !comment.trim()}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      Update Comment
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setComment('');
+                      }}
+                      variant="secondary"
+                      className="border-2"
+                    >
+                      Cancel Edit
+                    </Button>
+                  </>
                 )}
               </div>
             ) : (
@@ -770,7 +791,8 @@ export default function AdminDetail() {
                 </div>
                 <Button
                   onClick={() => setIsEditing(true)}
-                  variant="outline"
+                  variant="default"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Edit Decision
                 </Button>
