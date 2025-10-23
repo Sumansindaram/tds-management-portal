@@ -524,7 +524,7 @@ export default function AdminDetail() {
                     <Button
                       key={group}
                       variant={hasFiles ? "default" : "secondary"}
-                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : "bg-muted text-card-foreground"}`}
+                      className={`h-auto min-h-[3rem] flex-col items-start justify-center px-3 py-2 ${hasFiles ? 'bg-primary text-primary-foreground hover:bg-primary/90' : "bg-muted text-card-foreground"}`}
                       disabled={!hasFiles}
                        onClick={() => {
                          if (hasFiles && entry) {

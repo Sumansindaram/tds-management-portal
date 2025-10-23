@@ -708,7 +708,7 @@ export default function Form() {
                     key={group}
                     className={`flex cursor-pointer flex-col items-start justify-center gap-2 rounded-lg border-2 px-3 py-2 h-auto min-h-[3rem] w-full transition-colors ${
                       transportFiles[group] 
-                        ? 'border-[hsl(var(--maroon))] bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' 
+                        ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90' 
                         : 'border-dashed border-primary/30 hover:border-primary hover:bg-primary/5'
                     }`}
                   >

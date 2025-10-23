@@ -618,7 +618,7 @@ export default function RequestDetail() {
                     <div key={group} className="space-y-2">
                       <Button
                         variant={hasFiles ? 'default' : 'secondary'}
-                        className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs w-full ${hasFiles ? 'bg-[hsl(var(--maroon))] text-[hsl(var(--maroon-foreground))] hover:bg-[hsl(var(--maroon))]/90' : 'bg-muted text-card-foreground'}`}
+                        className={`h-auto min-h-[3rem] flex-col items-start justify-center px-2 sm:px-3 py-2 text-xs w-full ${hasFiles ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted text-card-foreground'}`}
                         disabled={!hasFiles}
                         onClick={() => {
                           if (hasFiles && entry) {
@@ -643,7 +643,7 @@ export default function RequestDetail() {
                           {hasFiles && (
                             <div className="space-y-1">
                               {transportFiles[group].map((fileName, idx) => (
-                                <div key={idx} className="flex items-center gap-1 text-[10px] bg-[hsl(var(--maroon))]/20 p-1 rounded">
+                                <div key={idx} className="flex items-center gap-1 text-[10px] bg-primary/20 p-1 rounded">
                                   <span className="flex-1 truncate">{fileName}</span>
                                   <button
                                     onClick={() => removeExistingTransportFile(group, fileName)}
