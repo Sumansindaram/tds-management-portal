@@ -158,15 +158,15 @@ export function Header() {
                           <ChevronDown className="h-3 w-3 ml-1" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="z-50 w-64 bg-card border-2">
+                      <DropdownMenuContent align="end" className="z-50 w-64 bg-background border-2 border-primary/30">
                         <DropdownMenuLabel className="font-normal">
                           <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-semibold text-card-foreground">Super Admin Tools</p>
-                            <p className="text-xs text-muted-foreground">System administration options</p>
+                            <p className="text-sm font-semibold text-foreground">Super Admin Tools</p>
+                            <p className="text-xs text-foreground/60">System administration options</p>
                           </div>
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer hover:bg-primary/10 text-card-foreground" onClick={() => {
+                        <DropdownMenuSeparator className="bg-foreground/20" />
+                        <DropdownMenuItem className="cursor-pointer hover:bg-primary/20 text-foreground focus:bg-primary/20 focus:text-foreground" onClick={() => {
                           toast({
                             title: "Backend Access",
                             description: "Click 'View Backend' in the Lovable chat to access the database dashboard.",
@@ -346,32 +346,32 @@ export function Header() {
                       <ChevronDown className="h-3 w-3 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="z-50 w-80 bg-card border-2">
-                    <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-primary/5 to-accent/5">
+                  <DropdownMenuContent align="end" className="z-50 w-80 bg-background border-2 border-primary/30">
+                    <div className="flex items-center gap-3 p-4 border-b border-foreground/20 bg-primary/10">
                       <img src={desLogo} alt="MOD & DE&S" className="h-12" />
                       <div className="flex-1">
-                        <div className="font-semibold text-sm text-primary">Ministry of Defence</div>
-                        <div className="text-xs text-muted-foreground">Defence Equipment & Support</div>
+                        <div className="font-semibold text-sm text-foreground">Ministry of Defence</div>
+                        <div className="text-xs text-foreground/70">Defence Equipment & Support</div>
                       </div>
                     </div>
-                    <DropdownMenuLabel className="font-normal bg-muted/30">
+                    <DropdownMenuLabel className="font-normal bg-primary/5">
                       <div className="flex flex-col space-y-1 py-2">
-                        <p className="text-sm font-semibold text-card-foreground">
+                        <p className="text-sm font-semibold text-foreground">
                           {fullName || user.email?.split('@')[0] || 'User'}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground flex items-center gap-1">
+                        <p className="text-xs leading-none text-foreground/60 flex items-center gap-1">
                           <User className="h-3 w-3" />
                           {user.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive cursor-pointer my-1 mx-1">
+                    <DropdownMenuSeparator className="bg-foreground/20" />
+                    <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer my-1 mx-1">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span className="font-medium">Logout</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <div className="px-3 py-2 text-xs text-center bg-muted/20 text-muted-foreground">
+                    <DropdownMenuSeparator className="bg-foreground/20" />
+                    <div className="px-3 py-2 text-xs text-center bg-primary/5 text-foreground/70">
                       <span className="font-medium">About:</span> Version 1.0.0
                     </div>
                   </DropdownMenuContent>
