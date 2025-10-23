@@ -713,7 +713,7 @@ export default function AdminDetail() {
                   User Comment
                 </h3>
                 <div className="rounded-md bg-card p-4 border">
-                  <p className="text-sm whitespace-pre-wrap text-foreground">{entry.user_comment}</p>
+                  <p className="text-sm whitespace-pre-wrap text-card-foreground">{entry.user_comment}</p>
                 </div>
               </div>
             )}

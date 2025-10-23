@@ -767,7 +767,7 @@ export default function RequestDetail() {
                   <span className="text-sm sm:text-base">User Comment</span>
                 </h3>
                 <div className="rounded-md bg-card p-3 sm:p-4 border">
-                  <p className="text-xs sm:text-sm whitespace-pre-wrap text-foreground">{entry.user_comment}</p>
+                  <p className="text-xs sm:text-sm whitespace-pre-wrap text-card-foreground">{entry.user_comment}</p>
                 </div>
               </div>
             )}
