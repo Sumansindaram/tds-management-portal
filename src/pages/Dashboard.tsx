@@ -72,10 +72,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <main className="container mx-auto p-6 lg:p-8 mt-8">
+      <main className="container mx-auto p-6 lg:p-8 mt-4">
 
         {!isAdmin && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
             {/* User Tiles - Equal Size */}
             <Card 
               className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
