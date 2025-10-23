@@ -210,11 +210,11 @@ export function Header() {
                       <Menu className="h-5 w-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-[280px] sm:w-[350px] flex flex-col">
+                  <SheetContent side="right" className="w-[280px] sm:w-[350px]">
                     <SheetHeader>
                       <SheetTitle className="text-left">Navigation Menu</SheetTitle>
                     </SheetHeader>
-                    <div className="flex flex-col gap-3 mt-6 overflow-y-auto flex-1 pr-2">
+                    <div className="flex flex-col gap-3 mt-6">
                       <Button
                         variant="default"
                         className="w-full justify-start bg-primary text-primary-foreground"
@@ -313,8 +313,8 @@ export function Header() {
                         )}
                         
                         <div className="bg-muted/30 rounded-lg p-3 mb-3">
-                          <p className="text-sm font-semibold text-card-foreground">{fullName || user.email?.split('@')[0] || 'User'}</p>
-                          <p className="text-xs text-card-foreground">{user.email}</p>
+                          <p className="text-sm font-semibold">{fullName || user.email?.split('@')[0] || 'User'}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                         
                         <Button
