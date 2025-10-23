@@ -72,7 +72,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <main className="container mx-auto p-6 lg:p-8 -mt-8">
+      <main className="container mx-auto p-6 lg:p-8 mt-8">
 
         {!isAdmin && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
