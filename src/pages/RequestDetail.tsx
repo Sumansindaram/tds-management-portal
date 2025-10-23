@@ -459,7 +459,21 @@ export default function RequestDetail() {
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {basicDetailsFields.map(field => {
-                      const fieldKey = field.label.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                      // Map label to actual database column name
+                      const fieldKeyMap: Record<string, string> = {
+                        'Length (m)': 'length',
+                        'Width (m)': 'width',
+                        'Height (m)': 'height',
+                        'Unladen Weight (kg)': 'unladen_weight',
+                        'Laden Weight (kg)': 'laden_weight',
+                        'ALEST': 'alest',
+                        'LIMS 2.5': 'lims_25',
+                        'LIMS 2.8': 'lims_28',
+                        'Out of Service Date': 'out_of_service_date',
+                        'Classification': 'classification',
+                        'MLC': 'mlc',
+                      };
+                      const fieldKey = fieldKeyMap[field.label] || field.label.toLowerCase().replace(/\s+/g, '_');
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
@@ -487,7 +501,14 @@ export default function RequestDetail() {
                   </h3>
                   <div className="grid gap-3">
                     {adamsDataFields.map(field => {
-                      const fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
+                      // Map label to actual database column name
+                      const fieldKeyMap: Record<string, string> = {
+                        'Service': 'service',
+                        'Owner Nation': 'owner_nation',
+                        'RIC Code': 'ric_code',
+                        'Asset Type': 'asset_type',
+                      };
+                      const fieldKey = fieldKeyMap[field.label] || field.label.toLowerCase().replace(/\s+/g, '_');
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
@@ -517,7 +538,14 @@ export default function RequestDetail() {
                   </h3>
                   <div className="grid gap-3">
                     {assetDetailsFields.map(field => {
-                      const fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
+                      // Map label to actual database column name
+                      const fieldKeyMap: Record<string, string> = {
+                        'Designation': 'designation',
+                        'NSN': 'nsn',
+                        'Asset Code': 'asset_code',
+                        'Short Name': 'short_name',
+                      };
+                      const fieldKey = fieldKeyMap[field.label] || field.label.toLowerCase().replace(/\s+/g, '_');
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
@@ -544,7 +572,18 @@ export default function RequestDetail() {
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {driverInfoFields.map(field => {
-                      const fieldKey = field.label.toLowerCase().replace(/\s+/g, '_');
+                      // Map label to actual database column name
+                      const fieldKeyMap: Record<string, string> = {
+                        'Licence': 'licence',
+                        'Crew Number': 'crew_number',
+                        'Passenger Capacity': 'passenger_capacity',
+                        'Range': 'range',
+                        'Fuel Capacity': 'fuel_capacity',
+                        'Single Carriage': 'single_carriage',
+                        'Dual Carriage': 'dual_carriage',
+                        'Max Speed': 'max_speed',
+                      };
+                      const fieldKey = fieldKeyMap[field.label] || field.label.toLowerCase().replace(/\s+/g, '_');
                       return (
                         <div key={field.label} className="space-y-1">
                           <Label className="text-xs font-medium text-muted-foreground">{field.label}</Label>
