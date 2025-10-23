@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 201 20% 23%;
+    --background: 201 20% 16%;
     --foreground: 0 0% 98%;
 
     --card: 0 0% 100%;
@@ -17,7 +17,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 210 30% 15%;
 
-    --primary: 320 33% 21%;
+    --primary: 320 33% 15%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 301 30% 25%;
@@ -44,7 +44,7 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --ribbon: 320 33% 21%;
+    --ribbon: 320 33% 15%;
     --ribbon-foreground: 0 0% 100%;
     
     --content-bg: 192 30% 10%;
@@ -65,7 +65,7 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 201 20% 23%;
+    --background: 201 20% 16%;
     --foreground: 0 0% 98%;
 
     --card: 0 0% 100%;
@@ -74,7 +74,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 210 30% 15%;
 
-    --primary: 320 33% 21%;
+    --primary: 320 33% 15%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 301 35% 28%;
@@ -99,7 +99,7 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     
-    --ribbon: 320 33% 21%;
+    --ribbon: 320 33% 15%;
     --ribbon-foreground: 0 0% 100%;
     
     --content-bg: 192 30% 8%;
