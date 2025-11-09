@@ -137,7 +137,7 @@ export default function SSRDirectory() {
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
         <Card className="p-6">
-          <h1 className="text-3xl font-bold text-foreground mb-6">Safety Leadership Directory</h1>
+          <h1 className="text-3xl font-bold text-primary mb-6">Safety Leadership Directory</h1>
           
           <Tabs defaultValue="list" className="w-full">
             <TabsList className="mb-4">
@@ -210,7 +210,7 @@ export default function SSRDirectory() {
           </Table>
 
               <div className="mt-6">
-                <Button variant="outline" onClick={() => navigate('/')}>
+                <Button variant="default" onClick={() => navigate('/')}>
                   Back to Dashboard
                 </Button>
               </div>
@@ -220,7 +220,7 @@ export default function SSRDirectory() {
               <TabsContent value="bulk">
                 <BulkSSRUpload onSuccess={loadSSRs} />
                 <div className="mt-4">
-                  <Button variant="outline" onClick={() => navigate('/')}>
+                  <Button variant="default" onClick={() => navigate('/')}>
                     Back to Dashboard
                   </Button>
                 </div>

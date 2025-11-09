@@ -329,7 +329,7 @@ export default function AgentDashboard() {
           </Tabs>
 
           <div className="mt-6">
-            <Button variant="outline" onClick={() => navigate('/')}>
+            <Button variant="default" onClick={() => navigate('/')}>
               Back to Dashboard
             </Button>
           </div>

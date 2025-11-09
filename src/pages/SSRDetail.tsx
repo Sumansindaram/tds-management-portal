@@ -195,7 +195,7 @@ export default function SSRDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
-        <Button variant="outline" onClick={() => navigate('/ssr-directory')} className="mb-4">
+        <Button variant="default" onClick={() => navigate('/ssr-directory')} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Directory
         </Button>

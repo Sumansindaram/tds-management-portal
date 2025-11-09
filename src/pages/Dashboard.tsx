@@ -183,23 +183,6 @@ export default function Dashboard() {
 
             <Card 
               className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
-              onClick={() => navigate('/user-approval')}
-            >
-              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
-              <CardHeader className="pb-3 relative">
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                  <Users className="h-10 w-10 text-primary-foreground" />
-                </div>
-                <CardTitle className="text-xl text-card-foreground">User Approvals</CardTitle>
-                <CardDescription>Approve pending users</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View Approvals</Button>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
               onClick={() => navigate('/ssr-directory')}
             >
               <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
