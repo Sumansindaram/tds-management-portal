@@ -117,10 +117,11 @@ export default function Users() {
   };
 
   const openEditDialog = (userToEdit: UserWithRole) => {
+    // Prevent editing own role - only another admin can change your role
     if (userToEdit.id === user?.id) {
       toast({
-        title: 'Not Allowed',
-        description: 'You cannot edit your own role',
+        title: 'Restricted',
+        description: 'You cannot change your own role. Another admin must change it for you.',
         variant: 'destructive',
       });
       return;

@@ -14,6 +14,10 @@ import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 import RequestDetail from "./pages/RequestDetail";
 import MySubmissions from "./pages/MySubmissions";
+import SSRDirectory from "./pages/SSRDirectory";
+import SSRDetail from "./pages/SSRDetail";
+import AgentDashboard from "./pages/AgentDashboard";
+import UserApproval from "./pages/UserApproval";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +77,38 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <RequestDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/user-approval"
+              element={
+                <ProtectedRoute adminOnly>
+                  <UserApproval />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ssr-directory"
+              element={
+                <ProtectedRoute>
+                  <SSRDirectory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ssr/:id"
+              element={
+                <ProtectedRoute>
+                  <SSRDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agent-dashboard"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AgentDashboard />
                 </ProtectedRoute>
               }
             />

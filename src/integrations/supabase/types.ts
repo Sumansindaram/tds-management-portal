@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          approved: boolean | null
           created_at: string | null
           email: string
           full_name: string
@@ -24,6 +25,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          approved?: boolean | null
           created_at?: string | null
           email: string
           full_name: string
@@ -32,12 +34,105 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          approved?: boolean | null
           created_at?: string | null
           email?: string
           full_name?: string
           id?: string
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      ssr_assets: {
+        Row: {
+          asset_code: string
+          asset_type: string
+          created_at: string
+          designation: string
+          id: string
+          nsn: string
+          short_name: string | null
+          ssr_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          asset_code: string
+          asset_type: string
+          created_at?: string
+          designation: string
+          id?: string
+          nsn: string
+          short_name?: string | null
+          ssr_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          asset_code?: string
+          asset_type?: string
+          created_at?: string
+          designation?: string
+          id?: string
+          nsn?: string
+          short_name?: string | null
+          ssr_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ssr_assets_ssr_id_fkey"
+            columns: ["ssr_id"]
+            isOneToOne: false
+            referencedRelation: "ssrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ssrs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delivery_team: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          phone: string | null
+          role_type: string
+          status: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delivery_team: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          phone?: string | null
+          role_type: string
+          status?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delivery_team?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string | null
+          role_type?: string
+          status?: string | null
+          title?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

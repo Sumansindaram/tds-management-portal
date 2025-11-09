@@ -28,9 +28,21 @@ export default function Auth() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      navigate('/');
-    }
+    const checkUserStatus = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('approved')
+          .eq('id', user.id)
+          .single();
+        
+        if (data?.approved) {
+          navigate('/');
+        }
+      }
+    };
+
+    checkUserStatus();
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,17 +80,33 @@ export default function Auth() {
         if (error) throw error;
 
         toast({
-          title: 'Success!',
-          description: 'Your account has been created. You can now sign in.',
+          title: 'Registration Submitted',
+          description: 'Your account is pending admin approval. You will be notified once approved.',
         });
         setIsSignUp(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) throw error;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('approved')
+          .eq('id', data.user.id)
+          .single();
+
+        if (!profile?.approved) {
+          await supabase.auth.signOut();
+          toast({
+            title: 'Account Pending Approval',
+            description: 'Your account is awaiting admin approval. Please contact an administrator.',
+            variant: 'destructive',
+          });
+          return;
+        }
 
         navigate('/');
       }

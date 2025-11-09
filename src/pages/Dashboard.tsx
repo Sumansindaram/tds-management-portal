@@ -130,8 +130,7 @@ export default function Dashboard() {
         )}
 
         {isAdmin && (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Admin Tiles - All Equal Size */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card 
               className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
               onClick={() => navigate('/admin')}
@@ -148,35 +147,11 @@ export default function Dashboard() {
                 <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
                   <Search className="h-10 w-10 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-xl text-card-foreground">View All Requests</CardTitle>
-                <CardDescription>Search and review all TDS submissions</CardDescription>
+                <CardTitle className="text-xl text-card-foreground">View TDS Requests</CardTitle>
+                <CardDescription>Review all submissions</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View All Requests</Button>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
-              onClick={() => navigate('/form')}
-            >
-              <div className="relative h-32 overflow-hidden">
-                <img 
-                  src={iconNewRequest} 
-                  alt="Submit Request" 
-                  className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-              </div>
-              <CardHeader className="pb-3 relative">
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                  <FileText className="h-10 w-10 text-primary-foreground" />
-                </div>
-                <CardTitle className="text-xl text-card-foreground">Submit Request</CardTitle>
-                <CardDescription>Create a new TDS entry</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">New Entry</Button>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View Requests</Button>
               </CardContent>
             </Card>
 
@@ -198,13 +173,64 @@ export default function Dashboard() {
                     <Users className="h-10 w-10 text-primary-foreground" />
                   </div>
                   <CardTitle className="text-xl text-card-foreground">Manage Users</CardTitle>
-                  <CardDescription>Control user roles and permissions</CardDescription>
+                  <CardDescription>Control user roles</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Manage Users</Button>
                 </CardContent>
               </Card>
             )}
+
+            <Card 
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+              onClick={() => navigate('/user-approval')}
+            >
+              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
+              <CardHeader className="pb-3 relative">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
+                  <Users className="h-10 w-10 text-primary-foreground" />
+                </div>
+                <CardTitle className="text-xl text-card-foreground">User Approvals</CardTitle>
+                <CardDescription>Approve pending users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View Approvals</Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+              onClick={() => navigate('/ssr-directory')}
+            >
+              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
+              <CardHeader className="pb-3 relative">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
+                  <Users className="h-10 w-10 text-primary-foreground" />
+                </div>
+                <CardTitle className="text-xl text-card-foreground">SSR Directory</CardTitle>
+                <CardDescription>Safety leadership contacts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View Directory</Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+              onClick={() => navigate('/agent-dashboard')}
+            >
+              <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
+              <CardHeader className="pb-3 relative">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
+                  <Search className="h-10 w-10 text-primary-foreground" />
+                </div>
+                <CardTitle className="text-xl text-card-foreground">AI Agent Dashboard</CardTitle>
+                <CardDescription>AI-powered tools</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Dashboard</Button>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>

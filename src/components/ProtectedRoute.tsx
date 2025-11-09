@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -24,8 +26,27 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, adminOnly = false, superAdminOnly = false }: ProtectedRouteProps) {
   const { user, role, loading } = useAuth();
+  const [approved, setApproved] = useState<boolean | null>(null);
+  const [checkingApproval, setCheckingApproval] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    const checkApproval = async () => {
+      if (!loading && user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('approved')
+          .eq('id', user.id)
+          .single();
+        
+        setApproved(data?.approved || false);
+        setCheckingApproval(false);
+      }
+    };
+
+    checkApproval();
+  }, [user, loading]);
+
+  if (loading || checkingApproval) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -33,7 +54,7 @@ export function ProtectedRoute({ children, adminOnly = false, superAdminOnly = f
     );
   }
 
-  if (!user) {
+  if (!user || approved === false) {
     return <Navigate to="/auth" replace />;
   }
 
