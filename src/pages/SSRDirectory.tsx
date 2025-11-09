@@ -9,9 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Search, Eye } from 'lucide-react';
+import { Loader2, Plus, Search, Eye, Upload } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import BulkSSRUpload from '@/components/BulkSSRUpload';
 
 interface SSR {
   id: string;
@@ -135,15 +137,24 @@ export default function SSRDirectory() {
       <Header />
       <main className="container mx-auto p-6 lg:p-8">
         <Card className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-foreground">Safety Leadership Directory</h1>
-            {isAdmin && (
-              <Button onClick={() => setShowDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create New SSR
-              </Button>
-            )}
-          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-6">Safety Leadership Directory</h1>
+          
+          <Tabs defaultValue="list" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="list">SSR List</TabsTrigger>
+              {isAdmin && <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>}
+            </TabsList>
+
+            <TabsContent value="list">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex-1" />
+                {isAdmin && (
+                  <Button onClick={() => setShowDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create New SSR
+                  </Button>
+                )}
+              </div>
 
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -198,11 +209,24 @@ export default function SSRDirectory() {
             </TableBody>
           </Table>
 
-          <div className="mt-6">
-            <Button variant="outline" onClick={() => navigate('/')}>
-              Back to Dashboard
-            </Button>
-          </div>
+              <div className="mt-6">
+                <Button variant="outline" onClick={() => navigate('/')}>
+                  Back to Dashboard
+                </Button>
+              </div>
+            </TabsContent>
+
+            {isAdmin && (
+              <TabsContent value="bulk">
+                <BulkSSRUpload onSuccess={loadSSRs} />
+                <div className="mt-4">
+                  <Button variant="outline" onClick={() => navigate('/')}>
+                    Back to Dashboard
+                  </Button>
+                </div>
+              </TabsContent>
+            )}
+          </Tabs>
         </Card>
       </main>
 

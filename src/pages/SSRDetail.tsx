@@ -9,9 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, ArrowLeft, Trash2 } from 'lucide-react';
+import { Loader2, Plus, ArrowLeft, Trash2, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import BulkAssetsUpload from '@/components/BulkAssetsUpload';
 
 interface SSR {
   id: string;
@@ -42,8 +44,10 @@ export default function SSRDetail() {
   const { role } = useAuth();
   const [ssr, setSSR] = useState<SSR | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [filteredAssets, setFilteredAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     nsn: '',
     asset_code: '',
@@ -58,6 +62,19 @@ export default function SSRDetail() {
   useEffect(() => {
     loadData();
   }, [id]);
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = assets.filter(asset =>
+        asset.nsn.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.asset_type.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredAssets(filtered);
+    } else {
+      setFilteredAssets(assets);
+    }
+  }, [searchQuery, assets]);
 
   const loadData = async () => {
     try {
@@ -78,6 +95,7 @@ export default function SSRDetail() {
 
       if (assetsError) throw assetsError;
       setAssets(assetsData || []);
+      setFilteredAssets(assetsData || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -219,20 +237,39 @@ export default function SSRDetail() {
         </Card>
 
         <Card className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Assets Managed</h2>
-            {isAdmin && (
-              <Button onClick={() => setShowDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Asset
-              </Button>
-            )}
-          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Assets Managed</h2>
+          
+          <Tabs defaultValue="list" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="list">Asset List</TabsTrigger>
+              {isAdmin && <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>}
+            </TabsList>
 
-          {assets.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No assets assigned yet</p>
-          ) : (
-            <Table>
+            <TabsContent value="list">
+              <div className="flex justify-between items-center mb-4 gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search by NSN, designation, or type..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                {isAdmin && (
+                  <Button onClick={() => setShowDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Asset
+                  </Button>
+                )}
+              </div>
+
+              {filteredAssets.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  {searchQuery ? 'No assets match your search' : 'No assets assigned yet'}
+                </p>
+              ) : (
+                <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>NSN</TableHead>
@@ -245,7 +282,7 @@ export default function SSRDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {assets.map((asset) => (
+                {filteredAssets.map((asset) => (
                   <TableRow key={asset.id}>
                     <TableCell className="font-mono">{asset.nsn}</TableCell>
                     <TableCell>{asset.asset_code}</TableCell>
@@ -273,8 +310,16 @@ export default function SSRDetail() {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
-          )}
+                </Table>
+              )}
+            </TabsContent>
+
+            {isAdmin && (
+              <TabsContent value="bulk">
+                <BulkAssetsUpload ssrId={id!} onSuccess={loadData} />
+              </TabsContent>
+            )}
+          </Tabs>
         </Card>
       </main>
 

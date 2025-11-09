@@ -1,1 +1,16 @@
 project_id = "ybqrysjtwynuzuqggtfs"
+
+[functions.send-tds-notification]
+verify_jwt = false
+
+[functions.ai-tds-search]
+verify_jwt = true
+
+[functions.ai-email-reply]
+verify_jwt = true
+
+[functions.process-ssr-csv]
+verify_jwt = true
+
+[functions.process-assets-csv]
+verify_jwt = true

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Header } from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,42 +7,131 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Search, FileText, Mail, Calculator, Users } from 'lucide-react';
+import { Search, FileText, Mail, Calculator, Users, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AgentDashboard() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [tdsQuery, setTdsQuery] = useState('');
+  const [tdsSearching, setTdsSearching] = useState(false);
+  const [tdsResults, setTdsResults] = useState<any>(null);
   const [emailContent, setEmailContent] = useState('');
+  const [emailGenerating, setEmailGenerating] = useState(false);
+  const [emailReply, setEmailReply] = useState('');
   const [dimensions, setDimensions] = useState({ length: '', width: '', height: '', weight: '' });
   const [cofgData, setCofgData] = useState({ weight: '', distance: '' });
+  const [cofgResult, setCofgResult] = useState<string>('');
 
-  const handleTDSSearch = () => {
-    toast({
-      title: 'TDS Search',
-      description: `Searching for: ${tdsQuery}`
-    });
+  const handleTDSSearch = async () => {
+    if (!tdsQuery.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a search query',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setTdsSearching(true);
+    setTdsResults(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-tds-search', {
+        body: { query: tdsQuery }
+      });
+
+      if (error) throw error;
+
+      setTdsResults(data);
+      toast({
+        title: 'Search Complete',
+        description: `Found ${data.results.length} matching entries`
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setTdsSearching(false);
+    }
   };
 
   const handleFallbackTDS = () => {
+    const { length, width, height, weight } = dimensions;
+    if (!length || !width || !height || !weight) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all dimensions',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     toast({
       title: 'Fallback TDS Generator',
-      description: `Dimensions: ${dimensions.length}x${dimensions.width}x${dimensions.height}mm, Weight: ${dimensions.weight}kg`
+      description: `Dimensions: ${length}x${width}x${height}mm, Weight: ${weight}kg`
     });
   };
 
-  const handleEmailReply = () => {
-    toast({
-      title: 'Email Reply Assistant',
-      description: 'Generating reply...'
-    });
+  const handleEmailReply = async () => {
+    if (!emailContent.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please paste email content',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setEmailGenerating(true);
+    setEmailReply('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-email-reply', {
+        body: { emailContent }
+      });
+
+      if (error) throw error;
+
+      setEmailReply(data.reply);
+      toast({
+        title: 'Reply Generated',
+        description: 'Email reply has been generated successfully'
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setEmailGenerating(false);
+    }
   };
 
   const handleCofGCalculation = () => {
+    const { weight, distance } = cofgData;
+    if (!weight || !distance) {
+      toast({
+        title: 'Error',
+        description: 'Please enter weight and distance',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const w = parseFloat(weight);
+    const d = parseFloat(distance);
+    const moment = w * d;
+    const result = `Center of Gravity Calculation:\n\nWeight: ${w} kg\nDistance from Reference: ${d} m\nMoment: ${moment.toFixed(2)} kg⋅m`;
+    
+    setCofgResult(result);
     toast({
-      title: 'CofG Calculator',
-      description: `Calculating with Weight: ${cofgData.weight}kg, Distance: ${cofgData.distance}m`
+      title: 'Calculation Complete',
+      description: `Moment: ${moment.toFixed(2)} kg⋅m`
     });
   };
 
@@ -78,13 +168,47 @@ export default function AgentDashboard() {
 
             <TabsContent value="tds" className="space-y-4">
               <h2 className="text-xl font-semibold">TDS Search</h2>
-              <p className="text-muted-foreground">Search for vehicle transportation data sheets</p>
+              <p className="text-muted-foreground">AI-powered search for vehicle transportation data sheets</p>
               <Input
-                placeholder="Enter vehicle name (e.g., Challenger)"
+                placeholder="Enter vehicle name, NSN, or designation (e.g., Challenger, Foxhound)"
                 value={tdsQuery}
                 onChange={(e) => setTdsQuery(e.target.value)}
               />
-              <Button onClick={handleTDSSearch}>Search</Button>
+              <Button onClick={handleTDSSearch} disabled={tdsSearching}>
+                {tdsSearching ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  'Search'
+                )}
+              </Button>
+
+              {tdsResults && (
+                <div className="mt-4 space-y-4">
+                  <Card className="p-4 bg-muted">
+                    <h3 className="font-semibold mb-2">AI Summary</h3>
+                    <p className="whitespace-pre-wrap">{tdsResults.aiSummary}</p>
+                  </Card>
+
+                  {tdsResults.results.length > 0 && (
+                    <Card className="p-4">
+                      <h3 className="font-semibold mb-2">Matching Entries</h3>
+                      <div className="space-y-2">
+                        {tdsResults.results.map((entry: any, i: number) => (
+                          <div key={i} className="border-b pb-2">
+                            <p><strong>Reference:</strong> {entry.reference}</p>
+                            <p><strong>Designation:</strong> {entry.designation}</p>
+                            <p><strong>NSN:</strong> {entry.nsn}</p>
+                            <p><strong>Status:</strong> {entry.status}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="fallback" className="space-y-4">
@@ -129,24 +253,50 @@ export default function AgentDashboard() {
 
             <TabsContent value="email" className="space-y-4">
               <h2 className="text-xl font-semibold">Email Reply Assistant</h2>
-              <p className="text-muted-foreground">Generate professional email responses</p>
+              <p className="text-muted-foreground">AI-powered professional email response generator</p>
               <Textarea
                 placeholder="Paste received email content here..."
                 rows={8}
                 value={emailContent}
                 onChange={(e) => setEmailContent(e.target.value)}
               />
-              <Button onClick={handleEmailReply}>Generate Reply</Button>
+              <Button onClick={handleEmailReply} disabled={emailGenerating}>
+                {emailGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  'Generate Reply'
+                )}
+              </Button>
+
+              {emailReply && (
+                <Card className="p-4 bg-muted mt-4">
+                  <h3 className="font-semibold mb-2">Generated Reply</h3>
+                  <div className="whitespace-pre-wrap">{emailReply}</div>
+                  <Button 
+                    className="mt-4" 
+                    onClick={() => {
+                      navigator.clipboard.writeText(emailReply);
+                      toast({ title: 'Copied', description: 'Reply copied to clipboard' });
+                    }}
+                  >
+                    Copy to Clipboard
+                  </Button>
+                </Card>
+              )}
             </TabsContent>
 
             <TabsContent value="cofg" className="space-y-4">
               <h2 className="text-xl font-semibold">Center of Gravity Calculator</h2>
-              <p className="text-muted-foreground">Calculate vehicle center of gravity</p>
+              <p className="text-muted-foreground">Calculate vehicle center of gravity moments</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">Weight (kg)</label>
                   <Input
                     type="number"
+                    placeholder="e.g., 62500"
                     value={cofgData.weight}
                     onChange={(e) => setCofgData({ ...cofgData, weight: e.target.value })}
                   />
@@ -155,12 +305,20 @@ export default function AgentDashboard() {
                   <label className="text-sm font-medium">Distance from Reference (m)</label>
                   <Input
                     type="number"
+                    placeholder="e.g., 3.5"
                     value={cofgData.distance}
                     onChange={(e) => setCofgData({ ...cofgData, distance: e.target.value })}
                   />
                 </div>
               </div>
               <Button onClick={handleCofGCalculation}>Calculate</Button>
+
+              {cofgResult && (
+                <Card className="p-4 bg-muted mt-4">
+                  <h3 className="font-semibold mb-2">Calculation Result</h3>
+                  <pre className="whitespace-pre-wrap font-mono text-sm">{cofgResult}</pre>
+                </Card>
+              )}
             </TabsContent>
 
             <TabsContent value="safety" className="space-y-4">
