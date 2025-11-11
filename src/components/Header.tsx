@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X, List } from 'lucide-react';
+import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X, List, Key, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -23,6 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import desLogo from '@/assets/des-logo.jfif';
+import { ChangePasswordDialog } from '@/components/ChangePasswordDialog';
 
 export function Header() {
   const { user, role, signOut } = useAuth();
@@ -31,6 +32,7 @@ export function Header() {
   const isMobile = useIsMobile();
   const [fullName, setFullName] = React.useState<string>('');
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (user?.id) {
@@ -94,47 +96,36 @@ export function Header() {
                   <Home className="mr-2 h-4 w-4" />
                   Home
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/form')}
-                  className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  {(role === 'admin' || role === 'super_admin') ? 'Submit Request' : 'Create Request'}
-                </Button>
-                {!(role === 'admin' || role === 'super_admin') && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate('/my-submissions')}
-                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                  >
-                    <List className="mr-2 h-4 w-4" />
-                    My Submissions
-                  </Button>
-                )}
                 {(role === 'admin' || role === 'super_admin') && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate('/admin')}
-                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                  >
-                    <Database className="mr-2 h-4 w-4" />
-                    View All Requests
-                  </Button>
-                )}
-                {role === 'super_admin' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate('/users')}
-                    className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
-                  >
-                    <Users className="mr-2 h-4 w-4" />
-                    Manage Users
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/admin')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    >
+                      <Database className="mr-2 h-4 w-4" />
+                      View Requests
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/ssr-directory')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      SSR Directory
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/agent-dashboard')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    >
+                      <Bot className="mr-2 h-4 w-4" />
+                      AI Dashboard
+                    </Button>
+                  </>
                 )}
               </div>
             )}
@@ -145,7 +136,7 @@ export function Header() {
               <>
                 {/* Desktop Navigation - Right Side */}
                 <div className="hidden lg:flex items-center gap-2">
-                  {role === 'super_admin' ? (
+                  {role === 'super_admin' && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button 
@@ -166,6 +157,10 @@ export function Header() {
                           </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer hover:bg-primary/10 text-card-foreground focus:bg-primary/10 focus:text-card-foreground" onClick={() => navigate('/users')}>
+                          <Users className="mr-2 h-4 w-4" />
+                          <span>Manage Users</span>
+                        </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer hover:bg-primary/10 text-card-foreground focus:bg-primary/10 focus:text-card-foreground" onClick={() => {
                           toast({
                             title: "Backend Access",
@@ -178,24 +173,6 @@ export function Header() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  ) : role === 'admin' ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 gap-1"
-                    >
-                      <Shield className="h-3 w-3 mr-1" />
-                      Admin
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 gap-1"
-                    >
-                      <User className="h-3 w-3 mr-1" />
-                      User
-                    </Button>
                   )}
                 </div>
 
@@ -366,6 +343,10 @@ export function Header() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setChangePasswordOpen(true)} className="cursor-pointer hover:bg-primary/10 focus:bg-primary/10 my-1 mx-1">
+                      <Key className="mr-2 h-4 w-4" />
+                      <span className="font-medium">Change Password</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer my-1 mx-1">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span className="font-medium">Logout</span>
@@ -381,6 +362,7 @@ export function Header() {
           </div>
         </div>
       </div>
+      <ChangePasswordDialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen} />
     </header>
   );
 }

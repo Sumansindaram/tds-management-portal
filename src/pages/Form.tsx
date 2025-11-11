@@ -373,7 +373,7 @@ export default function Form() {
         </header>
       )}
       <main className="container mx-auto p-6">
-        <Card className="shadow-2xl border-2 max-w-6xl mx-auto">
+        <Card className="shadow-2xl border-2">
           <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
             <CardTitle className="text-3xl font-bold text-center">
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">

@@ -394,13 +394,13 @@ export default function RequestDetail() {
       <main className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Reference and Status Cards */}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Card className="shadow-sm border-2 border-primary/20">
+          <Card className="shadow-sm border-2 border-primary/20 bg-card">
             <CardContent className="pt-4 sm:pt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Reference Number</p>
               <p className="text-xl sm:text-2xl font-bold text-card-foreground break-all">{entry.reference}</p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm border-2 border-primary/20">
+          <Card className="shadow-sm border-2 border-primary/20 bg-card">
             <CardContent className="pt-4 sm:pt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Current Status</p>
               <Badge className={`text-sm px-4 py-1.5 font-semibold ${STATUS_COLORS[entry.status] || 'bg-muted'}`}>{entry.status}</Badge>
@@ -418,11 +418,11 @@ export default function RequestDetail() {
           </Card>
         </div>
 
-        <Card className="shadow-lg border-2">
+        <Card className="shadow-lg border-2 bg-card">
           <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
             <CardTitle className="text-xl sm:text-2xl text-card-foreground">Request Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6 sm:space-y-8 pt-4 sm:pt-6">
+          <CardContent className="space-y-6 sm:space-y-8 pt-4 sm:pt-6 bg-card">
             {/* Two Column Layout for Details Sections */}
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Left Column */}

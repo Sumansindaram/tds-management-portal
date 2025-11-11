@@ -397,12 +397,12 @@ export default function AdminDetail() {
    const isReadOnly = entry.status !== 'Pending' && !isEditing;
  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/10">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto p-6 lg:p-8 space-y-6">
         {/* Reference and Status Cards */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="shadow-sm border-2 border-primary/20">
+          <Card className="shadow-sm border-2 border-primary/20 bg-card">
             <CardContent className="pt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
                 Reference Number
@@ -412,36 +412,103 @@ export default function AdminDetail() {
               </p>
             </CardContent>
           </Card>
-          <Card className="shadow-sm border-2 border-primary/20">
-            <CardContent className="pt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
-                Current Status
-              </p>
-              <Badge 
-                className={`text-sm px-4 py-1.5 font-semibold ${STATUS_COLORS[entry.status] || ''}`}
-              >
-                {entry.status}
-              </Badge>
+          <Card className="shadow-sm border-2 border-primary/20 bg-card">
+            <CardContent className="pt-6 flex justify-between items-center">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
+                  Current Status
+                </p>
+                <Badge 
+                  className={`text-sm px-4 py-1.5 font-semibold ${STATUS_COLORS[entry.status] || ''}`}
+                >
+                  {entry.status}
+                </Badge>
+              </div>
+              {!isEditing && (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  variant="outline"
+                  size="sm"
+                  className="border-primary text-primary hover:bg-primary/10"
+                >
+                  Edit
+                </Button>
+              )}
+              {isEditing && (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        setUpdating(true);
+                        const { error } = await supabase
+                          .from('tds_entries')
+                          .update(entry)
+                          .eq('id', entry.id);
+                        
+                        if (error) throw error;
+                        
+                        toast({
+                          title: 'Success',
+                          description: 'Changes saved successfully',
+                        });
+                        setIsEditing(false);
+                        await loadEntry();
+                      } catch (error: any) {
+                        toast({
+                          title: 'Error',
+                          description: error.message || 'Failed to save changes',
+                          variant: 'destructive',
+                        });
+                      } finally {
+                        setUpdating(false);
+                      }
+                    }}
+                    variant="default"
+                    size="sm"
+                    disabled={updating}
+                  >
+                    {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsEditing(false);
+                      loadEntry();
+                    }}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        <Card className={`shadow-lg border-2 ${entry.status !== 'Pending' && !isEditing ? 'opacity-75' : ''}`}>
+        <Card className="shadow-lg border-2 bg-card">
           <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
-            <CardTitle className="text-2xl text-primary">Request Details</CardTitle>
+            <CardTitle className="text-2xl text-card-foreground">Request Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-8 pt-6">
+          <CardContent className="space-y-8 pt-6 bg-card">
             {/* Asset Owner Details */}
             <section className="bg-card rounded-lg p-6 border-2 shadow-sm">
               <h3 className="mb-4 pb-3 text-lg font-bold text-primary flex items-center gap-3 border-b-2 border-primary/20">
-                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold">1</span>
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center text-sm font-bold text-primary">1</span>
                 Asset Owner Details
               </h3>
               <div className="grid gap-3 md:grid-cols-2">
                 {assetOwnerFields.map(field => (
                   <div key={field.label} className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
+                    {isEditing ? (
+                      <Input
+                        value={entry[field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email'] || ''}
+                        onChange={(e) => setEntry({ ...entry, [field.label === 'SSR/SR Name' ? 'ssr_name' : 'ssr_email']: e.target.value })}
+                        className="text-sm bg-card"
+                      />
+                    ) : (
+                      <p className="text-sm font-semibold text-card-foreground p-2 bg-card rounded border">{field.value || '—'}</p>
+                    )}
                   </div>
                 ))}
               </div>
