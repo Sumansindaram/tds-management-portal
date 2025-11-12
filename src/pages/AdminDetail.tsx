@@ -427,9 +427,9 @@ export default function AdminDetail() {
               {!isEditing && (
                 <Button
                   onClick={() => setIsEditing(true)}
-                  variant="outline"
+                  variant="default"
                   size="sm"
-                  className="border-primary text-primary hover:bg-primary/10"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Edit
                 </Button>
@@ -521,12 +521,25 @@ export default function AdminDetail() {
                 Asset Details
               </h3>
               <div className="grid gap-3 md:grid-cols-2">
-                {assetDetailsFields.map(field => (
-                  <div key={field.label} className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                  </div>
-                ))}
+                {assetDetailsFields.map(field => {
+                  const fieldKey = field.label === 'Designation' ? 'designation' : 
+                                  field.label === 'NSN' ? 'nsn' :
+                                  field.label === 'Asset Code' ? 'asset_code' : 'short_name';
+                  return (
+                    <div key={field.label} className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                      {isEditing ? (
+                        <Input
+                          value={entry[fieldKey] || ''}
+                          onChange={(e) => setEntry({ ...entry, [fieldKey]: e.target.value })}
+                          className="text-sm bg-card"
+                        />
+                      ) : (
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-card rounded border">{field.value || '—'}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
 
@@ -537,12 +550,33 @@ export default function AdminDetail() {
                 Basic Details
               </h3>
               <div className="grid gap-3 md:grid-cols-3">
-                {basicDetailsFields.map(field => (
-                  <div key={field.label} className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                  </div>
-                ))}
+                {basicDetailsFields.map(field => {
+                  const fieldKey = field.label === 'Length (m)' ? 'length' :
+                                  field.label === 'Width (m)' ? 'width' :
+                                  field.label === 'Height (m)' ? 'height' :
+                                  field.label === 'Unladen Weight (kg)' ? 'unladen_weight' :
+                                  field.label === 'Laden Weight (kg)' ? 'laden_weight' :
+                                  field.label === 'ALEST' ? 'alest' :
+                                  field.label === 'LIMS 2.5' ? 'lims_25' :
+                                  field.label === 'LIMS 2.8' ? 'lims_28' :
+                                  field.label === 'Out of Service Date' ? 'out_of_service_date' :
+                                  field.label === 'Classification' ? 'classification' : 'mlc';
+                  return (
+                    <div key={field.label} className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                      {isEditing ? (
+                        <Input
+                          value={entry[fieldKey] || ''}
+                          onChange={(e) => setEntry({ ...entry, [fieldKey]: e.target.value })}
+                          className="text-sm bg-card"
+                          type={fieldKey === 'out_of_service_date' ? 'date' : 'text'}
+                        />
+                      ) : (
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-card rounded border">{field.value || '—'}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
 
@@ -553,12 +587,29 @@ export default function AdminDetail() {
                 Driver Information
               </h3>
               <div className="grid gap-3 md:grid-cols-3">
-                {driverInfoFields.map(field => (
-                  <div key={field.label} className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                  </div>
-                ))}
+                {driverInfoFields.map(field => {
+                  const fieldKey = field.label === 'Licence' ? 'licence' :
+                                  field.label === 'Crew Number' ? 'crew_number' :
+                                  field.label === 'Passenger Capacity' ? 'passenger_capacity' :
+                                  field.label === 'Range' ? 'range' :
+                                  field.label === 'Fuel Capacity' ? 'fuel_capacity' :
+                                  field.label === 'Single Carriage' ? 'single_carriage' :
+                                  field.label === 'Dual Carriage' ? 'dual_carriage' : 'max_speed';
+                  return (
+                    <div key={field.label} className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                      {isEditing ? (
+                        <Input
+                          value={entry[fieldKey] || ''}
+                          onChange={(e) => setEntry({ ...entry, [fieldKey]: e.target.value })}
+                          className="text-sm bg-card"
+                        />
+                      ) : (
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-card rounded border">{field.value || '—'}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
 
@@ -569,12 +620,25 @@ export default function AdminDetail() {
                 ADAMS Data
               </h3>
               <div className="grid gap-3 md:grid-cols-2">
-                {adamsDataFields.map(field => (
-                  <div key={field.label} className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
-                    <p className="text-sm font-semibold text-card-foreground p-2 bg-muted/30 rounded border">{field.value || '—'}</p>
-                  </div>
-                ))}
+                {adamsDataFields.map(field => {
+                  const fieldKey = field.label === 'Service' ? 'service' :
+                                  field.label === 'Owner Nation' ? 'owner_nation' :
+                                  field.label === 'RIC Code' ? 'ric_code' : 'asset_type';
+                  return (
+                    <div key={field.label} className="space-y-1">
+                      <p className="text-xs font-medium text-muted-foreground">{field.label}</p>
+                      {isEditing ? (
+                        <Input
+                          value={entry[fieldKey] || ''}
+                          onChange={(e) => setEntry({ ...entry, [fieldKey]: e.target.value })}
+                          className="text-sm bg-card"
+                        />
+                      ) : (
+                        <p className="text-sm font-semibold text-card-foreground p-2 bg-card rounded border">{field.value || '—'}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
 

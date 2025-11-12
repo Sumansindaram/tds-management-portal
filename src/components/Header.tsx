@@ -110,11 +110,42 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => navigate('/form')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Submit Request
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => navigate('/ssr-directory')}
                       className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
                       <Users className="mr-2 h-4 w-4" />
                       SSR Directory
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/agent-dashboard')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    >
+                      <Bot className="mr-2 h-4 w-4" />
+                      AI Dashboard
+                    </Button>
+                  </>
+                )}
+                {!(role === 'admin' || role === 'super_admin') && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/form')}
+                      className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Submit Request
                     </Button>
                     <Button
                       variant="outline"
@@ -136,6 +167,12 @@ export function Header() {
               <>
                 {/* Desktop Navigation - Right Side */}
                 <div className="hidden lg:flex items-center gap-2">
+                  {role === 'admin' && (
+                    <Badge variant="default" className="bg-badge-user text-white px-3 py-1">
+                      <Shield className="mr-1 h-3 w-3" />
+                      Admin
+                    </Badge>
+                  )}
                   {role === 'super_admin' && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -173,6 +210,12 @@ export function Header() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                  )}
+                  {!(role === 'admin' || role === 'super_admin') && (
+                    <Badge variant="secondary" className="bg-muted text-muted-foreground px-3 py-1">
+                      <User className="mr-1 h-3 w-3" />
+                      User
+                    </Badge>
                   )}
                 </div>
 

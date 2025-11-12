@@ -372,7 +372,7 @@ export default function Form() {
           </div>
         </header>
       )}
-      <main className="container mx-auto p-6">
+      <main className="mx-auto p-6 lg:px-12 xl:px-20">
         <Card className="shadow-2xl border-2">
           <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
             <CardTitle className="text-3xl font-bold text-center">
