@@ -118,7 +118,7 @@ export default function BulkSSRUpload({ onSuccess }: BulkSSRUploadProps) {
         <div>
           <Button
             type="button"
-            variant="outline"
+            variant="default"
             onClick={downloadTemplate}
             className="mb-2"
           >
