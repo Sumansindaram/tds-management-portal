@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X, List, Key, Bot } from 'lucide-react';
+import { LogOut, Shield, User, Users, Home, ChevronDown, Info, Database, Menu, X, List, Key, Wrench } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -128,11 +128,11 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate('/agent-dashboard')}
+                      onClick={() => navigate('/tds-tool')}
                       className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
-                      <Bot className="mr-2 h-4 w-4" />
-                      AI Dashboard
+                      <Wrench className="mr-2 h-4 w-4" />
+                      TDS Tool
                     </Button>
                   </>
                 )}
@@ -150,11 +150,11 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate('/agent-dashboard')}
+                      onClick={() => navigate('/tds-tool')}
                       className="border-ribbon-foreground/30 bg-ribbon text-ribbon-foreground hover:bg-ribbon-foreground/20 font-semibold"
                     >
-                      <Bot className="mr-2 h-4 w-4" />
-                      AI Dashboard
+                      <Wrench className="mr-2 h-4 w-4" />
+                      TDS Tool
                     </Button>
                   </>
                 )}

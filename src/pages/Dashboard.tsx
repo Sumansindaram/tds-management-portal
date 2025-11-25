@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-import { FileText, List, PlusCircle, Users, Search, Bot } from 'lucide-react';
+import { FileText, List, PlusCircle, Users, Search, Wrench } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import heroBanner from '@/assets/tds-hero-banner.jpg';
@@ -179,21 +179,21 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {/* AI Agent Dashboard */}
+                {/* TDS Tool */}
                 <Card 
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
-                  onClick={() => navigate('/agent-dashboard')}
+                  onClick={() => navigate('/tds-tool')}
                 >
                   <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
                   <CardHeader className="pb-3 relative">
                     <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <Bot className="h-10 w-10 text-primary-foreground" />
+                      <Wrench className="h-10 w-10 text-primary-foreground" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">AI Agent Dashboard</CardTitle>
-                    <CardDescription>AI-powered tools and assistance</CardDescription>
+                    <CardTitle className="text-xl text-card-foreground">TDS Tool</CardTitle>
+                    <CardDescription>Transportation planning calculations</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Dashboard</Button>
+                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Tool</Button>
                   </CardContent>
                 </Card>
               </>
@@ -329,21 +329,21 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                {/* AI Agent Dashboard */}
+                {/* TDS Tool */}
                 <Card 
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
-                  onClick={() => navigate('/agent-dashboard')}
+                  onClick={() => navigate('/tds-tool')}
                 >
                   <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
                   <CardHeader className="pb-3 relative">
                     <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <Bot className="h-10 w-10 text-primary-foreground" />
+                      <Wrench className="h-10 w-10 text-primary-foreground" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">AI Agent Dashboard</CardTitle>
-                    <CardDescription>AI-powered tools and assistance</CardDescription>
+                    <CardTitle className="text-xl text-card-foreground">TDS Tool</CardTitle>
+                    <CardDescription>Transportation planning calculations</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Dashboard</Button>
+                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Tool</Button>
                   </CardContent>
                 </Card>
               </>
