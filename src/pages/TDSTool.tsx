@@ -304,11 +304,11 @@ export default function TDSTool() {
                   <CardContent className="space-y-4">
                     <Button 
                       onClick={() => window.open('https://tiedown.desdigital.mod.uk/search', '_blank')}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      variant="default"
                     >
                       Open TDS Search
                     </Button>
-                    <p className="text-sm text-muted-foreground font-mono">
+                    <p className="text-sm text-foreground/70">
                       Tip: Use Asset Code, Designation, NSN or RIC; refine with Status, Asset Types and Transportation Types.
                     </p>
                   </CardContent>
@@ -323,17 +323,17 @@ export default function TDSTool() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex gap-2 flex-wrap">
-                      <Button onClick={addItem} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button onClick={addItem} variant="default">
                         <Plus className="h-4 w-4 mr-2" />
                         Add item
                       </Button>
                       <Button onClick={presetAxles} variant="secondary">
                         Use axle masses
                       </Button>
-                      <Button onClick={() => setItems([])} variant="outline">
+                      <Button onClick={() => setItems([])} variant="outline" className="text-foreground">
                         Clear items
                       </Button>
-                      <Button onClick={() => calcCoG()} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button onClick={() => calcCoG()} variant="default">
                         Calculate CoG
                       </Button>
                     </div>
@@ -474,7 +474,7 @@ export default function TDSTool() {
                     <div className="flex gap-2 flex-wrap">
                       <Button onClick={presetUK} variant="secondary">UK Road Preset</Button>
                       <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} variant="outline">Starter plan</Button>
+                      <Button onClick={starterPlan} variant="outline" className="text-foreground">Starter plan</Button>
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
@@ -679,14 +679,14 @@ export default function TDSTool() {
                         />
                       </div>
                       <div className="flex gap-2">
-                        <Button onClick={addLashing} className="bg-primary text-primary-foreground hover:bg-primary/90">Add</Button>
-                        <Button onClick={clearLashings} variant="outline">Clear all</Button>
+                        <Button onClick={addLashing} variant="default">Add</Button>
+                        <Button onClick={clearLashings} variant="outline" className="text-foreground">Clear all</Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                      <Button onClick={calcRestraint} className="bg-primary text-primary-foreground hover:bg-primary/90">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} variant="outline">Clear results</Button>
+                      <Button onClick={calcRestraint} variant="default">Calculate</Button>
+                      <Button onClick={() => setRestraintResults([])} variant="outline" className="text-foreground">Clear results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
@@ -825,7 +825,7 @@ export default function TDSTool() {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button onClick={checkFit} className="bg-primary text-primary-foreground hover:bg-primary/90">Check fit</Button>
+                      <Button onClick={checkFit} variant="default">Check fit</Button>
                       <Button
                         onClick={() => {
                           setAssetL('');
@@ -836,6 +836,7 @@ export default function TDSTool() {
                           setFitResult('');
                         }}
                         variant="outline"
+                        className="text-foreground"
                       >
                         Clear
                       </Button>
@@ -855,27 +856,240 @@ export default function TDSTool() {
                 <Card className="bg-card border-border">
                   <CardHeader>
                     <CardTitle className="text-card-foreground">Guidance for Front-Line Commands (FLC)</CardTitle>
+                    <CardDescription>Simple step-by-step instructions for calculating Centre of Gravity, Restraint Systems, and Container Fit</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
+                    
+                    {/* Centre of Gravity Section */}
                     <Card className="bg-muted border-border">
                       <CardHeader>
-                        <CardTitle className="text-card-foreground">Quick rules</CardTitle>
+                        <CardTitle className="text-card-foreground">Centre of Gravity (CoG) - Finding the Balance Point</CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <ul className="list-disc list-inside space-y-2 text-foreground">
-                          <li><strong>Use Defence values:</strong> Forward 0.8 g, Rear 0.5 g, Side 0.5 g.</li>
-                          <li><strong>Straps:</strong> choose LC (e.g., 2000 daN). Keep angle small (≈ 20°) and straight to the direction.</li>
-                          <li><strong>Plan:</strong> Start with 4 straps forward, 2 rearward, 4 lateral. Recalculate and add if any direction shows FAIL.</li>
-                        </ul>
+                      <CardContent className="space-y-4 text-foreground">
+                        <div>
+                          <h4 className="font-semibold mb-2">What is Centre of Gravity?</h4>
+                          <p className="text-sm">
+                            The Centre of Gravity (CoG) is the balance point of your equipment. Think of it like a seesaw - 
+                            if you know where the balance point is, you can load and secure your cargo properly.
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">How to Calculate:</h4>
+                          <ol className="list-decimal list-inside space-y-2 text-sm">
+                            <li><strong>Break it down into parts:</strong> Divide your equipment into separate items (e.g., vehicle body, fuel, crew, cargo)</li>
+                            <li><strong>Weigh each part:</strong> Enter the weight (mass) of each item in kilograms</li>
+                            <li><strong>Measure the position:</strong> Measure where each item sits from a reference point (usually the front):
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li>x = front to back distance (in meters)</li>
+                                <li>y = left to right distance (in meters)</li>
+                                <li>z = height from ground (in meters)</li>
+                              </ul>
+                            </li>
+                            <li><strong>Click "Calculate CoG":</strong> The tool will calculate the overall balance point automatically</li>
+                          </ol>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Quick Method - Using Axle Weights:</h4>
+                          <p className="text-sm">
+                            If you have a vehicle with known axle weights, use the "Use axle masses" button. 
+                            Just enter the weight on each axle and where the axles are positioned. This gives you a quick CoG estimate.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-warning/10 border border-warning/30 rounded p-3">
+                          <p className="text-sm"><strong>Important:</strong> The CoG affects stability. A high CoG (large z value) means 
+                          the equipment is more likely to tip over. Always consider this when planning transport.</p>
+                        </div>
                       </CardContent>
                     </Card>
+
+                    {/* Restraint System Section */}
+                    <Card className="bg-muted border-border">
+                      <CardHeader>
+                        <CardTitle className="text-card-foreground">Restraint System - Securing Your Load</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4 text-foreground">
+                        <div>
+                          <h4 className="font-semibold mb-2">What is a Restraint System?</h4>
+                          <p className="text-sm">
+                            A restraint system is how you tie down and secure equipment to prevent it from moving during transport. 
+                            You need to secure it in three directions: forward (braking), rearward (acceleration), and sideways (cornering).
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Step-by-Step Guide:</h4>
+                          <ol className="list-decimal list-inside space-y-3 text-sm">
+                            <li><strong>Enter the design mass:</strong> This is the total weight of what you're securing (in kilograms)</li>
+                            
+                            <li><strong>Select a preset:</strong>
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>UK Road Preset:</strong> Use if transporting on UK roads (assumes some friction μ=0.30)</li>
+                                <li><strong>Defence Preset:</strong> Use for military operations (assumes no friction μ=0, safer)</li>
+                              </ul>
+                            </li>
+                            
+                            <li><strong>Add your lashings (tie-down straps):</strong>
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>Direction:</strong> Choose Forward, Rearward, or Lateral (sideways)</li>
+                                <li><strong>Count:</strong> How many straps in this direction (e.g., 4)</li>
+                                <li><strong>LC (Lashing Capacity):</strong> The strength rating of your strap (usually printed on it, e.g., 2000 daN)</li>
+                                <li><strong>Angle (θ):</strong> How steep the strap angle is - keep this small (around 20-30 degrees) for best results</li>
+                              </ul>
+                            </li>
+                            
+                            <li><strong>Click "Calculate":</strong> The tool checks if your lashings are strong enough</li>
+                            
+                            <li><strong>Read the results:</strong>
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>PASS:</strong> Your restraint system is adequate</li>
+                                <li><strong>FAIL:</strong> You need more lashings in that direction - add more and recalculate</li>
+                              </ul>
+                            </li>
+                          </ol>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Recommended Starting Point:</h4>
+                          <p className="text-sm mb-2">Click "Starter plan" to load a typical setup, then adjust as needed:</p>
+                          <ul className="list-disc list-inside ml-6 space-y-1 text-sm">
+                            <li>4 straps pulling forward</li>
+                            <li>2 straps pulling rearward</li>
+                            <li>4 straps pulling sideways (lateral)</li>
+                          </ul>
+                        </div>
+                        
+                        <div className="bg-warning/10 border border-warning/30 rounded p-3">
+                          <p className="text-sm"><strong>Key Tips:</strong></p>
+                          <ul className="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li>Smaller angles (closer to horizontal) = more effective restraint</li>
+                            <li>Use higher capacity straps rather than excessive quantities</li>
+                            <li>Distribute lashings evenly around the load</li>
+                            <li>Always re-check lashings before moving</li>
+                          </ul>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Container Fit Section */}
+                    <Card className="bg-muted border-border">
+                      <CardHeader>
+                        <CardTitle className="text-card-foreground">ISO Container Fit - Will It Fit?</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4 text-foreground">
+                        <div>
+                          <h4 className="font-semibold mb-2">What is Container Fit?</h4>
+                          <p className="text-sm">
+                            This tool checks if your equipment will fit inside a standard shipping container (like those on cargo ships). 
+                            It checks both the door opening and the internal space.
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">How to Use:</h4>
+                          <ol className="list-decimal list-inside space-y-2 text-sm">
+                            <li><strong>Select container type:</strong> Most common is "20 ft ISO (Standard)" - this is the standard military container size</li>
+                            
+                            <li><strong>Allow rotation:</strong> 
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>Yes:</strong> The tool will try different orientations (turning it sideways or on end)</li>
+                                <li><strong>No:</strong> Only checks if it fits in the normal position</li>
+                              </ul>
+                            </li>
+                            
+                            <li><strong>Enter your equipment dimensions:</strong>
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li>L = Length (longest dimension)</li>
+                                <li>W = Width</li>
+                                <li>H = Height</li>
+                                <li>All measurements in meters (e.g., 4.50 m)</li>
+                              </ul>
+                            </li>
+                            
+                            <li><strong>Enter weights:</strong>
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>Design mass:</strong> Weight of your equipment (kg)</li>
+                                <li><strong>Payload limit:</strong> Maximum weight the container can carry (typically around 30,000 kg for 20 ft ISO)</li>
+                              </ul>
+                            </li>
+                            
+                            <li><strong>Click "Check fit":</strong> The tool will tell you:
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>PASS:</strong> Equipment fits - it shows which orientation works (e.g., "L×W×H")</li>
+                                <li><strong>FAIL:</strong> Equipment doesn't fit - you'll need a larger container or different transport method</li>
+                              </ul>
+                            </li>
+                          </ol>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Standard 20 ft ISO Container Dimensions:</h4>
+                          <ul className="list-disc list-inside ml-6 space-y-1 text-sm">
+                            <li><strong>Door opening:</strong> 2.34 m wide × 2.28 m high</li>
+                            <li><strong>Internal space:</strong> 5.90 m long × 2.35 m wide × 2.39 m high</li>
+                            <li><strong>Payload capacity:</strong> Approximately 30,480 kg</li>
+                          </ul>
+                        </div>
+                        
+                        <div className="bg-warning/10 border border-warning/30 rounded p-3">
+                          <p className="text-sm"><strong>Remember:</strong> Even if the equipment fits dimensionally, you must also check:</p>
+                          <ul className="list-disc list-inside ml-4 space-y-1 text-sm">
+                            <li>Can you safely load it through the door?</li>
+                            <li>Is there clearance for securing straps?</li>
+                            <li>Will the weight distribution be safe?</li>
+                            <li>Consider using High Cube (2.69 m high) for taller items</li>
+                          </ul>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Quick Reference */}
+                    <Card className="bg-success/10 border-success/30 border">
+                      <CardHeader>
+                        <CardTitle className="text-card-foreground">Quick Reference Card</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid md:grid-cols-3 gap-4 text-sm text-foreground">
+                          <div>
+                            <h4 className="font-semibold mb-2">Defence Standard Values:</h4>
+                            <ul className="space-y-1">
+                              <li>Forward: 0.8 g</li>
+                              <li>Rearward: 0.5 g</li>
+                              <li>Lateral: 0.5 g</li>
+                              <li>Friction (μ): 0.0</li>
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-2">Typical Strap Ratings:</h4>
+                            <ul className="space-y-1">
+                              <li>Light: 1000 daN</li>
+                              <li>Medium: 2000 daN</li>
+                              <li>Heavy: 4000 daN</li>
+                              <li>Extra Heavy: 5000+ daN</li>
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-2">Best Practices:</h4>
+                            <ul className="space-y-1">
+                              <li>Keep strap angles &lt; 30°</li>
+                              <li>Use Defence preset for safety</li>
+                              <li>Check all directions</li>
+                              <li>Re-tension after 30 minutes</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
                   </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
 
             <div className="mt-6 flex justify-center">
-              <Button variant="outline" onClick={() => navigate('/')}>
+              <Button variant="outline" className="text-foreground" onClick={() => navigate('/')}>
                 Back to Dashboard
               </Button>
             </div>
