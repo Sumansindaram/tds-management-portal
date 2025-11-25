@@ -16,7 +16,7 @@ import RequestDetail from "./pages/RequestDetail";
 import MySubmissions from "./pages/MySubmissions";
 import SSRDirectory from "./pages/SSRDirectory";
 import SSRDetail from "./pages/SSRDetail";
-import AgentDashboard from "./pages/AgentDashboard";
+import TDSTool from "./pages/TDSTool";
 import UserApproval from "./pages/UserApproval";
 
 const queryClient = new QueryClient();
@@ -105,10 +105,10 @@ const App = () => (
               }
             />
             <Route
-              path="/agent-dashboard"
+              path="/tds-tool"
               element={
-                <ProtectedRoute adminOnly>
-                  <AgentDashboard />
+                <ProtectedRoute>
+                  <TDSTool />
                 </ProtectedRoute>
               }
             />
