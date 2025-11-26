@@ -358,7 +358,7 @@ export default function TDSTool() {
                                   value={item.name}
                                   onChange={(e) => updateItem(i, 'name', e.target.value)}
                                   placeholder="Item name"
-                                  className="bg-background text-foreground border-border"
+                                  className="bg-white text-gray-900 border-border"
                                 />
                               </TableCell>
                               <TableCell>
@@ -367,7 +367,7 @@ export default function TDSTool() {
                                   value={item.mass}
                                   onChange={(e) => updateItem(i, 'mass', e.target.value)}
                                   placeholder="kg"
-                                  className="bg-background text-foreground border-border"
+                                  className="bg-white text-gray-900 border-border"
                                 />
                               </TableCell>
                               <TableCell>
@@ -376,7 +376,7 @@ export default function TDSTool() {
                                   value={item.x}
                                   onChange={(e) => updateItem(i, 'x', e.target.value)}
                                   placeholder="x m"
-                                  className="bg-background text-foreground border-border"
+                                  className="bg-white text-gray-900 border-border"
                                 />
                               </TableCell>
                               <TableCell>
@@ -385,7 +385,7 @@ export default function TDSTool() {
                                   value={item.y}
                                   onChange={(e) => updateItem(i, 'y', e.target.value)}
                                   placeholder="y m"
-                                  className="bg-background text-foreground border-border"
+                                  className="bg-white text-gray-900 border-border"
                                 />
                               </TableCell>
                               <TableCell>
@@ -394,7 +394,7 @@ export default function TDSTool() {
                                   value={item.z}
                                   onChange={(e) => updateItem(i, 'z', e.target.value)}
                                   placeholder="z m"
-                                  className="bg-background text-foreground border-border"
+                                  className="bg-white text-gray-900 border-border"
                                 />
                               </TableCell>
                               <TableCell>
@@ -424,7 +424,7 @@ export default function TDSTool() {
                           value={axle1Mass}
                           onChange={(e) => setAxle1Mass(e.target.value)}
                           placeholder="e.g., 4700"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -435,7 +435,7 @@ export default function TDSTool() {
                           onChange={(e) => setAxle1X(e.target.value)}
                           placeholder="e.g., 0.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -445,7 +445,7 @@ export default function TDSTool() {
                           value={axle2Mass}
                           onChange={(e) => setAxle2Mass(e.target.value)}
                           placeholder="e.g., 4800"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -456,7 +456,7 @@ export default function TDSTool() {
                           onChange={(e) => setAxle2X(e.target.value)}
                           placeholder="e.g., 4.20"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                     </div>
@@ -485,7 +485,7 @@ export default function TDSTool() {
                           value={designMass}
                           onChange={(e) => setDesignMass(e.target.value)}
                           placeholder="e.g., 9500"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -496,7 +496,7 @@ export default function TDSTool() {
                           onChange={(e) => setGrav(e.target.value)}
                           placeholder="9.81"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -507,16 +507,16 @@ export default function TDSTool() {
                           onChange={(e) => setMu(e.target.value)}
                           placeholder="UK ~0.30; Defence 0.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
                         <label className="text-sm font-medium text-foreground">Rating unit</label>
                         <Select value={ratingUnit} onValueChange={setRatingUnit}>
-                          <SelectTrigger className="bg-background text-foreground border-border">
+                          <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="daN">daN</SelectItem>
                             <SelectItem value="kN">kN</SelectItem>
                             <SelectItem value="N">N</SelectItem>
@@ -534,7 +534,7 @@ export default function TDSTool() {
                           onChange={(e) => setAf(e.target.value)}
                           placeholder="e.g., 0.80"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -545,7 +545,7 @@ export default function TDSTool() {
                           onChange={(e) => setAr(e.target.value)}
                           placeholder="e.g., 0.50"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -556,7 +556,7 @@ export default function TDSTool() {
                           onChange={(e) => setAl(e.target.value)}
                           placeholder="e.g., 0.50"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -566,7 +566,7 @@ export default function TDSTool() {
                           value={anchorSWL}
                           onChange={(e) => setAnchorSWL(e.target.value)}
                           placeholder="e.g., 20"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                     </div>
@@ -580,7 +580,7 @@ export default function TDSTool() {
                           onChange={(e) => setSfF(e.target.value)}
                           placeholder="e.g., 1.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -591,7 +591,7 @@ export default function TDSTool() {
                           onChange={(e) => setSfR(e.target.value)}
                           placeholder="e.g., 1.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -602,7 +602,7 @@ export default function TDSTool() {
                           onChange={(e) => setSfL(e.target.value)}
                           placeholder="e.g., 1.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -613,7 +613,7 @@ export default function TDSTool() {
                           onChange={(e) => setAnchorMargin(e.target.value)}
                           placeholder="e.g., 1.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                     </div>
@@ -623,10 +623,10 @@ export default function TDSTool() {
                       <div>
                         <label className="text-sm font-medium text-foreground">Direction</label>
                         <Select value={lashDir} onValueChange={setLashDir}>
-                          <SelectTrigger className="bg-background text-foreground border-border">
+                          <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="Forward">Forward</SelectItem>
                             <SelectItem value="Rearward">Rearward</SelectItem>
                             <SelectItem value="Lateral">Lateral</SelectItem>
@@ -641,7 +641,7 @@ export default function TDSTool() {
                           onChange={(e) => setLashCount(e.target.value)}
                           placeholder="e.g., 2"
                           min="1"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -651,16 +651,16 @@ export default function TDSTool() {
                           value={lashLC}
                           onChange={(e) => setLashLC(e.target.value)}
                           placeholder="e.g., 2000"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
                         <label className="text-sm font-medium text-foreground">Unit</label>
                         <Select value={lashUnit} onValueChange={setLashUnit}>
-                          <SelectTrigger className="bg-background text-foreground border-border">
+                          <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="daN">daN</SelectItem>
                             <SelectItem value="kN">kN</SelectItem>
                             <SelectItem value="N">N</SelectItem>
@@ -675,7 +675,7 @@ export default function TDSTool() {
                           onChange={(e) => setLashAngle(e.target.value)}
                           placeholder="e.g., 20"
                           step="0.1"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div className="flex gap-2">
@@ -741,10 +741,10 @@ export default function TDSTool() {
                       <div>
                         <label className="text-sm font-medium text-foreground">Container preset</label>
                         <Select value={containerPreset} onValueChange={setContainerPreset}>
-                          <SelectTrigger className="bg-background text-foreground border-border">
+                          <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="20std">20 ft ISO (Standard)</SelectItem>
                             <SelectItem value="20hc">20 ft ISO (High Cube)</SelectItem>
                             <SelectItem value="custom">Custom ISO</SelectItem>
@@ -754,10 +754,10 @@ export default function TDSTool() {
                       <div>
                         <label className="text-sm font-medium text-foreground">Allow rotation</label>
                         <Select value={allowRotation} onValueChange={setAllowRotation}>
-                          <SelectTrigger className="bg-background text-foreground border-border">
+                          <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="Yes">Yes</SelectItem>
                             <SelectItem value="No">No</SelectItem>
                           </SelectContent>
@@ -774,7 +774,7 @@ export default function TDSTool() {
                           onChange={(e) => setAssetL(e.target.value)}
                           placeholder="e.g., 4.50"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -785,7 +785,7 @@ export default function TDSTool() {
                           onChange={(e) => setAssetW(e.target.value)}
                           placeholder="e.g., 2.10"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -796,7 +796,7 @@ export default function TDSTool() {
                           onChange={(e) => setAssetH(e.target.value)}
                           placeholder="e.g., 2.00"
                           step="0.01"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                     </div>
@@ -809,7 +809,7 @@ export default function TDSTool() {
                           value={contMass}
                           onChange={(e) => setContMass(e.target.value)}
                           placeholder="e.g., 9500"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
@@ -819,7 +819,7 @@ export default function TDSTool() {
                           value={payloadLimit}
                           onChange={(e) => setPayloadLimit(e.target.value)}
                           placeholder="e.g., 30480"
-                          className="bg-background text-foreground border-border"
+                          className="bg-white text-gray-900 border-border"
                         />
                       </div>
                     </div>
