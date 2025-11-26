@@ -327,10 +327,10 @@ export default function TDSTool() {
                         <Plus className="h-4 w-4 mr-2" />
                         Add item
                       </Button>
-                      <Button onClick={presetAxles} variant="secondary">
+                      <Button onClick={presetAxles} className="bg-white text-gray-900 border border-border hover:bg-gray-100">
                         Use axle masses
                       </Button>
-                      <Button onClick={() => setItems([])} variant="outline" className="text-foreground">
+                      <Button onClick={() => setItems([])} className="bg-white text-gray-900 border border-border hover:bg-gray-100">
                         Clear items
                       </Button>
                       <Button onClick={() => calcCoG()} variant="default">
@@ -340,14 +340,14 @@ export default function TDSTool() {
 
                     <div className="rounded-md border border-border">
                       <Table>
-                        <TableHeader className="bg-muted">
+                        <TableHeader className="bg-gray-200">
                           <TableRow>
-                            <TableHead className="text-foreground">Name</TableHead>
-                            <TableHead className="text-foreground">Mass (kg)</TableHead>
-                            <TableHead className="text-foreground">x (m)</TableHead>
-                            <TableHead className="text-foreground">y (m)</TableHead>
-                            <TableHead className="text-foreground">z (m)</TableHead>
-                            <TableHead className="text-foreground">Action</TableHead>
+                            <TableHead className="text-gray-900 font-semibold">Name</TableHead>
+                            <TableHead className="text-gray-900 font-semibold">Mass (kg)</TableHead>
+                            <TableHead className="text-gray-900 font-semibold">x (m)</TableHead>
+                            <TableHead className="text-gray-900 font-semibold">y (m)</TableHead>
+                            <TableHead className="text-gray-900 font-semibold">z (m)</TableHead>
+                            <TableHead className="text-gray-900 font-semibold">Action</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -404,12 +404,12 @@ export default function TDSTool() {
                               </TableCell>
                             </TableRow>
                           ))}
-                          <TableRow className="bg-muted font-bold">
-                            <TableCell className="text-foreground">Total</TableCell>
-                            <TableCell className="text-foreground">{cogResult.totalMass}</TableCell>
-                            <TableCell className="text-foreground">{cogResult.x}</TableCell>
-                            <TableCell className="text-foreground">{cogResult.y}</TableCell>
-                            <TableCell className="text-foreground">{cogResult.z}</TableCell>
+                          <TableRow className="bg-gray-200 font-bold">
+                            <TableCell className="text-gray-900">Total</TableCell>
+                            <TableCell className="text-gray-900">{cogResult.totalMass}</TableCell>
+                            <TableCell className="text-gray-900">{cogResult.x}</TableCell>
+                            <TableCell className="text-gray-900">{cogResult.y}</TableCell>
+                            <TableCell className="text-gray-900">{cogResult.z}</TableCell>
                             <TableCell></TableCell>
                           </TableRow>
                         </TableBody>
@@ -861,11 +861,11 @@ export default function TDSTool() {
                   <CardContent className="space-y-6">
                     
                     {/* Centre of Gravity Section */}
-                    <Card className="bg-muted border-border">
+                    <Card className="bg-white border-border">
                       <CardHeader>
-                        <CardTitle className="text-card-foreground">Centre of Gravity (CoG) - Finding the Balance Point</CardTitle>
+                        <CardTitle className="text-gray-900">Centre of Gravity (CoG) - Finding the Balance Point</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4 text-foreground">
+                      <CardContent className="space-y-4 text-gray-900">
                         <div>
                           <h4 className="font-semibold mb-2">What is Centre of Gravity?</h4>
                           <p className="text-sm">
@@ -906,11 +906,11 @@ export default function TDSTool() {
                     </Card>
 
                     {/* Restraint System Section */}
-                    <Card className="bg-muted border-border">
+                    <Card className="bg-white border-border">
                       <CardHeader>
-                        <CardTitle className="text-card-foreground">Restraint System - Securing Your Load</CardTitle>
+                        <CardTitle className="text-gray-900">Restraint System - Securing Your Load</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4 text-foreground">
+                      <CardContent className="space-y-4 text-gray-900">
                         <div>
                           <h4 className="font-semibold mb-2">What is a Restraint System?</h4>
                           <p className="text-sm">
@@ -974,11 +974,11 @@ export default function TDSTool() {
                     </Card>
 
                     {/* Container Fit Section */}
-                    <Card className="bg-muted border-border">
+                    <Card className="bg-white border-border">
                       <CardHeader>
-                        <CardTitle className="text-card-foreground">ISO Container Fit - Will It Fit?</CardTitle>
+                        <CardTitle className="text-gray-900">ISO Container Fit - Will It Fit?</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4 text-foreground">
+                      <CardContent className="space-y-4 text-gray-900">
                         <div>
                           <h4 className="font-semibold mb-2">What is Container Fit?</h4>
                           <p className="text-sm">
