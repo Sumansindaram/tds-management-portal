@@ -271,24 +271,24 @@ export default function TDSTool() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="search" className="w-full">
-              <TabsList className="grid w-full grid-cols-5 bg-muted">
-                <TabsTrigger value="search" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <TabsList className="grid w-full grid-cols-5 bg-gray-200">
+                <TabsTrigger value="search" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
                   <Search className="h-4 w-4 mr-2" />
                   TDS Search
                 </TabsTrigger>
-                <TabsTrigger value="cog" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="cog" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
                   <Calculator className="h-4 w-4 mr-2" />
                   Centre of Gravity
                 </TabsTrigger>
-                <TabsTrigger value="restraint" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="restraint" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
                   <Box className="h-4 w-4 mr-2" />
                   Restraint System
                 </TabsTrigger>
-                <TabsTrigger value="container" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="container" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
                   <Box className="h-4 w-4 mr-2" />
                   Container Fit
                 </TabsTrigger>
-                <TabsTrigger value="guidance" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="guidance" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
                   <Info className="h-4 w-4 mr-2" />
                   Guidance
                 </TabsTrigger>
@@ -319,7 +319,7 @@ export default function TDSTool() {
               <TabsContent value="cog" className="space-y-4">
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-card-foreground">Centre of Gravity</CardTitle>
+                    <CardTitle className="text-gray-900">Centre of Gravity</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex gap-2 flex-wrap">
@@ -334,7 +334,7 @@ export default function TDSTool() {
                         Clear items
                       </Button>
                       <Button onClick={() => calcCoG()} variant="default">
-                        Calculate CoG
+                        Calculate CofG
                       </Button>
                     </div>
 
@@ -398,7 +398,7 @@ export default function TDSTool() {
                                 />
                               </TableCell>
                               <TableCell>
-                                <Button onClick={() => deleteItem(i)} variant="outline" size="sm">
+                                <Button onClick={() => deleteItem(i)} variant="outline" size="sm" className="text-gray-900 hover:bg-gray-100">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </TableCell>
@@ -468,7 +468,7 @@ export default function TDSTool() {
               <TabsContent value="restraint" className="space-y-4">
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-card-foreground">Restraint System (Direct lashings)</CardTitle>
+                    <CardTitle className="text-gray-900">Restraint System (Direct lashings)</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex gap-2 flex-wrap">
@@ -691,17 +691,17 @@ export default function TDSTool() {
 
                     {restraintResults.length > 0 && (
                       <>
-                        <h3 className="text-lg font-semibold text-card-foreground">Results summary</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Results summary</h3>
                         <div className="rounded-md border border-border">
                           <Table>
-                            <TableHeader className="bg-muted">
+                            <TableHeader className="bg-gray-200">
                               <TableRow>
-                                <TableHead className="text-foreground">Direction</TableHead>
-                                <TableHead className="text-foreground">F_req (N)</TableHead>
-                                <TableHead className="text-foreground">F_μ (N)</TableHead>
-                                <TableHead className="text-foreground">Residual (N)</TableHead>
-                                <TableHead className="text-foreground">Capacity (N)</TableHead>
-                                <TableHead className="text-foreground">Status</TableHead>
+                                <TableHead className="text-gray-900 font-semibold">Direction</TableHead>
+                                <TableHead className="text-gray-900 font-semibold">F_req (N)</TableHead>
+                                <TableHead className="text-gray-900 font-semibold">F_μ (N)</TableHead>
+                                <TableHead className="text-gray-900 font-semibold">Residual (N)</TableHead>
+                                <TableHead className="text-gray-900 font-semibold">Capacity (N)</TableHead>
+                                <TableHead className="text-gray-900 font-semibold">Status</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -709,12 +709,12 @@ export default function TDSTool() {
                                 const pass = r.cap >= r.Residual;
                                 return (
                                   <TableRow key={i}>
-                                    <TableCell className="text-foreground">{r.dir}</TableCell>
-                                    <TableCell className="text-foreground">{fmt(r.Freq)}</TableCell>
-                                    <TableCell className="text-foreground">{fmt(r.Fmu)}</TableCell>
-                                    <TableCell className="text-foreground">{fmt(r.Residual)}</TableCell>
-                                    <TableCell className="text-foreground">{fmt(r.cap)}</TableCell>
-                                    <TableCell className={pass ? 'text-green-500 font-bold' : 'text-red-500 font-bold'}>
+                                    <TableCell className="text-gray-900">{r.dir}</TableCell>
+                                    <TableCell className="text-gray-900">{fmt(r.Freq)}</TableCell>
+                                    <TableCell className="text-gray-900">{fmt(r.Fmu)}</TableCell>
+                                    <TableCell className="text-gray-900">{fmt(r.Residual)}</TableCell>
+                                    <TableCell className="text-gray-900">{fmt(r.cap)}</TableCell>
+                                    <TableCell className={pass ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
                                       {pass ? 'PASS' : 'FAIL'}
                                     </TableCell>
                                   </TableRow>
@@ -733,7 +733,7 @@ export default function TDSTool() {
               <TabsContent value="container" className="space-y-4">
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-card-foreground">Container Fit — 20 ft ISO by default</CardTitle>
+                    <CardTitle className="text-gray-900">Container Fit — 20 ft ISO by default</CardTitle>
                     <CardDescription>For non-20 ft ISO, pick Custom ISO to edit sizes.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -863,14 +863,33 @@ export default function TDSTool() {
                     {/* Centre of Gravity Section */}
                     <Card className="bg-white border-border">
                       <CardHeader>
-                        <CardTitle className="text-gray-900">Centre of Gravity (CoG) - Finding the Balance Point</CardTitle>
+                        <CardTitle className="text-gray-900">Centre of Gravity (CofG) - Finding the Balance Point</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4 text-gray-900">
                         <div>
                           <h4 className="font-semibold mb-2">What is Centre of Gravity?</h4>
                           <p className="text-sm">
-                            The Centre of Gravity (CoG) is the balance point of your equipment. Think of it like a seesaw - 
+                            The Centre of Gravity (CofG) is the balance point of your equipment. Think of it like a seesaw - 
                             if you know where the balance point is, you can load and secure your cargo properly.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-blue-50 border border-blue-200 p-4 rounded">
+                          <p className="font-semibold text-blue-900 mb-2">Critical: Use Transportation Weight</p>
+                          <p className="text-gray-900 mb-2">
+                            Always calculate CofG using the <strong>transportation weight</strong> - this is the actual weight during transport, which is different from laden or unladen weight.
+                          </p>
+                          <p className="text-gray-900 mb-2">Transportation weight includes:</p>
+                          <ul className="list-disc ml-5 space-y-1 text-gray-900">
+                            <li>Ammunition</li>
+                            <li>Weapon systems</li>
+                            <li>Fuel in tanks</li>
+                            <li>Water</li>
+                            <li>Crew kit and equipment</li>
+                            <li>Any other items that will be onboard during transport</li>
+                          </ul>
+                          <p className="mt-2 text-gray-900">
+                            These items add weight to the unladen weight and change the CofG position. Never use just the empty vehicle weight!
                           </p>
                         </div>
                         
@@ -886,7 +905,7 @@ export default function TDSTool() {
                                 <li>z = height from ground (in meters)</li>
                               </ul>
                             </li>
-                            <li><strong>Click "Calculate CoG":</strong> The tool will calculate the overall balance point automatically</li>
+                            <li><strong>Click "Calculate CofG":</strong> The tool will calculate the overall balance point automatically</li>
                           </ol>
                         </div>
                         
@@ -894,13 +913,32 @@ export default function TDSTool() {
                           <h4 className="font-semibold mb-2">Quick Method - Using Axle Weights:</h4>
                           <p className="text-sm">
                             If you have a vehicle with known axle weights, use the "Use axle masses" button. 
-                            Just enter the weight on each axle and where the axles are positioned. This gives you a quick CoG estimate.
+                            Just enter the weight on each axle and where the axles are positioned. This gives you a quick CofG estimate.
                           </p>
                         </div>
                         
-                        <div className="bg-warning/10 border border-warning/30 rounded p-3">
-                          <p className="text-sm"><strong>Important:</strong> The CoG affects stability. A high CoG (large z value) means 
-                          the equipment is more likely to tip over. Always consider this when planning transport.</p>
+                        <div className="bg-amber-50 border border-amber-200 rounded p-4">
+                          <p className="font-semibold text-amber-900 mb-2">Important: High CofG and Safety</p>
+                          <p className="text-gray-900 mb-2">
+                            A high CofG (large z value above 2m) means the equipment is more likely to tip over during transport, especially on slopes or during cornering.
+                          </p>
+                          <p className="text-gray-900 mb-2"><strong>What needs to be considered when planning transport:</strong></p>
+                          <ul className="list-disc ml-5 space-y-1 text-gray-900">
+                            <li>Stability during acceleration, braking, and cornering</li>
+                            <li>Risk of rollover on uneven terrain or slopes</li>
+                            <li>Route planning to avoid steep gradients and sharp bends</li>
+                            <li>Speed restrictions for high CofG loads</li>
+                          </ul>
+                          <p className="text-gray-900 mt-3 mb-2"><strong>High CofG Mitigation - How to transport safely:</strong></p>
+                          <ul className="list-disc ml-5 space-y-1 text-gray-900">
+                            <li><strong>Reduce speed:</strong> Drive slower, especially on bends and uneven terrain</li>
+                            <li><strong>Additional restraints:</strong> Use more lashings and ensure they're properly tensioned</li>
+                            <li><strong>Lower the load:</strong> Remove turrets, antennas, or detachable components if possible</li>
+                            <li><strong>Route planning:</strong> Avoid steep gradients, sharp turns, and rough terrain</li>
+                            <li><strong>Weight distribution:</strong> Place heavier items lower in the vehicle where practical</li>
+                            <li><strong>Driver briefing:</strong> Ensure drivers understand stability risks and safe driving practices</li>
+                            <li><strong>Escort vehicles:</strong> Consider using escort for very high CofG loads</li>
+                          </ul>
                         </div>
                       </CardContent>
                     </Card>
@@ -1048,13 +1086,13 @@ export default function TDSTool() {
                     {/* Quick Reference */}
                     <Card className="bg-success/10 border-success/30 border">
                       <CardHeader>
-                        <CardTitle className="text-card-foreground">Quick Reference Card</CardTitle>
+                        <CardTitle className="text-gray-900">Quick Reference Card</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="grid md:grid-cols-3 gap-4 text-sm text-foreground">
+                        <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-900">
                           <div>
-                            <h4 className="font-semibold mb-2">Defence Standard Values:</h4>
-                            <ul className="space-y-1">
+                            <h4 className="font-semibold mb-2 text-gray-900">Defence Standard Values:</h4>
+                            <ul className="space-y-1 text-gray-900">
                               <li>Forward: 0.8 g</li>
                               <li>Rearward: 0.5 g</li>
                               <li>Lateral: 0.5 g</li>
@@ -1062,8 +1100,8 @@ export default function TDSTool() {
                             </ul>
                           </div>
                           <div>
-                            <h4 className="font-semibold mb-2">Typical Strap Ratings:</h4>
-                            <ul className="space-y-1">
+                            <h4 className="font-semibold mb-2 text-gray-900">Typical Strap Ratings:</h4>
+                            <ul className="space-y-1 text-gray-900">
                               <li>Light: 1000 daN</li>
                               <li>Medium: 2000 daN</li>
                               <li>Heavy: 4000 daN</li>
@@ -1071,8 +1109,8 @@ export default function TDSTool() {
                             </ul>
                           </div>
                           <div>
-                            <h4 className="font-semibold mb-2">Best Practices:</h4>
-                            <ul className="space-y-1">
+                            <h4 className="font-semibold mb-2 text-gray-900">Best Practices:</h4>
+                            <ul className="space-y-1 text-gray-900">
                               <li>Keep strap angles &lt; 30°</li>
                               <li>Use Defence preset for safety</li>
                               <li>Check all directions</li>
