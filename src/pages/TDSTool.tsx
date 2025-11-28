@@ -221,20 +221,20 @@ export default function TDSTool() {
   // Container Functions
   const getContainerDimensions = () => {
     if (containerPreset === '20std') {
-      return { Lint: 5.90, Wint: 2.35, Hint: 2.39, Wdoor: 2.34, Hdoor: 2.28 };
+      return { Lint: 5.90, Wint: 2.35, Hint: 2.39, Wdoor: 2.34, Hdoor: 2.28, payload: 30480 };
     } else if (containerPreset === '20hc') {
-      return { Lint: 5.90, Wint: 2.35, Hint: 2.69, Wdoor: 2.34, Hdoor: 2.58 };
+      return { Lint: 5.90, Wint: 2.35, Hint: 2.69, Wdoor: 2.34, Hdoor: 2.58, payload: 30480 };
     }
-    return { Lint: 5.90, Wint: 2.35, Hint: 2.39, Wdoor: 2.34, Hdoor: 2.28 };
+    return { Lint: 5.90, Wint: 2.35, Hint: 2.39, Wdoor: 2.34, Hdoor: 2.28, payload: 0 };
   };
 
   const checkFit = () => {
-    const { Lint, Wint, Hint, Wdoor, Hdoor } = getContainerDimensions();
+    const { Lint, Wint, Hint, Wdoor, Hdoor, payload: defaultPayload } = getContainerDimensions();
     const La = parseFloat(assetL) || 0;
     const Wa = parseFloat(assetW) || 0;
     const Ha = parseFloat(assetH) || 0;
     const m = parseFloat(contMass) || 0;
-    const payload = parseFloat(payloadLimit) || 0;
+    const payload = parseFloat(payloadLimit) || defaultPayload;
 
     const orientations = [
       { name: 'Normal (L×W×H)', dims: [La, Wa, Ha], desc: 'length first' },
@@ -248,16 +248,26 @@ export default function TDSTool() {
 
     tries.forEach((o) => {
       const [L, W, H] = o.dims;
-      const doorPass = Math.min(W, H) <= Wdoor && Math.max(W, H) <= Hdoor;
+      const doorPass = W <= Wdoor && H <= Hdoor;
       const internalFit = L <= Lint && W <= Wint && H <= Hint;
       
       if (!passedOrientation && doorPass && internalFit) {
         passedOrientation = o;
       } else if (!passedOrientation) {
         const reasons = [];
-        if (!doorPass) reasons.push('too large for door opening');
-        if (!internalFit) reasons.push('exceeds internal dimensions');
-        failReasons.push(`${o.name}: ${reasons.join(' and ')}`);
+        if (!doorPass) {
+          const doorDiff = Math.max(W - Wdoor, H - Hdoor);
+          reasons.push(`Cannot fit through door (${doorDiff > 0 ? `exceeds by ${doorDiff.toFixed(2)}m` : 'too large'})`);
+        }
+        if (!internalFit) {
+          const sizeDiffs = [
+            L > Lint ? `length exceeds by ${(L - Lint).toFixed(2)}m` : null,
+            W > Wint ? `width exceeds by ${(W - Wint).toFixed(2)}m` : null,
+            H > Hint ? `height exceeds by ${(H - Hint).toFixed(2)}m` : null
+          ].filter(Boolean);
+          reasons.push(`Internal space: ${sizeDiffs.join(', ')}`);
+        }
+        failReasons.push(`${o.name}:\n  • ${reasons.join('\n  • ')}`);
       }
     });
 
@@ -265,26 +275,48 @@ export default function TDSTool() {
     
     if (passedOrientation) {
       const weightNote = payloadOK 
-        ? 'Weight is within payload limit ✓' 
-        : `⚠️ WARNING: Weight exceeds payload limit by ${(m - payload).toFixed(0)} kg`;
+        ? `Weight: ${m.toFixed(0)} kg (within ${payload.toFixed(0)} kg limit) ✓` 
+        : `⚠️ WARNING: Weight ${m.toFixed(0)} kg exceeds payload limit ${payload.toFixed(0)} kg by ${(m - payload).toFixed(0)} kg`;
       
       setFitResult(
-        `✓ PASS\n\n` +
-        `Orientation: ${passedOrientation.name} (${passedOrientation.desc})\n` +
-        `• Fits through door: ✓\n` +
-        `• Fits inside container: ✓\n` +
-        `• ${weightNote}\n\n` +
+        `✓ PASS - Equipment Fits!\n\n` +
+        `Orientation: ${passedOrientation.name} (${passedOrientation.desc})\n\n` +
+        `✓ Fits through door opening (${Wdoor}m × ${Hdoor}m)\n` +
+        `✓ Fits inside container (${Lint}m × ${Wint}m × ${Hint}m)\n` +
+        `${weightNote}\n\n` +
         `This orientation will work for loading into the container.`
       );
     } else {
       let reason = '';
       if (allowRotation === 'No') {
-        reason = 'With rotation disabled, the equipment in its normal orientation is too large.\n\n' +
-                 'Try enabling "Allow rotation" to check if turning it sideways or on end might work.';
+        const [L, W, H] = [La, Wa, Ha];
+        const doorFail = W > Wdoor || H > Hdoor;
+        const internalFail = L > Lint || W > Wint || H > Hint;
+        
+        if (doorFail && internalFail) {
+          reason = `❌ Equipment dimensions are TOO LARGE for this container:\n\n`;
+          reason += `Your equipment: ${L.toFixed(2)}m (L) × ${W.toFixed(2)}m (W) × ${H.toFixed(2)}m (H)\n\n`;
+          if (W > Wdoor || H > Hdoor) {
+            reason += `Door opening: ${Wdoor}m (W) × ${Hdoor}m (H) - Equipment won't fit through\n`;
+          }
+          if (L > Lint || W > Wint || H > Hint) {
+            reason += `Internal space: ${Lint}m (L) × ${Wint}m (W) × ${Hint}m (H) - Equipment too large\n`;
+          }
+          reason += `\n💡 TRY: Enable "Allow rotation" to test other orientations, or use a larger container.`;
+        } else {
+          reason = 'With rotation disabled, the equipment in its normal orientation is too large.\n\n' +
+                   '💡 TRY: Enable "Allow rotation" to check if turning it sideways or on end might work.';
+        }
       } else {
-        reason = 'Equipment does not fit in any orientation:\n\n' +
-                 failReasons.map(r => `• ${r}`).join('\n') +
-                 '\n\nYou will need a larger container (e.g., 40 ft ISO or High Cube) or different transport method.';
+        reason = `❌ FAIL - Equipment does not fit in any orientation:\n\n` +
+                 `Your equipment: ${La.toFixed(2)}m (L) × ${Wa.toFixed(2)}m (W) × ${Ha.toFixed(2)}m (H)\n` +
+                 `Container: ${Lint}m (L) × ${Wint}m (W) × ${Hint}m (H) internal\n` +
+                 `Door: ${Wdoor}m (W) × ${Hdoor}m (H)\n\n` +
+                 `Tried orientations:\n${failReasons.join('\n\n')}\n\n` +
+                 `💡 SOLUTION: You will need a larger container:\n` +
+                 `   • 40 ft ISO container (12m length)\n` +
+                 `   • High Cube container (2.69m height)\n` +
+                 `   • Or consider alternative transport method`;
       }
       
       setFitResult(`✗ FAIL\n\n${reason}`);
@@ -303,23 +335,23 @@ export default function TDSTool() {
           <CardContent>
             <Tabs defaultValue="search" className="w-full">
               <TabsList className="grid w-full grid-cols-5 bg-gray-200">
-                <TabsTrigger value="search" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
+                <TabsTrigger value="search" className="data-[state=active]:bg-ribbon data-[state=active]:text-white text-gray-900">
                   <Search className="h-4 w-4 mr-2" />
                   TDS Search
                 </TabsTrigger>
-                <TabsTrigger value="cog" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
+                <TabsTrigger value="cog" className="data-[state=active]:bg-ribbon data-[state=active]:text-white text-gray-900">
                   <Calculator className="h-4 w-4 mr-2" />
                   Centre of Gravity
                 </TabsTrigger>
-                <TabsTrigger value="restraint" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
+                <TabsTrigger value="restraint" className="data-[state=active]:bg-ribbon data-[state=active]:text-white text-gray-900">
                   <Box className="h-4 w-4 mr-2" />
                   Restraint System
                 </TabsTrigger>
-                <TabsTrigger value="container" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
+                <TabsTrigger value="container" className="data-[state=active]:bg-ribbon data-[state=active]:text-white text-gray-900">
                   <Box className="h-4 w-4 mr-2" />
                   Container Fit
                 </TabsTrigger>
-                <TabsTrigger value="guidance" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 text-gray-900">
+                <TabsTrigger value="guidance" className="data-[state=active]:bg-ribbon data-[state=active]:text-white text-gray-900">
                   <Info className="h-4 w-4 mr-2" />
                   Guidance
                 </TabsTrigger>
@@ -429,7 +461,7 @@ export default function TDSTool() {
                                 />
                               </TableCell>
                               <TableCell>
-                                <Button onClick={() => deleteItem(i)} variant="outline" size="sm" className="text-gray-900 hover:bg-gray-100">
+                                <Button onClick={() => deleteItem(i)} size="sm" className="bg-ribbon hover:bg-ribbon/90 text-white">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </TableCell>
@@ -447,6 +479,14 @@ export default function TDSTool() {
                       </Table>
                     </div>
 
+                    <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-md mb-4">
+                      <p className="font-bold text-blue-900 mb-2">Quick Method: Using Axle Masses</p>
+                      <p className="text-gray-900 text-sm mb-3">
+                        If you know the weight on each axle, this provides a faster way to calculate CofG for vehicles. 
+                        Example: A 10,000 kg vehicle with front axle at 0m carrying 4,500 kg and rear axle at 3.5m carrying 5,500 kg.
+                      </p>
+                    </div>
+
                     <div className="grid grid-cols-4 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-900">Front axle mass (kg)</label>
@@ -454,7 +494,7 @@ export default function TDSTool() {
                           type="number"
                           value={axle1Mass}
                           onChange={(e) => setAxle1Mass(e.target.value)}
-                          placeholder="e.g., 4700"
+                          placeholder="e.g., 4500"
                           className="bg-white text-gray-900 border-border"
                         />
                       </div>
@@ -475,7 +515,7 @@ export default function TDSTool() {
                           type="number"
                           value={axle2Mass}
                           onChange={(e) => setAxle2Mass(e.target.value)}
-                          placeholder="e.g., 4800"
+                          placeholder="e.g., 5500"
                           className="bg-white text-gray-900 border-border"
                         />
                       </div>
@@ -485,7 +525,7 @@ export default function TDSTool() {
                           type="number"
                           value={axle2X}
                           onChange={(e) => setAxle2X(e.target.value)}
-                          placeholder="e.g., 4.20"
+                          placeholder="e.g., 3.50"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
@@ -505,7 +545,7 @@ export default function TDSTool() {
                     <div className="flex gap-2 flex-wrap">
                       <Button onClick={presetUK} variant="secondary">UK Road Preset</Button>
                       <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} variant="outline" className="text-white">Starter plan</Button>
+                      <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white">Starter plan</Button>
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
@@ -711,13 +751,13 @@ export default function TDSTool() {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={addLashing} variant="default">Add</Button>
-                        <Button onClick={clearLashings} variant="outline" className="text-white">Clear all</Button>
+                        <Button onClick={clearLashings} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear all</Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2 mt-4">
                       <Button onClick={calcRestraint} variant="default">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} variant="outline" className="text-white">Clear results</Button>
+                      <Button onClick={() => setRestraintResults([])} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
@@ -909,14 +949,18 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Payload limit (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Payload limit (kg) - Auto-filled</label>
                         <Input
                           type="number"
-                          value={payloadLimit}
+                          value={payloadLimit || (containerPreset !== 'custom' ? '30480' : '')}
                           onChange={(e) => setPayloadLimit(e.target.value)}
-                          placeholder="e.g., 30480"
+                          placeholder="Auto: 30480 for 20ft ISO"
                           className="bg-white text-gray-900 border-border"
+                          disabled={containerPreset !== 'custom'}
                         />
+                        <p className="text-xs text-gray-600 mt-1">
+                          20ft ISO standard payload: 30,480 kg (auto-filled)
+                        </p>
                       </div>
                     </div>
 
@@ -931,8 +975,7 @@ export default function TDSTool() {
                           setPayloadLimit('');
                           setFitResult('');
                         }}
-                        variant="outline"
-                        className="text-white"
+                        className="bg-ribbon hover:bg-ribbon/90 text-white"
                       >
                         Clear
                       </Button>
@@ -1011,12 +1054,26 @@ export default function TDSTool() {
                           </ol>
                         </div>
                         
-                        <div>
-                          <h4 className="font-semibold mb-2">Quick Method - Using Axle Weights:</h4>
-                          <p className="text-sm">
+                        <div className="bg-green-50 border-2 border-green-400 p-4 rounded">
+                          <h4 className="font-semibold mb-2 text-green-900">Quick Method - Using Axle Weights (Example):</h4>
+                          <p className="text-sm text-gray-900 mb-2">
                             If you have a vehicle with known axle weights, use the "Use axle masses" button. 
                             Just enter the weight on each axle and where the axles are positioned. This gives you a quick CofG estimate.
                           </p>
+                          <div className="bg-white p-3 rounded border border-green-300 mt-2">
+                            <p className="font-semibold text-gray-900 mb-1">Example Calculation:</p>
+                            <p className="text-sm text-gray-900">Vehicle: 10,000 kg total weight</p>
+                            <ul className="list-disc ml-5 text-sm text-gray-900 space-y-1 mt-1">
+                              <li>Front axle: 4,500 kg at position x = 0.00 m (reference point)</li>
+                              <li>Rear axle: 5,500 kg at position x = 3.50 m (from front)</li>
+                            </ul>
+                            <p className="text-sm text-gray-900 mt-2">
+                              <strong>Result:</strong> CofG at x = 1.93 m from front axle
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1">
+                              Formula: CofG(x) = (4500×0 + 5500×3.5) ÷ 10000 = 1.93 m
+                            </p>
+                          </div>
                         </div>
                         
                         <div className="bg-amber-50 border border-amber-200 rounded p-4">
@@ -1229,7 +1286,7 @@ export default function TDSTool() {
             </Tabs>
 
             <div className="mt-6 flex justify-center">
-              <Button variant="outline" className="text-white" onClick={() => navigate('/')}>
+              <Button className="bg-ribbon hover:bg-ribbon/90 text-white" onClick={() => navigate('/')}>
                 Back to Dashboard
               </Button>
             </div>
