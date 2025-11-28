@@ -418,7 +418,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Front axle mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Front axle mass (kg)</label>
                         <Input
                           type="number"
                           value={axle1Mass}
@@ -428,7 +428,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Front axle x (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Front axle x (m)</label>
                         <Input
                           type="number"
                           value={axle1X}
@@ -439,7 +439,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Rear axle mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Rear axle mass (kg)</label>
                         <Input
                           type="number"
                           value={axle2Mass}
@@ -449,7 +449,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Rear axle x (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Rear axle x (m)</label>
                         <Input
                           type="number"
                           value={axle2X}
@@ -474,12 +474,12 @@ export default function TDSTool() {
                     <div className="flex gap-2 flex-wrap">
                       <Button onClick={presetUK} variant="secondary">UK Road Preset</Button>
                       <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} variant="outline" className="text-foreground">Starter plan</Button>
+                      <Button onClick={starterPlan} variant="outline" className="text-gray-900">Starter plan</Button>
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Design mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Design mass (kg)</label>
                         <Input
                           type="number"
                           value={designMass}
@@ -489,7 +489,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">g (m/s²)</label>
+                        <label className="text-sm font-medium text-gray-900">g (m/s²)</label>
                         <Input
                           type="number"
                           value={grav}
@@ -500,7 +500,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Friction μ</label>
+                        <label className="text-sm font-medium text-gray-900">Friction μ</label>
                         <Input
                           type="number"
                           value={mu}
@@ -511,7 +511,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Rating unit</label>
+                        <label className="text-sm font-medium text-gray-900">Rating unit</label>
                         <Select value={ratingUnit} onValueChange={setRatingUnit}>
                           <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
@@ -527,7 +527,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Forward accel (g)</label>
+                        <label className="text-sm font-medium text-gray-900">Forward accel (g)</label>
                         <Input
                           type="number"
                           value={af}
@@ -538,7 +538,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Rearward accel (g)</label>
+                        <label className="text-sm font-medium text-gray-900">Rearward accel (g)</label>
                         <Input
                           type="number"
                           value={ar}
@@ -549,7 +549,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Lateral accel (g)</label>
+                        <label className="text-sm font-medium text-gray-900">Lateral accel (g)</label>
                         <Input
                           type="number"
                           value={al}
@@ -560,7 +560,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Anchor SWL per point</label>
+                        <label className="text-sm font-medium text-gray-900">Anchor SWL per point</label>
                         <Input
                           type="number"
                           value={anchorSWL}
@@ -573,7 +573,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Safety × Forward</label>
+                        <label className="text-sm font-medium text-gray-900">Safety × Forward</label>
                         <Input
                           type="number"
                           value={sfF}
@@ -584,7 +584,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Safety × Rearward</label>
+                        <label className="text-sm font-medium text-gray-900">Safety × Rearward</label>
                         <Input
                           type="number"
                           value={sfR}
@@ -595,7 +595,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Safety × Lateral</label>
+                        <label className="text-sm font-medium text-gray-900">Safety × Lateral</label>
                         <Input
                           type="number"
                           value={sfL}
@@ -606,7 +606,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Anchor margin ×</label>
+                        <label className="text-sm font-medium text-gray-900">Anchor margin ×</label>
                         <Input
                           type="number"
                           value={anchorMargin}
@@ -618,10 +618,10 @@ export default function TDSTool() {
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-card-foreground">Add lashing</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Add lashing</h3>
                     <div className="grid grid-cols-6 gap-4 items-end">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Direction</label>
+                        <label className="text-sm font-medium text-gray-900">Direction</label>
                         <Select value={lashDir} onValueChange={setLashDir}>
                           <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
@@ -634,7 +634,7 @@ export default function TDSTool() {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Count</label>
+                        <label className="text-sm font-medium text-gray-900">Count</label>
                         <Input
                           type="number"
                           value={lashCount}
@@ -645,7 +645,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">LC</label>
+                        <label className="text-sm font-medium text-gray-900">LC</label>
                         <Input
                           type="number"
                           value={lashLC}
@@ -655,7 +655,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Unit</label>
+                        <label className="text-sm font-medium text-gray-900">Unit</label>
                         <Select value={lashUnit} onValueChange={setLashUnit}>
                           <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
@@ -668,7 +668,7 @@ export default function TDSTool() {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">θ°</label>
+                        <label className="text-sm font-medium text-gray-900">θ°</label>
                         <Input
                           type="number"
                           value={lashAngle}
@@ -680,13 +680,13 @@ export default function TDSTool() {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={addLashing} variant="default">Add</Button>
-                        <Button onClick={clearLashings} variant="outline" className="text-foreground">Clear all</Button>
+                        <Button onClick={clearLashings} variant="outline" className="text-gray-900">Clear all</Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2 mt-4">
                       <Button onClick={calcRestraint} variant="default">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} variant="outline" className="text-foreground">Clear results</Button>
+                      <Button onClick={() => setRestraintResults([])} variant="outline" className="text-gray-900">Clear results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
@@ -739,7 +739,7 @@ export default function TDSTool() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Container preset</label>
+                        <label className="text-sm font-medium text-gray-900">Container preset</label>
                         <Select value={containerPreset} onValueChange={setContainerPreset}>
                           <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
@@ -752,7 +752,7 @@ export default function TDSTool() {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Allow rotation</label>
+                        <label className="text-sm font-medium text-gray-900">Allow rotation</label>
                         <Select value={allowRotation} onValueChange={setAllowRotation}>
                           <SelectTrigger className="bg-white text-gray-900 border-border">
                             <SelectValue />
@@ -767,7 +767,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Asset L (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Asset L (m)</label>
                         <Input
                           type="number"
                           value={assetL}
@@ -778,7 +778,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Asset W (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Asset W (m)</label>
                         <Input
                           type="number"
                           value={assetW}
@@ -789,7 +789,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Asset H (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Asset H (m)</label>
                         <Input
                           type="number"
                           value={assetH}
@@ -803,7 +803,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground">Design mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Design mass (kg)</label>
                         <Input
                           type="number"
                           value={contMass}
@@ -813,7 +813,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground">Payload limit (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Payload limit (kg)</label>
                         <Input
                           type="number"
                           value={payloadLimit}
@@ -836,7 +836,7 @@ export default function TDSTool() {
                           setFitResult('');
                         }}
                         variant="outline"
-                        className="text-foreground"
+                        className="text-gray-900"
                       >
                         Clear
                       </Button>
@@ -844,7 +844,7 @@ export default function TDSTool() {
 
                     {fitResult && (
                       <div className="p-4 rounded-md bg-muted border border-border">
-                        <p className="font-mono text-foreground">{fitResult}</p>
+                        <p className="font-mono text-gray-900">{fitResult}</p>
                       </div>
                     )}
                   </CardContent>
@@ -1127,7 +1127,7 @@ export default function TDSTool() {
             </Tabs>
 
             <div className="mt-6 flex justify-center">
-              <Button variant="outline" className="text-foreground" onClick={() => navigate('/')}>
+              <Button variant="outline" className="text-gray-900" onClick={() => navigate('/')}>
                 Back to Dashboard
               </Button>
             </div>
