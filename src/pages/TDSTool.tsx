@@ -237,27 +237,58 @@ export default function TDSTool() {
     const payload = parseFloat(payloadLimit) || 0;
 
     const orientations = [
-      { name: 'L×W×H', dims: [La, Wa, Ha] },
-      { name: 'W×L×H', dims: [Wa, La, Ha] },
-      { name: 'H×W×L', dims: [Ha, Wa, La] }
+      { name: 'Normal (L×W×H)', dims: [La, Wa, Ha], desc: 'length first' },
+      { name: 'Rotated 90° (W×L×H)', dims: [Wa, La, Ha], desc: 'width first' },
+      { name: 'On end (H×W×L)', dims: [Ha, Wa, La], desc: 'standing upright' }
     ];
 
     const tries = allowRotation === 'Yes' ? orientations : [orientations[0]];
-    let ok = null;
+    let passedOrientation = null;
+    const failReasons: string[] = [];
 
     tries.forEach((o) => {
       const [L, W, H] = o.dims;
       const doorPass = Math.min(W, H) <= Wdoor && Math.max(W, H) <= Hdoor;
       const internalFit = L <= Lint && W <= Wint && H <= Hint;
-      if (!ok && doorPass && internalFit) ok = o.name;
+      
+      if (!passedOrientation && doorPass && internalFit) {
+        passedOrientation = o;
+      } else if (!passedOrientation) {
+        const reasons = [];
+        if (!doorPass) reasons.push('too large for door opening');
+        if (!internalFit) reasons.push('exceeds internal dimensions');
+        failReasons.push(`${o.name}: ${reasons.join(' and ')}`);
+      }
     });
 
     const payloadOK = (payload && m) ? (m <= payload) : true;
-    setFitResult(
-      ok
-        ? `PASS — orientation ${ok}; door ✓, internal ✓; payload ${payloadOK ? '✓' : '✗'}`
-        : `FAIL — no orientation passes door & internal simultaneously.`
-    );
+    
+    if (passedOrientation) {
+      const weightNote = payloadOK 
+        ? 'Weight is within payload limit ✓' 
+        : `⚠️ WARNING: Weight exceeds payload limit by ${(m - payload).toFixed(0)} kg`;
+      
+      setFitResult(
+        `✓ PASS\n\n` +
+        `Orientation: ${passedOrientation.name} (${passedOrientation.desc})\n` +
+        `• Fits through door: ✓\n` +
+        `• Fits inside container: ✓\n` +
+        `• ${weightNote}\n\n` +
+        `This orientation will work for loading into the container.`
+      );
+    } else {
+      let reason = '';
+      if (allowRotation === 'No') {
+        reason = 'With rotation disabled, the equipment in its normal orientation is too large.\n\n' +
+                 'Try enabling "Allow rotation" to check if turning it sideways or on end might work.';
+      } else {
+        reason = 'Equipment does not fit in any orientation:\n\n' +
+                 failReasons.map(r => `• ${r}`).join('\n') +
+                 '\n\nYou will need a larger container (e.g., 40 ft ISO or High Cube) or different transport method.';
+      }
+      
+      setFitResult(`✗ FAIL\n\n${reason}`);
+    }
   };
 
   return (
@@ -474,7 +505,7 @@ export default function TDSTool() {
                     <div className="flex gap-2 flex-wrap">
                       <Button onClick={presetUK} variant="secondary">UK Road Preset</Button>
                       <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} variant="outline" className="text-gray-900">Starter plan</Button>
+                      <Button onClick={starterPlan} variant="outline" className="text-white">Starter plan</Button>
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
@@ -680,48 +711,113 @@ export default function TDSTool() {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={addLashing} variant="default">Add</Button>
-                        <Button onClick={clearLashings} variant="outline" className="text-gray-900">Clear all</Button>
+                        <Button onClick={clearLashings} variant="outline" className="text-white">Clear all</Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2 mt-4">
                       <Button onClick={calcRestraint} variant="default">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} variant="outline" className="text-gray-900">Clear results</Button>
+                      <Button onClick={() => setRestraintResults([])} variant="outline" className="text-white">Clear results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
                       <>
-                        <h3 className="text-lg font-semibold text-gray-900">Results summary</h3>
-                        <div className="rounded-md border border-border">
-                          <Table>
-                            <TableHeader className="bg-gray-200">
-                              <TableRow>
-                                <TableHead className="text-gray-900 font-semibold">Direction</TableHead>
-                                <TableHead className="text-gray-900 font-semibold">F_req (N)</TableHead>
-                                <TableHead className="text-gray-900 font-semibold">F_μ (N)</TableHead>
-                                <TableHead className="text-gray-900 font-semibold">Residual (N)</TableHead>
-                                <TableHead className="text-gray-900 font-semibold">Capacity (N)</TableHead>
-                                <TableHead className="text-gray-900 font-semibold">Status</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {restraintResults.map((r, i) => {
-                                const pass = r.cap >= r.Residual;
-                                return (
-                                  <TableRow key={i}>
-                                    <TableCell className="text-gray-900">{r.dir}</TableCell>
-                                    <TableCell className="text-gray-900">{fmt(r.Freq)}</TableCell>
-                                    <TableCell className="text-gray-900">{fmt(r.Fmu)}</TableCell>
-                                    <TableCell className="text-gray-900">{fmt(r.Residual)}</TableCell>
-                                    <TableCell className="text-gray-900">{fmt(r.cap)}</TableCell>
-                                    <TableCell className={pass ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
-                                      {pass ? 'PASS' : 'FAIL'}
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
+                        <h3 className="text-lg font-semibold text-gray-900">Lashing Results - Your Restraint Plan</h3>
+                        
+                        <div className="bg-red-50 border-2 border-red-600 p-4 rounded-md mb-4">
+                          <p className="font-bold text-red-900 mb-2">⚠️ CRITICAL DEFENCE STANDARD:</p>
+                          <p className="text-gray-900">
+                            <strong>Zero Friction (μ=0)</strong> is assumed for Defence operations. Your lashings must 
+                            provide ALL the restraint force. Do NOT rely on friction between the load and the platform. 
+                            The load surface must be treated as completely slippery.
+                          </p>
+                        </div>
+
+                        {restraintResults.map((r, i) => {
+                          const pass = r.cap >= r.Residual;
+                          const directionLashings = lashings[r.dir as keyof typeof lashings];
+                          const totalStraps = directionLashings.reduce((sum, L) => sum + (parseFloat(L.count) || 0), 0);
+                          
+                          return (
+                            <Card key={i} className={`${pass ? 'bg-green-50 border-green-600' : 'bg-red-50 border-red-600'} border-2`}>
+                              <CardContent className="pt-6">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="text-xl font-bold text-gray-900">{r.dir} Direction</h4>
+                                  <span className={`text-2xl font-bold ${pass ? 'text-green-700' : 'text-red-700'}`}>
+                                    {pass ? '✓ PASS' : '✗ FAIL'}
+                                  </span>
+                                </div>
+
+                                <div className="space-y-3 text-gray-900">
+                                  <div className="bg-white p-3 rounded border border-gray-300">
+                                    <p className="text-sm font-semibold mb-1">Total Straps Required:</p>
+                                    <p className="text-2xl font-bold">{totalStraps} straps in {r.dir.toLowerCase()} direction</p>
+                                  </div>
+
+                                  <div className="bg-white p-3 rounded border border-gray-300">
+                                    <p className="text-sm font-semibold mb-2">Your Strap Configuration:</p>
+                                    {directionLashings.length === 0 ? (
+                                      <p className="text-red-600 font-semibold">⚠️ No straps configured for this direction!</p>
+                                    ) : (
+                                      <ul className="space-y-1">
+                                        {directionLashings.map((L, idx) => (
+                                          <li key={idx} className="flex items-center justify-between">
+                                            <span>• {L.count} straps @ {L.LC} {L.unit} capacity</span>
+                                            <span className="font-semibold">Angle: {L.angle}°</span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-white p-3 rounded border border-gray-300">
+                                      <p className="text-sm mb-1">Force Needed (with safety factor):</p>
+                                      <p className="text-lg font-bold">{fmt(r.Residual)} N</p>
+                                      <p className="text-xs text-gray-600 mt-1">({(r.Residual / 10).toFixed(0)} daN)</p>
+                                    </div>
+                                    <div className="bg-white p-3 rounded border border-gray-300">
+                                      <p className="text-sm mb-1">Your Strap Capacity:</p>
+                                      <p className="text-lg font-bold">{fmt(r.cap)} N</p>
+                                      <p className="text-xs text-gray-600 mt-1">({(r.cap / 10).toFixed(0)} daN)</p>
+                                    </div>
+                                  </div>
+
+                                  {!pass && (
+                                    <div className="bg-red-100 border border-red-400 p-3 rounded">
+                                      <p className="font-bold text-red-900 mb-1">⚠️ Action Required:</p>
+                                      <p className="text-gray-900 text-sm">
+                                        Add more straps or use higher capacity straps (e.g., upgrade from 1000 daN to 2000 daN). 
+                                        You need approximately <strong>{Math.ceil((r.Residual - r.cap) / 10000)} more standard (2000 daN) straps</strong> to pass.
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  <div className="bg-blue-50 border border-blue-300 p-3 rounded">
+                                    <p className="font-semibold text-blue-900 mb-1">Lashing Angle Guide:</p>
+                                    <p className="text-sm text-gray-900">
+                                      Keep strap angles <strong>20-30°</strong> for maximum efficiency. 
+                                      Lower angles (closer to horizontal) provide better restraint. 
+                                      Angles above 45° significantly reduce effectiveness.
+                                    </p>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+
+                        <div className="bg-amber-50 border-2 border-amber-600 p-4 rounded-md mt-4">
+                          <p className="font-bold text-amber-900 mb-2">Standard Strap Ratings:</p>
+                          <ul className="space-y-1 text-gray-900">
+                            <li>• <strong>Light duty:</strong> 1,000 daN (suitable for loads under 5,000 kg)</li>
+                            <li>• <strong>Medium duty:</strong> 2,000 daN (most common, suitable for loads 5,000-15,000 kg)</li>
+                            <li>• <strong>Heavy duty:</strong> 4,000 daN (for heavy loads over 15,000 kg)</li>
+                          </ul>
+                          <p className="mt-2 text-sm text-gray-900">
+                            <strong>Defence Standard:</strong> Strap capacity should be at least <strong>2× the g-force applied</strong>. 
+                            For 1g acceleration, minimum 2,000 daN straps recommended.
+                          </p>
                         </div>
                       </>
                     )}
@@ -836,15 +932,21 @@ export default function TDSTool() {
                           setFitResult('');
                         }}
                         variant="outline"
-                        className="text-gray-900"
+                        className="text-white"
                       >
                         Clear
                       </Button>
                     </div>
 
                     {fitResult && (
-                      <div className="p-4 rounded-md bg-muted border border-border">
-                        <p className="font-mono text-gray-900">{fitResult}</p>
+                      <div className={`p-4 rounded-md border-2 ${
+                        fitResult.startsWith('✓ PASS') 
+                          ? 'bg-green-50 border-green-600' 
+                          : 'bg-red-50 border-red-600'
+                      }`}>
+                        <pre className="whitespace-pre-wrap text-gray-900 font-sans text-sm leading-relaxed">
+                          {fitResult}
+                        </pre>
                       </div>
                     )}
                   </CardContent>
@@ -1127,7 +1229,7 @@ export default function TDSTool() {
             </Tabs>
 
             <div className="mt-6 flex justify-center">
-              <Button variant="outline" className="text-gray-900" onClick={() => navigate('/')}>
+              <Button variant="outline" className="text-white" onClick={() => navigate('/')}>
                 Back to Dashboard
               </Button>
             </div>
