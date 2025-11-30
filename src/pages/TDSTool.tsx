@@ -100,26 +100,17 @@ export default function TDSTool() {
   const deleteItem = (index: number) => {
     const newItems = items.filter((_, i) => i !== index);
     setItems(newItems);
-    calcCoG(newItems);
+    updateTotalRow(newItems);
   };
 
   const updateItem = (index: number, field: keyof Item, value: string) => {
     const newItems = [...items];
     newItems[index][field] = value;
     setItems(newItems);
-    calcCoG(newItems);
+    updateTotalRow(newItems);
   };
 
-  const calcCoG = (itemsList = items) => {
-    if (itemsList.length === 0) {
-      toast({
-        title: 'No Items',
-        description: 'Please add items before calculating',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
+  const updateTotalRow = (itemsList = items) => {
     let mt = 0, sx = 0, sy = 0, sz = 0;
     itemsList.forEach((item) => {
       const m = parseFloat(item.mass) || 0;
@@ -132,26 +123,36 @@ export default function TDSTool() {
       sz += m * z;
     });
     
-    const result = {
+    setCogResult({
       totalMass: fmt(mt),
       x: mt ? fmt(sx / mt) : '–',
       y: mt ? fmt(sy / mt) : '–',
       z: mt ? fmt(sz / mt) : '–'
-    };
+    });
+  };
+
+  const calcCoG = () => {
+    if (items.length === 0) {
+      toast({
+        title: 'No Items',
+        description: 'Please add items before calculating',
+        variant: 'destructive'
+      });
+      return;
+    }
     
-    setCogResult(result);
-    
-    // Add to history
+    // Result is already in cogResult from updateTotalRow
+    // Just add to history and show toast
     const historyEntry: HistoryEntry = {
       timestamp: new Date().toLocaleString(),
-      result: result,
+      result: cogResult,
       type: 'cog'
     };
     setCogHistory([historyEntry, ...cogHistory].slice(0, 10)); // Keep last 10
     
     toast({
       title: 'CoG Calculated',
-      description: `Centre of Gravity: x=${result.x}m, y=${result.y}m, z=${result.z}m`
+      description: `Centre of Gravity: x=${cogResult.x}m, y=${cogResult.y}m, z=${cogResult.z}m`
     });
   };
   
@@ -170,11 +171,11 @@ export default function TDSTool() {
     const m2 = parseFloat(axle2Mass) || 0;
     const x2 = parseFloat(axle2X) || 0;
     const newItems = [
-      { name: 'Axle 1', mass: m1.toString(), x: x1.toString(), y: '0', z: '' },
-      { name: 'Axle 2', mass: m2.toString(), x: x2.toString(), y: '0', z: '' }
+      { name: 'Axle 1', mass: m1.toString(), x: x1.toString(), y: '0', z: '0' },
+      { name: 'Axle 2', mass: m2.toString(), x: x2.toString(), y: '0', z: '0' }
     ];
     setItems(newItems);
-    calcCoG(newItems);
+    updateTotalRow(newItems);
   };
 
   // Restraint Functions
@@ -456,10 +457,21 @@ export default function TDSTool() {
                       <Button onClick={clearAllCog} className="bg-ribbon hover:bg-ribbon/90 text-white">
                         Clear Items
                       </Button>
-                      <Button onClick={() => calcCoG()} variant="default">
+                      <Button onClick={calcCoG} variant="default">
                         Calculate CoG
                       </Button>
                     </div>
+
+                    {cogResult.x !== '–' && (
+                      <div className="bg-green-50 border-2 border-green-400 p-4 rounded-md">
+                        <h3 className="font-bold text-green-900 text-lg mb-2">Current Centre of Gravity Result</h3>
+                        <div className="text-green-900 font-semibold">
+                          <p>Total Mass: {cogResult.totalMass} kg</p>
+                          <p>CoG Position: x = {cogResult.x}m, y = {cogResult.y}m, z = {cogResult.z}m</p>
+                        </div>
+                        <p className="text-sm text-green-800 mt-2">Click "Calculate CoG" button to save this result to history.</p>
+                      </div>
+                    )}
 
                     <div className="rounded-md border border-border">
                       <Table>
