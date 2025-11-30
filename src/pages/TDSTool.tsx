@@ -25,6 +25,12 @@ interface Lashing {
   angle: string;
 }
 
+interface HistoryEntry {
+  timestamp: string;
+  result: any;
+  type: 'cog' | 'restraint' | 'container';
+}
+
 export default function TDSTool() {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -36,6 +42,7 @@ export default function TDSTool() {
   const [axle1X, setAxle1X] = useState('');
   const [axle2Mass, setAxle2Mass] = useState('');
   const [axle2X, setAxle2X] = useState('');
+  const [cogHistory, setCogHistory] = useState<HistoryEntry[]>([]);
 
   // Restraint State
   const [designMass, setDesignMass] = useState('');
@@ -61,6 +68,7 @@ export default function TDSTool() {
     Lateral: []
   });
   const [restraintResults, setRestraintResults] = useState<any[]>([]);
+  const [restraintHistory, setRestraintHistory] = useState<HistoryEntry[]>([]);
 
   // Container State
   const [containerPreset, setContainerPreset] = useState('20std');
@@ -71,6 +79,7 @@ export default function TDSTool() {
   const [contMass, setContMass] = useState('');
   const [payloadLimit, setPayloadLimit] = useState('');
   const [fitResult, setFitResult] = useState('');
+  const [containerHistory, setContainerHistory] = useState<HistoryEntry[]>([]);
 
   // Helper functions
   const toN = (val: string | number, unit: string) => {
@@ -102,6 +111,15 @@ export default function TDSTool() {
   };
 
   const calcCoG = (itemsList = items) => {
+    if (itemsList.length === 0) {
+      toast({
+        title: 'No Items',
+        description: 'Please add items before calculating',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     let mt = 0, sx = 0, sy = 0, sz = 0;
     itemsList.forEach((item) => {
       const m = parseFloat(item.mass) || 0;
@@ -113,12 +131,37 @@ export default function TDSTool() {
       sy += m * y;
       sz += m * z;
     });
-    setCogResult({
+    
+    const result = {
       totalMass: fmt(mt),
       x: mt ? fmt(sx / mt) : '–',
       y: mt ? fmt(sy / mt) : '–',
       z: mt ? fmt(sz / mt) : '–'
+    };
+    
+    setCogResult(result);
+    
+    // Add to history
+    const historyEntry: HistoryEntry = {
+      timestamp: new Date().toLocaleString(),
+      result: result,
+      type: 'cog'
+    };
+    setCogHistory([historyEntry, ...cogHistory].slice(0, 10)); // Keep last 10
+    
+    toast({
+      title: 'CoG Calculated',
+      description: `Centre of Gravity: x=${result.x}m, y=${result.y}m, z=${result.z}m`
     });
+  };
+  
+  const clearAllCog = () => {
+    setItems([]);
+    setCogResult({ totalMass: '0', x: '–', y: '–', z: '–' });
+    setAxle1Mass('');
+    setAxle1X('');
+    setAxle2Mass('');
+    setAxle2X('');
   };
 
   const presetAxles = () => {
@@ -159,6 +202,9 @@ export default function TDSTool() {
 
   const clearLashings = () => {
     setLashings({ Forward: [], Rearward: [], Lateral: [] });
+    setLashCount('');
+    setLashLC('');
+    setLashAngle('');
   };
 
   const starterPlan = () => {
@@ -167,13 +213,6 @@ export default function TDSTool() {
       Rearward: [{ count: '2', LC: '4000', unit: 'daN', angle: '10' }],
       Lateral: [{ count: '4', LC: '2000', unit: 'daN', angle: '30' }]
     });
-  };
-
-  const presetUK = () => {
-    setMu('0.30');
-    setAf('0.80');
-    setAr('0.50');
-    setAl('0.50');
   };
 
   const presetDef = () => {
@@ -216,6 +255,19 @@ export default function TDSTool() {
     ];
 
     setRestraintResults(results);
+    
+    // Add to history
+    const historyEntry: HistoryEntry = {
+      timestamp: new Date().toLocaleString(),
+      result: { results, designMass: m, lashings },
+      type: 'restraint'
+    };
+    setRestraintHistory([historyEntry, ...restraintHistory].slice(0, 10));
+    
+    toast({
+      title: 'Restraint Calculated',
+      description: 'Check results below for each direction'
+    });
   };
 
   // Container Functions
@@ -321,6 +373,14 @@ export default function TDSTool() {
       
       setFitResult(`✗ FAIL\n\n${reason}`);
     }
+    
+    // Add to history
+    const historyEntry: HistoryEntry = {
+      timestamp: new Date().toLocaleString(),
+      result: { fitResult: passedOrientation ? 'PASS' : 'FAIL', dimensions: { L: La, W: Wa, H: Ha }, mass: m },
+      type: 'container'
+    };
+    setContainerHistory([historyEntry, ...containerHistory].slice(0, 10));
   };
 
   return (
@@ -388,16 +448,16 @@ export default function TDSTool() {
                     <div className="flex gap-2 flex-wrap">
                       <Button onClick={addItem} variant="default">
                         <Plus className="h-4 w-4 mr-2" />
-                        Add item
+                        Add Item
                       </Button>
-                      <Button onClick={presetAxles} className="bg-white text-gray-900 border border-border hover:bg-gray-100">
-                        Use axle masses
+                      <Button onClick={presetAxles} className="bg-ribbon hover:bg-ribbon/90 text-white">
+                        Use Axle Masses
                       </Button>
-                      <Button onClick={() => setItems([])} className="bg-white text-gray-900 border border-border hover:bg-gray-100">
-                        Clear items
+                      <Button onClick={clearAllCog} className="bg-ribbon hover:bg-ribbon/90 text-white">
+                        Clear Items
                       </Button>
                       <Button onClick={() => calcCoG()} variant="default">
-                        Calculate CofG
+                        Calculate CoG
                       </Button>
                     </div>
 
@@ -489,7 +549,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Front axle mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Front Axle Mass (kg)</label>
                         <Input
                           type="number"
                           value={axle1Mass}
@@ -499,7 +559,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Front axle x (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Front Axle X (m)</label>
                         <Input
                           type="number"
                           value={axle1X}
@@ -510,7 +570,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Rear axle mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Rear Axle Mass (kg)</label>
                         <Input
                           type="number"
                           value={axle2Mass}
@@ -520,7 +580,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Rear axle x (m)</label>
+                        <label className="text-sm font-medium text-gray-900">Rear Axle X (m)</label>
                         <Input
                           type="number"
                           value={axle2X}
@@ -531,6 +591,22 @@ export default function TDSTool() {
                         />
                       </div>
                     </div>
+                    
+                    {cogHistory.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Calculation History</h3>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                          {cogHistory.map((entry, idx) => (
+                            <div key={idx} className="bg-gray-100 p-3 rounded border border-gray-300">
+                              <p className="text-xs text-gray-600 mb-1">{entry.timestamp}</p>
+                              <p className="text-sm text-gray-900 font-semibold">
+                                CoG: x={entry.result.x}m, y={entry.result.y}m, z={entry.result.z}m | Mass: {entry.result.totalMass}kg
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -542,15 +618,30 @@ export default function TDSTool() {
                     <CardTitle className="text-gray-900">Restraint System (Direct lashings)</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-md mb-4">
+                      <p className="font-bold text-blue-900 mb-2">Example: Securing a 9,500 kg Vehicle</p>
+                      <p className="text-gray-900 text-sm mb-2">
+                        <strong>Step 1:</strong> Click "Defence Preset" to set friction μ=0 and acceleration values (0.8g forward, 0.5g rearward/lateral)
+                      </p>
+                      <p className="text-gray-900 text-sm mb-2">
+                        <strong>Step 2:</strong> Enter Transportation Weight = 9500 kg (this is the actual weight during transport)
+                      </p>
+                      <p className="text-gray-900 text-sm mb-2">
+                        <strong>Step 3:</strong> Click "Starter Plan" to load typical strap setup, then adjust as needed
+                      </p>
+                      <p className="text-gray-900 text-sm">
+                        <strong>Step 4:</strong> Click "Calculate" to check if your straps are sufficient
+                      </p>
+                    </div>
+                    
                     <div className="flex gap-2 flex-wrap">
-                      <Button onClick={presetUK} variant="secondary">UK Road Preset</Button>
                       <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white">Starter plan</Button>
+                      <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white">Starter Plan</Button>
                     </div>
 
                     <div className="grid grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Design mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Transportation Weight (kg)</label>
                         <Input
                           type="number"
                           value={designMass}
@@ -689,7 +780,7 @@ export default function TDSTool() {
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-900">Add lashing</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Add Lashing</h3>
                     <div className="grid grid-cols-6 gap-4 items-end">
                       <div>
                         <label className="text-sm font-medium text-gray-900">Direction</label>
@@ -751,13 +842,13 @@ export default function TDSTool() {
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={addLashing} variant="default">Add</Button>
-                        <Button onClick={clearLashings} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear all</Button>
+                        <Button onClick={clearLashings} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear All</Button>
                       </div>
                     </div>
 
                     <div className="flex gap-2 mt-4">
                       <Button onClick={calcRestraint} variant="default">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear results</Button>
+                      <Button onClick={() => setRestraintResults([])} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear Results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
@@ -859,6 +950,25 @@ export default function TDSTool() {
                             For 1g acceleration, minimum 2,000 daN straps recommended.
                           </p>
                         </div>
+                        
+                        {restraintHistory.length > 0 && (
+                          <div className="mt-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Calculation History</h3>
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                              {restraintHistory.map((entry, idx) => (
+                                <div key={idx} className="bg-gray-100 p-3 rounded border border-gray-300">
+                                  <p className="text-xs text-gray-600 mb-1">{entry.timestamp}</p>
+                                  <p className="text-sm text-gray-900 font-semibold">
+                                    Mass: {entry.result.designMass}kg | 
+                                    F: {entry.result.lashings.Forward.length} sets, 
+                                    R: {entry.result.lashings.Rearward.length} sets, 
+                                    L: {entry.result.lashings.Lateral.length} sets
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </CardContent>
@@ -939,7 +1049,7 @@ export default function TDSTool() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Design mass (kg)</label>
+                        <label className="text-sm font-medium text-gray-900">Transportation Weight (kg)</label>
                         <Input
                           type="number"
                           value={contMass}
@@ -949,7 +1059,7 @@ export default function TDSTool() {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Payload limit (kg) - Auto-filled</label>
+                        <label className="text-sm font-medium text-gray-900">Payload Limit (kg) - Auto-Filled</label>
                         <Input
                           type="number"
                           value={payloadLimit || (containerPreset !== 'custom' ? '30480' : '')}
@@ -992,6 +1102,24 @@ export default function TDSTool() {
                         </pre>
                       </div>
                     )}
+                    
+                    {containerHistory.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Calculation History</h3>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                          {containerHistory.map((entry, idx) => (
+                            <div key={idx} className="bg-gray-100 p-3 rounded border border-gray-300">
+                              <p className="text-xs text-gray-600 mb-1">{entry.timestamp}</p>
+                              <p className="text-sm text-gray-900 font-semibold">
+                                Result: {entry.result.fitResult} | 
+                                Dimensions: {entry.result.dimensions.L}m × {entry.result.dimensions.W}m × {entry.result.dimensions.H}m | 
+                                Mass: {entry.result.mass}kg
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -1019,22 +1147,22 @@ export default function TDSTool() {
                           </p>
                         </div>
                         
-                        <div className="bg-blue-50 border border-blue-200 p-4 rounded">
-                          <p className="font-semibold text-blue-900 mb-2">Critical: Use Transportation Weight</p>
+                        <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded">
+                          <p className="font-semibold text-blue-900 mb-2">⚠️ CRITICAL: Use Transportation Weight</p>
                           <p className="text-gray-900 mb-2">
-                            Always calculate CofG using the <strong>transportation weight</strong> - this is the actual weight during transport, which is different from laden or unladen weight.
+                            Always calculate CofG and restraint systems using the <strong>transportation weight</strong> - this is the actual weight during transport, which is different from laden or unladen weight.
                           </p>
-                          <p className="text-gray-900 mb-2">Transportation weight includes:</p>
+                          <p className="text-gray-900 mb-2"><strong>Transportation weight includes:</strong></p>
                           <ul className="list-disc ml-5 space-y-1 text-gray-900">
                             <li>Ammunition</li>
                             <li>Weapon systems</li>
-                            <li>Fuel in tanks</li>
-                            <li>Water</li>
+                            <li>Fuel in tanks (typically full or operational level)</li>
+                            <li>Water systems</li>
                             <li>Crew kit and equipment</li>
                             <li>Any other items that will be onboard during transport</li>
                           </ul>
-                          <p className="mt-2 text-gray-900">
-                            These items add weight to the unladen weight and change the CofG position. Never use just the empty vehicle weight!
+                          <p className="mt-2 text-gray-900 font-semibold">
+                            ⚠️ Never use just the empty vehicle (unladen) weight! These additional items add significant weight and change the CofG position, affecting both stability and restraint requirements.
                           </p>
                         </div>
                         
@@ -1116,24 +1244,29 @@ export default function TDSTool() {
                           </p>
                         </div>
                         
+                        <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded mb-4">
+                          <p className="font-semibold text-blue-900 mb-2">⚠️ CRITICAL: Use Transportation Weight</p>
+                          <p className="text-gray-900 text-sm">
+                            The "Transportation Weight (kg)" field must contain the actual weight during transport - NOT the empty/unladen weight. 
+                            This includes fuel, ammunition, crew equipment, and all items onboard during transport. 
+                            This is the same weight used for Centre of Gravity calculations.
+                          </p>
+                        </div>
+                        
                         <div>
                           <h4 className="font-semibold mb-2">Step-by-Step Guide:</h4>
                           <ol className="list-decimal list-inside space-y-3 text-sm">
-                            <li><strong>Enter the design mass:</strong> This is the total weight of what you're securing (in kilograms)</li>
+                            <li><strong>Enter the Transportation Weight:</strong> This is the total weight including all fuel, ammunition, crew kit, and equipment (in kilograms)</li>
                             
-                            <li><strong>Select a preset:</strong>
-                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                                <li><strong>UK Road Preset:</strong> Use if transporting on UK roads (assumes some friction μ=0.30)</li>
-                                <li><strong>Defence Preset:</strong> Use for military operations (assumes no friction μ=0, safer)</li>
-                              </ul>
-                            </li>
+                            <li><strong>Select Defence Preset:</strong> Click "Defence Preset (μ=0)" for military operations (assumes zero friction, which is the Defence Standard)</li>
                             
                             <li><strong>Add your lashings (tie-down straps):</strong>
                               <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                                <li><strong>Direction:</strong> Choose Forward, Rearward, or Lateral (sideways)</li>
-                                <li><strong>Count:</strong> How many straps in this direction (e.g., 4)</li>
-                                <li><strong>LC (Lashing Capacity):</strong> The strength rating of your strap (usually printed on it, e.g., 2000 daN)</li>
-                                <li><strong>Angle (θ):</strong> How steep the strap angle is - keep this small (around 20-30 degrees) for best results</li>
+                                <li><strong>Direction:</strong> Choose Forward (for braking), Rearward (for acceleration), or Lateral (for cornering/sideways)</li>
+                                <li><strong>Count:</strong> How many straps in this direction (e.g., 4 straps)</li>
+                                <li><strong>LC (Lashing Capacity):</strong> The strength rating printed on your strap label. Common ratings are 1000 daN or 2000 daN</li>
+                                <li><strong>Unit:</strong> Usually daN (deca-Newtons) - this is the standard for strap ratings</li>
+                                <li><strong>Angle (θ):</strong> The angle between the strap and the horizontal plane - keep this between 20-30° for best results. Angles above 45° are much less effective</li>
                               </ul>
                             </li>
                             
@@ -1148,23 +1281,38 @@ export default function TDSTool() {
                           </ol>
                         </div>
                         
-                        <div>
-                          <h4 className="font-semibold mb-2">Recommended Starting Point:</h4>
-                          <p className="text-sm mb-2">Click "Starter plan" to load a typical setup, then adjust as needed:</p>
-                          <ul className="list-disc list-inside ml-6 space-y-1 text-sm">
-                            <li>4 straps pulling forward</li>
-                            <li>2 straps pulling rearward</li>
-                            <li>4 straps pulling sideways (lateral)</li>
+                        <div className="bg-green-50 border-2 border-green-400 p-4 rounded">
+                          <h4 className="font-semibold mb-2 text-green-900">Recommended Starting Point (Example):</h4>
+                          <p className="text-sm text-gray-900 mb-2">Click "Starter Plan" button to load a typical setup for a 9,500 kg vehicle:</p>
+                          <ul className="list-disc list-inside ml-6 space-y-1 text-sm text-gray-900">
+                            <li><strong>Forward:</strong> 4 straps @ 2000 daN capacity, 20° angle</li>
+                            <li><strong>Rearward:</strong> 2 straps @ 4000 daN capacity, 10° angle</li>
+                            <li><strong>Lateral:</strong> 4 straps @ 2000 daN capacity, 30° angle</li>
+                          </ul>
+                          <p className="text-xs text-gray-600 mt-2">You can then adjust these numbers based on your actual strap availability and the calculation results</p>
+                        </div>
+                        
+                        <div className="bg-amber-50 border-2 border-amber-600 rounded p-4">
+                          <p className="text-sm font-bold text-amber-900 mb-2">⚠️ Important Field Explanations:</p>
+                          <ul className="list-disc list-inside ml-4 space-y-2 text-sm text-gray-900">
+                            <li><strong>Transportation Weight (kg):</strong> The total weight including fuel, ammunition, crew equipment - NOT empty weight</li>
+                            <li><strong>g (m/s²):</strong> Gravity constant - leave at 9.81 (this is standard Earth gravity)</li>
+                            <li><strong>Friction μ (mu):</strong> Defence Standard is μ=0 (zero friction) for safety. Never rely on friction for Defence operations</li>
+                            <li><strong>Forward/Rearward/Lateral accel (g):</strong> The g-forces during transport. Defence Standards: Forward 0.8g, Rearward 0.5g, Lateral 0.5g</li>
+                            <li><strong>Safety factors:</strong> Usually 1.00 (already built into Defence Standards)</li>
+                            <li><strong>LC (Lashing Capacity):</strong> Strap strength printed on the label - common values are 1000, 2000, or 4000 daN</li>
+                            <li><strong>Angle θ:</strong> Keep between 20-30° for best efficiency. Lower angles = more effective restraint</li>
                           </ul>
                         </div>
                         
-                        <div className="bg-warning/10 border border-warning/30 rounded p-3">
-                          <p className="text-sm"><strong>Key Tips:</strong></p>
-                          <ul className="list-disc list-inside ml-4 space-y-1 text-sm">
-                            <li>Smaller angles (closer to horizontal) = more effective restraint</li>
-                            <li>Use higher capacity straps rather than excessive quantities</li>
-                            <li>Distribute lashings evenly around the load</li>
-                            <li>Always re-check lashings before moving</li>
+                        <div className="bg-blue-50 border border-blue-300 rounded p-3 mt-3">
+                          <p className="text-sm font-semibold text-blue-900 mb-1">Key Tips:</p>
+                          <ul className="list-disc list-inside ml-4 space-y-1 text-sm text-gray-900">
+                            <li>Smaller angles (20-30°, closer to horizontal) = more effective restraint</li>
+                            <li>Use higher capacity straps (2000 daN) rather than excessive quantities of weak straps</li>
+                            <li>Distribute lashings evenly around the load for balanced restraint</li>
+                            <li>Always re-check and re-tension lashings after first 30 minutes of transport</li>
+                            <li>For Defence: Strap capacity should be at least 2× the g-force applied (e.g., 1g = 2000 daN minimum)</li>
                           </ul>
                         </div>
                       </CardContent>
@@ -1207,8 +1355,8 @@ export default function TDSTool() {
                             
                             <li><strong>Enter weights:</strong>
                               <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                                <li><strong>Design mass:</strong> Weight of your equipment (kg)</li>
-                                <li><strong>Payload limit:</strong> Maximum weight the container can carry (typically around 30,000 kg for 20 ft ISO)</li>
+                                <li><strong>Transportation Weight:</strong> Weight of your equipment (kg) - same as used for CoG and restraint calculations</li>
+                                <li><strong>Payload Limit:</strong> Auto-filled for standard containers - 30,480 kg for 20 ft ISO (you don't need to enter this)</li>
                               </ul>
                             </li>
                             
