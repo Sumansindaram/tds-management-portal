@@ -12,6 +12,7 @@ import iconNewRequest from '@/assets/icon-new-request.jpg';
 import iconMySubmissions from '@/assets/icon-my-submissions.jpg';
 import iconViewRequests from '@/assets/icon-view-requests.jpg';
 import iconManageUsers from '@/assets/icon-manage-users.jpg';
+import iconTdsTool from '@/assets/icon-tds-tool.jpg';
 
 export default function Dashboard() {
   const { role, user } = useAuth();
@@ -184,7 +185,14 @@ export default function Dashboard() {
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
                   onClick={() => navigate('/tds-tool')}
                 >
-                  <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
+                  <div className="relative h-32 overflow-hidden">
+                    <img 
+                      src={iconTdsTool} 
+                      alt="TDS Tool" 
+                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+                  </div>
                   <CardHeader className="pb-3 relative">
                     <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
                       <Wrench className="h-10 w-10 text-primary-foreground" />
@@ -316,7 +324,14 @@ export default function Dashboard() {
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
                   onClick={() => navigate('/ssr-directory')}
                 >
-                  <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
+                  <div className="relative h-32 overflow-hidden">
+                    <img 
+                      src={iconManageUsers} 
+                      alt="SSR Directory" 
+                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+                  </div>
                   <CardHeader className="pb-3 relative">
                     <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
                       <Users className="h-10 w-10 text-primary-foreground" />
@@ -334,7 +349,14 @@ export default function Dashboard() {
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
                   onClick={() => navigate('/tds-tool')}
                 >
-                  <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20" />
+                  <div className="relative h-32 overflow-hidden">
+                    <img 
+                      src={iconTdsTool} 
+                      alt="TDS Tool" 
+                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+                  </div>
                   <CardHeader className="pb-3 relative">
                     <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
                       <Wrench className="h-10 w-10 text-primary-foreground" />
