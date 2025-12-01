@@ -130,79 +130,85 @@ export default function Dashboard() {
               <>
                 {/* Submit Request */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/form')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconNewRequest} 
-                      alt="Submit Request" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <PlusCircle className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconNewRequest} 
+                    alt="Submit Request" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <PlusCircle className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">Submit Request</CardTitle>
-                    <CardDescription>Create a new TDS entry request</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Create Request</Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">Submit Request</h3>
+                        <p className="text-white/90 text-sm">Create a new TDS entry request</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">Create Request</Button>
+                    </div>
+                  </div>
                 </Card>
 
                 {/* My Submissions */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden"
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80"
                   onClick={() => navigate('/my-submissions')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconMySubmissions} 
-                      alt="My Submissions" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <List className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconMySubmissions} 
+                    alt="My Submissions" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <List className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">My Submissions</CardTitle>
-                    <CardDescription>View and track your TDS requests</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">
-                      View Submissions ({myEntries.length})
-                    </Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">My Submissions</h3>
+                        <p className="text-white/90 text-sm">View and track your TDS requests</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">
+                        View Submissions ({myEntries.length})
+                      </Button>
+                    </div>
+                  </div>
                 </Card>
 
                 {/* TDS Tool */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/tds-tool')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconTdsTool} 
-                      alt="TDS Tool" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <Wrench className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconTdsTool} 
+                    alt="TDS Tool" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <Wrench className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">TDS Tool</CardTitle>
-                    <CardDescription>Transportation planning calculations</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Tool</Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">TDS Tool</h3>
+                        <p className="text-white/90 text-sm">Transportation planning calculations</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">Open Tool</Button>
+                    </div>
+                  </div>
                 </Card>
               </>
             )}
@@ -271,102 +277,110 @@ export default function Dashboard() {
               <>
                 {/* View All Requests */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/admin')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconViewRequests} 
-                      alt="View All Requests" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <Search className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconViewRequests} 
+                    alt="View All Requests" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <Search className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">View All Requests</CardTitle>
-                    <CardDescription>Review all TDS submissions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View Requests</Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">View All Requests</h3>
+                        <p className="text-white/90 text-sm">Review all TDS submissions</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">View Requests</Button>
+                    </div>
+                  </div>
                 </Card>
 
                 {/* Submit Request */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/form')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconNewRequest} 
-                      alt="Submit Request" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <PlusCircle className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconNewRequest} 
+                    alt="Submit Request" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <PlusCircle className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">Submit Request</CardTitle>
-                    <CardDescription>Create a new TDS entry request</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Create Request</Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">Submit Request</h3>
+                        <p className="text-white/90 text-sm">Create a new TDS entry request</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">Create Request</Button>
+                    </div>
+                  </div>
                 </Card>
 
                 {/* SSR Directory */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/ssr-directory')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconManageUsers} 
-                      alt="SSR Directory" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <Users className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconManageUsers} 
+                    alt="SSR Directory" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <Users className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">SSR Directory</CardTitle>
-                    <CardDescription>Safety leadership contacts</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">View Directory</Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">SSR Directory</h3>
+                        <p className="text-white/90 text-sm">Safety leadership contacts</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">View Directory</Button>
+                    </div>
+                  </div>
                 </Card>
 
                 {/* TDS Tool */}
                 <Card 
-                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 bg-card group overflow-hidden" 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/tds-tool')}
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={iconTdsTool} 
-                      alt="TDS Tool" 
-                      className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                  </div>
-                  <CardHeader className="pb-3 relative">
-                    <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-lg group-hover:scale-110 transition-transform -mt-16 border-4 border-card">
-                      <Wrench className="h-10 w-10 text-primary-foreground" />
+                  <img 
+                    src={iconTdsTool} 
+                    alt="TDS Tool" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <Wrench className="h-10 w-10 text-white" />
                     </div>
-                    <CardTitle className="text-xl text-card-foreground">TDS Tool</CardTitle>
-                    <CardDescription>Transportation planning calculations</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full shadow-md bg-primary text-primary-foreground hover:bg-primary/90">Open Tool</Button>
-                  </CardContent>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">TDS Tool</h3>
+                        <p className="text-white/90 text-sm">Transportation planning calculations</p>
+                      </div>
+                      <Button className="w-full shadow-md bg-white text-primary hover:bg-white/90 font-semibold">Open Tool</Button>
+                    </div>
+                  </div>
                 </Card>
               </>
             )}
