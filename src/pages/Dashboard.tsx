@@ -8,9 +8,9 @@ import { FileText, List, PlusCircle, Users, Search, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import heroBanner from '@/assets/tds-hero-banner.jpg';
-import iconNewRequest from '@/assets/icon-submit-request-new.jpg';
+import iconNewRequest from '@/assets/icon-create-request.jpg';
 import iconMySubmissions from '@/assets/icon-my-submissions-new.jpg';
-import iconViewRequests from '@/assets/icon-view-requests-new.jpg';
+import iconViewRequests from '@/assets/icon-view-all-requests.jpg';
 import iconManageUsers from '@/assets/icon-ssr-directory-new.jpg';
 import iconTdsTool from '@/assets/icon-tds-tool.jpg';
 
@@ -150,7 +150,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">Submit Request</h3>
                         <p className="text-white/90 text-sm">Create a new TDS entry request</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">Create Request</Button>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">Create Request</Button>
                     </div>
                   </div>
                 </Card>
@@ -177,7 +177,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">My Submissions</h3>
                         <p className="text-white/90 text-sm">View and track your TDS requests</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">
                         View Submissions ({myEntries.length})
                       </Button>
                     </div>
@@ -206,7 +206,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">TDS Tool</h3>
                         <p className="text-white/90 text-sm">Transportation planning calculations</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">Open Tool</Button>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">Open Tool</Button>
                     </div>
                   </div>
                 </Card>
@@ -297,7 +297,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">View All Requests</h3>
                         <p className="text-white/90 text-sm">Review all TDS submissions</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">View Requests</Button>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">View Requests</Button>
                     </div>
                   </div>
                 </Card>
@@ -324,7 +324,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">Submit Request</h3>
                         <p className="text-white/90 text-sm">Create a new TDS entry request</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">Create Request</Button>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">Create Request</Button>
                     </div>
                   </div>
                 </Card>
@@ -351,7 +351,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">SSR Directory</h3>
                         <p className="text-white/90 text-sm">Safety leadership contacts</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">View Directory</Button>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">View Directory</Button>
                     </div>
                   </div>
                 </Card>
@@ -378,7 +378,7 @@ export default function Dashboard() {
                         <h3 className="text-2xl font-semibold text-white mb-2">TDS Tool</h3>
                         <p className="text-white/90 text-sm">Transportation planning calculations</p>
                       </div>
-                      <Button className="w-full shadow-md bg-ribbon text-white hover:bg-ribbon/90 font-semibold">Open Tool</Button>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">Open Tool</Button>
                     </div>
                   </div>
                 </Card>
