@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Calculator, Box, FileText, Info, Plus, Trash2 } from 'lucide-react';
+import { Search, Calculator, Box, FileText, Info, Plus, Trash2, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Item {
@@ -24,6 +24,8 @@ interface LashingRow {
   count: number;
   lcDaN: number | null;
   angleDeg: number;
+  anglePreset?: 'low' | 'typical' | 'steep';
+  strapPreset?: 'light' | 'medium' | 'heavy';
   // Computed outputs
   requiredForceDaN?: number;
   strapCapacityPerStrapDaN?: number;
@@ -31,6 +33,7 @@ interface LashingRow {
   totalCapacityDaN?: number;
   pass?: boolean;
   message?: string;
+  swlWarning?: string;
 }
 
 interface HistoryEntry {
@@ -52,22 +55,24 @@ export default function TDSTool() {
   const [axle2X, setAxle2X] = useState('');
   const [cogHistory, setCogHistory] = useState<HistoryEntry[]>([]);
 
-  // Restraint State
+  // Restraint State - Initialize with Defence defaults
+  const [calculatorMode, setCalculatorMode] = useState<'standard' | 'field'>('standard');
   const [designMass, setDesignMass] = useState('');
   const [grav, setGrav] = useState('9.81');
-  const [mu, setMu] = useState('');
-  const [af, setAf] = useState('');
-  const [ar, setAr] = useState('');
-  const [al, setAl] = useState('');
+  const [mu, setMu] = useState('0.00');
+  const [af, setAf] = useState('0.80');
+  const [ar, setAr] = useState('0.50');
+  const [al, setAl] = useState('0.50');
   const [anchorSWL, setAnchorSWL] = useState('');
+  const [swlKnown, setSwlKnown] = useState<'known' | 'unknown'>('unknown');
   const [sfF, setSfF] = useState('1.00');
   const [sfR, setSfR] = useState('1.00');
   const [sfL, setSfL] = useState('1.00');
   const [anchorMargin, setAnchorMargin] = useState('1.00');
   const [lashingRows, setLashingRows] = useState<LashingRow[]>([
-    { direction: 'Forward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
-    { direction: 'Rearward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
-    { direction: 'Lateral', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 }
+    { direction: 'Forward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' },
+    { direction: 'Rearward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' },
+    { direction: 'Lateral', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' }
   ]);
   const [restraintResults, setRestraintResults] = useState<LashingRow[]>([]);
   const [restraintHistory, setRestraintHistory] = useState<HistoryEntry[]>([]);
@@ -93,6 +98,26 @@ export default function TDSTool() {
   };
 
   const fmt = (n: number) => Number.isFinite(n) ? n.toFixed(2) : '–';
+
+  // Angle preset mapping
+  const getAngleFromPreset = (preset: string): number => {
+    switch (preset) {
+      case 'low': return 20;
+      case 'typical': return 30;
+      case 'steep': return 45;
+      default: return 30;
+    }
+  };
+
+  // Strap preset mapping
+  const getStrapFromPreset = (preset: string): number => {
+    switch (preset) {
+      case 'light': return 1000;
+      case 'medium': return 2000;
+      case 'heavy': return 4000;
+      default: return 2000;
+    }
+  };
 
   // CoG Functions
   const addItem = () => {
@@ -143,14 +168,12 @@ export default function TDSTool() {
       return;
     }
     
-    // Result is already in cogResult from updateTotalRow
-    // Just add to history and show toast
     const historyEntry: HistoryEntry = {
       timestamp: new Date().toLocaleString(),
       result: cogResult,
       type: 'cog'
     };
-    setCogHistory([historyEntry, ...cogHistory].slice(0, 10)); // Keep last 10
+    setCogHistory([historyEntry, ...cogHistory].slice(0, 10));
     
     toast({
       title: 'CoG Calculated',
@@ -182,25 +205,41 @@ export default function TDSTool() {
 
   // Restraint Functions
   const updateLashingRow = (direction: 'Forward' | 'Rearward' | 'Lateral', field: keyof LashingRow, value: any) => {
-    setLashingRows(rows => rows.map(row => 
-      row.direction === direction ? { ...row, [field]: value } : row
-    ));
+    setLashingRows(rows => rows.map(row => {
+      if (row.direction !== direction) return row;
+      
+      const updatedRow = { ...row, [field]: value };
+      
+      // If angle preset changed, update angleDeg
+      if (field === 'anglePreset') {
+        updatedRow.angleDeg = getAngleFromPreset(value);
+      }
+      // If strap preset changed, update lcDaN
+      if (field === 'strapPreset') {
+        updatedRow.lcDaN = getStrapFromPreset(value);
+      }
+      
+      return updatedRow;
+    }));
   };
 
-  const clearLashings = () => {
+  const resetLashingInputs = () => {
+    // Only reset input fields, NOT results or history
     setLashingRows([
-      { direction: 'Forward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
-      { direction: 'Rearward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
-      { direction: 'Lateral', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 }
+      { direction: 'Forward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' },
+      { direction: 'Rearward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' },
+      { direction: 'Lateral', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' }
     ]);
-    setRestraintResults([]);
+    setDesignMass('');
+    setAnchorSWL('');
+    setSwlKnown('unknown');
   };
 
   const starterPlan = () => {
     setLashingRows([
-      { direction: 'Forward', mode: 'manual', count: 4, lcDaN: 2000, angleDeg: 20 },
-      { direction: 'Rearward', mode: 'manual', count: 2, lcDaN: 4000, angleDeg: 10 },
-      { direction: 'Lateral', mode: 'manual', count: 4, lcDaN: 2000, angleDeg: 30 }
+      { direction: 'Forward', mode: 'manual', count: 4, lcDaN: 2000, angleDeg: 20, anglePreset: 'low', strapPreset: 'medium' },
+      { direction: 'Rearward', mode: 'manual', count: 2, lcDaN: 4000, angleDeg: 10, anglePreset: 'low', strapPreset: 'heavy' },
+      { direction: 'Lateral', mode: 'manual', count: 4, lcDaN: 2000, angleDeg: 30, anglePreset: 'typical', strapPreset: 'medium' }
     ]);
   };
 
@@ -211,16 +250,39 @@ export default function TDSTool() {
     setAl('0.50');
   };
 
+  const switchToFieldMode = () => {
+    setCalculatorMode('field');
+    // Apply Defence presets automatically
+    setMu('0.00');
+    setAf('0.80');
+    setAr('0.50');
+    setAl('0.50');
+    setSwlKnown('unknown');
+    // Set all rows to auto mode with presets
+    setLashingRows(rows => rows.map(row => ({
+      ...row,
+      mode: 'auto' as const,
+      anglePreset: 'typical' as const,
+      strapPreset: 'medium' as const,
+      angleDeg: 30,
+      lcDaN: 2000
+    })));
+  };
+
+  const switchToStandardMode = () => {
+    setCalculatorMode('standard');
+  };
+
   const calculateLashings = (): LashingRow[] => {
     const weightKg = parseFloat(designMass) || 0;
     const gMs2 = parseFloat(grav) || 9.81;
-    const accelForwardG = parseFloat(af) || 0;
-    const accelRearwardG = parseFloat(ar) || 0;
-    const accelLateralG = parseFloat(al) || 0;
+    const accelForwardG = parseFloat(af) || 0.80;
+    const accelRearwardG = parseFloat(ar) || 0.50;
+    const accelLateralG = parseFloat(al) || 0.50;
     const sfForward = parseFloat(sfF) || 1;
     const sfRearward = parseFloat(sfR) || 1;
     const sfLateral = parseFloat(sfL) || 1;
-    const anchorSwlDaN = parseFloat(anchorSWL) || 0;
+    const anchorSwlDaN = swlKnown === 'known' ? (parseFloat(anchorSWL) || 0) : null;
     const anchorMarg = parseFloat(anchorMargin) || 1;
 
     const weightN = weightKg * gMs2;
@@ -278,15 +340,20 @@ export default function TDSTool() {
 
       let pass = totalCapacityN >= FreqN;
       let message = '';
+      let swlWarning = '';
 
       // Anchor SWL check
-      if (anchorSwlDaN && countUsed > 0) {
+      if (anchorSwlDaN && anchorSwlDaN > 0 && countUsed > 0) {
         const perStrapLoadDaN = requiredForceDaN / countUsed;
         const maxPerStrapDaN = anchorSwlDaN * anchorMarg;
         if (perStrapLoadDaN > maxPerStrapDaN) {
           pass = false;
           message += `Anchor SWL exceeded: each strap would see ~${perStrapLoadDaN.toFixed(0)} daN but max allowed is ${maxPerStrapDaN.toFixed(0)} daN. `;
+        } else {
+          swlWarning = `Anchor SWL check: each strap ≈ ${perStrapLoadDaN.toFixed(0)} daN, limit = ${anchorSwlDaN.toFixed(0)} daN → OK.`;
         }
+      } else if (swlKnown === 'unknown' || !anchorSwlDaN) {
+        swlWarning = 'NOTE: Anchor SWL NOT CHECKED – tie-down point strength unknown. This strap count satisfies Defence g-forces assuming the lashing points are strong enough. Confirm platform SWL from vehicle data / TDS.';
       }
 
       if (row.mode === 'auto') {
@@ -313,7 +380,8 @@ export default function TDSTool() {
         totalCapacityDaN,
         count: row.mode === 'auto' ? requiredCount : countUsed,
         pass,
-        message
+        message,
+        swlWarning
       };
     });
   };
@@ -449,7 +517,6 @@ export default function TDSTool() {
       setFitResult(`✗ FAIL\n\n${reason}`);
     }
     
-    // Add to history
     const historyEntry: HistoryEntry = {
       timestamp: new Date().toLocaleString(),
       result: { fitResult: passedOrientation ? 'PASS' : 'FAIL', dimensions: { L: La, W: Wa, H: Ha }, mass: m },
@@ -704,26 +771,82 @@ export default function TDSTool() {
                     <CardTitle className="text-gray-900">Restraint System (Direct lashings)</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-md mb-4">
-                      <p className="font-bold text-blue-900 mb-2">How to Use This Tool</p>
-                      <p className="text-gray-900 text-sm mb-2">
-                        <strong>Auto Mode:</strong> Enter strap rating and angle - the tool tells you exactly how many straps you need.
-                      </p>
-                      <p className="text-gray-900 text-sm mb-2">
-                        <strong>Manual Mode:</strong> Enter your strap count to check if it's enough (PASS/FAIL).
-                      </p>
-                      <p className="text-gray-900 text-sm">
-                        Click "Defence Preset" first, then enter your load weight and click "Calculate".
-                      </p>
-                    </div>
-                    
-                    <div className="flex gap-2 flex-wrap">
-                      <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white">Starter Plan (Manual)</Button>
-                      <Button onClick={clearLashings} variant="outline">Reset All</Button>
+                    {/* Mode Toggle */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <span className="text-sm font-medium text-gray-900">Calculator Mode:</span>
+                      <div className="flex">
+                        <button
+                          onClick={switchToStandardMode}
+                          className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
+                            calculatorMode === 'standard'
+                              ? 'bg-ribbon text-white border-ribbon'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                          }`}
+                        >
+                          Standard
+                        </button>
+                        <button
+                          onClick={switchToFieldMode}
+                          className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-b border-r ${
+                            calculatorMode === 'field'
+                              ? 'bg-ribbon text-white border-ribbon'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                          }`}
+                        >
+                          Field
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    {/* How to Use section */}
+                    <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-md mb-4">
+                      <p className="font-bold text-blue-900 mb-2">How to Use This Tool</p>
+                      {calculatorMode === 'field' ? (
+                        <>
+                          <p className="text-gray-900 text-sm mb-2">
+                            <strong>Field Mode:</strong> Simplified for soldiers in the field. Just enter the weight and select strap type - the tool tells you how many straps you need.
+                          </p>
+                          <p className="text-gray-900 text-sm">
+                            Defence road-move settings are automatically applied (0.8g forward, 0.5g rear/lateral, zero friction).
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-gray-900 text-sm mb-2">
+                            <strong>Auto Mode:</strong> Enter strap rating and angle - the tool tells you exactly how many straps you need.
+                          </p>
+                          <p className="text-gray-900 text-sm mb-2">
+                            <strong>Manual Mode:</strong> Enter your strap count to check if it's enough (PASS/FAIL).
+                          </p>
+                          <p className="text-gray-900 text-sm">
+                            Defence values (0.8g forward, 0.5g rear/lateral, μ=0) are pre-loaded. Enter your load weight and click "Calculate".
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Field Mode Info Banner */}
+                    {calculatorMode === 'field' && (
+                      <div className="bg-green-50 border-2 border-green-500 p-4 rounded-md">
+                        <p className="text-green-900 font-semibold">
+                          Field Mode is using Defence road-move settings: 0.8g forward, 0.5g rear/lateral, zero friction (μ = 0).
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Buttons */}
+                    <div className="flex gap-2 flex-wrap">
+                      {calculatorMode === 'standard' && (
+                        <>
+                          <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
+                          <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white h-10">Starter Plan (Manual)</Button>
+                        </>
+                      )}
+                      <Button onClick={resetLashingInputs} className="bg-secondary hover:bg-secondary/80 text-secondary-foreground h-10">Reset Inputs</Button>
+                    </div>
+
+                    {/* Weight Input - Always visible */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-900">Transportation Weight (kg)</label>
                         <Input
@@ -734,122 +857,170 @@ export default function TDSTool() {
                           className="bg-white text-gray-900 border-border"
                         />
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">g (m/s²)</label>
-                        <Input
-                          type="number"
-                          value={grav}
-                          onChange={(e) => setGrav(e.target.value)}
-                          placeholder="9.81"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Friction μ</label>
-                        <Input
-                          type="number"
-                          value={mu}
-                          onChange={(e) => setMu(e.target.value)}
-                          placeholder="Defence = 0.00"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
+                      
+                      {calculatorMode === 'standard' && (
+                        <>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">g (m/s²)</label>
+                            <Input
+                              type="number"
+                              value={grav}
+                              onChange={(e) => setGrav(e.target.value)}
+                              placeholder="9.81"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Friction μ</label>
+                            <Input
+                              type="number"
+                              value={mu}
+                              onChange={(e) => setMu(e.target.value)}
+                              placeholder="Defence = 0.00"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    <div className="grid grid-cols-4 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Forward accel (g)</label>
-                        <Input
-                          type="number"
-                          value={af}
-                          onChange={(e) => setAf(e.target.value)}
-                          placeholder="0.80"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Rearward accel (g)</label>
-                        <Input
-                          type="number"
-                          value={ar}
-                          onChange={(e) => setAr(e.target.value)}
-                          placeholder="0.50"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Lateral accel (g)</label>
-                        <Input
-                          type="number"
-                          value={al}
-                          onChange={(e) => setAl(e.target.value)}
-                          placeholder="0.50"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Anchor SWL (daN)</label>
-                        <Input
-                          type="number"
-                          value={anchorSWL}
-                          onChange={(e) => setAnchorSWL(e.target.value)}
-                          placeholder="Optional"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                    </div>
+                    {/* Standard Mode - Full controls */}
+                    {calculatorMode === 'standard' && (
+                      <>
+                        <div className="grid grid-cols-4 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Forward accel (g)</label>
+                            <Input
+                              type="number"
+                              value={af}
+                              onChange={(e) => setAf(e.target.value)}
+                              placeholder="0.80"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Rearward accel (g)</label>
+                            <Input
+                              type="number"
+                              value={ar}
+                              onChange={(e) => setAr(e.target.value)}
+                              placeholder="0.50"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Lateral accel (g)</label>
+                            <Input
+                              type="number"
+                              value={al}
+                              onChange={(e) => setAl(e.target.value)}
+                              placeholder="0.50"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Anchor SWL (daN)</label>
+                            <Input
+                              type="number"
+                              value={anchorSWL}
+                              onChange={(e) => setAnchorSWL(e.target.value)}
+                              placeholder="Optional"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                        </div>
 
-                    <div className="grid grid-cols-4 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Safety × Forward</label>
-                        <Input
-                          type="number"
-                          value={sfF}
-                          onChange={(e) => setSfF(e.target.value)}
-                          placeholder="1.00"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
+                        <div className="grid grid-cols-4 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Safety × Forward</label>
+                            <Input
+                              type="number"
+                              value={sfF}
+                              onChange={(e) => setSfF(e.target.value)}
+                              placeholder="1.00"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Safety × Rearward</label>
+                            <Input
+                              type="number"
+                              value={sfR}
+                              onChange={(e) => setSfR(e.target.value)}
+                              placeholder="1.00"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Safety × Lateral</label>
+                            <Input
+                              type="number"
+                              value={sfL}
+                              onChange={(e) => setSfL(e.target.value)}
+                              placeholder="1.00"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-900">Anchor margin ×</label>
+                            <Input
+                              type="number"
+                              value={anchorMargin}
+                              onChange={(e) => setAnchorMargin(e.target.value)}
+                              placeholder="1.00"
+                              step="0.01"
+                              className="bg-white text-gray-900 border-border"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Field Mode - SWL Control */}
+                    {calculatorMode === 'field' && (
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-300">
+                        <label className="text-sm font-medium text-gray-900 block mb-2">Anchor SWL (tie-down point strength)</label>
+                        <div className="flex items-center gap-4 mb-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="swlKnown"
+                              checked={swlKnown === 'unknown'}
+                              onChange={() => setSwlKnown('unknown')}
+                              className="w-4 h-4"
+                            />
+                            <span className="text-sm text-gray-900">I do NOT know the SWL (default)</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="swlKnown"
+                              checked={swlKnown === 'known'}
+                              onChange={() => setSwlKnown('known')}
+                              className="w-4 h-4"
+                            />
+                            <span className="text-sm text-gray-900">I know the SWL</span>
+                          </label>
+                        </div>
+                        {swlKnown === 'known' && (
+                          <Input
+                            type="number"
+                            value={anchorSWL}
+                            onChange={(e) => setAnchorSWL(e.target.value)}
+                            placeholder="Enter SWL in daN"
+                            className="bg-white text-gray-900 border-border max-w-xs"
+                          />
+                        )}
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Safety × Rearward</label>
-                        <Input
-                          type="number"
-                          value={sfR}
-                          onChange={(e) => setSfR(e.target.value)}
-                          placeholder="1.00"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Safety × Lateral</label>
-                        <Input
-                          type="number"
-                          value={sfL}
-                          onChange={(e) => setSfL(e.target.value)}
-                          placeholder="1.00"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Anchor margin ×</label>
-                        <Input
-                          type="number"
-                          value={anchorMargin}
-                          onChange={(e) => setAnchorMargin(e.target.value)}
-                          placeholder="1.00"
-                          step="0.01"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                    </div>
+                    )}
 
                     <h3 className="text-lg font-semibold text-gray-900 mt-6">Lashing Configuration by Direction</h3>
                     
@@ -858,33 +1029,35 @@ export default function TDSTool() {
                         <div key={row.direction} className="bg-gray-50 p-4 rounded-lg border border-gray-300">
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="text-md font-bold text-gray-900">{row.direction}</h4>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600">Mode:</span>
-                              <button
-                                onClick={() => updateLashingRow(row.direction, 'mode', 'auto')}
-                                className={`px-3 py-1 text-sm rounded-l-md border ${
-                                  row.mode === 'auto' 
-                                    ? 'bg-ribbon text-white border-ribbon' 
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                                }`}
-                              >
-                                Auto
-                              </button>
-                              <button
-                                onClick={() => updateLashingRow(row.direction, 'mode', 'manual')}
-                                className={`px-3 py-1 text-sm rounded-r-md border-t border-b border-r ${
-                                  row.mode === 'manual' 
-                                    ? 'bg-ribbon text-white border-ribbon' 
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                                }`}
-                              >
-                                Manual
-                              </button>
-                            </div>
+                            {calculatorMode === 'standard' && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-600">Mode:</span>
+                                <button
+                                  onClick={() => updateLashingRow(row.direction, 'mode', 'auto')}
+                                  className={`px-3 py-1 text-sm rounded-l-md border ${
+                                    row.mode === 'auto' 
+                                      ? 'bg-ribbon text-white border-ribbon' 
+                                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  Auto
+                                </button>
+                                <button
+                                  onClick={() => updateLashingRow(row.direction, 'mode', 'manual')}
+                                  className={`px-3 py-1 text-sm rounded-r-md border-t border-b border-r ${
+                                    row.mode === 'manual' 
+                                      ? 'bg-ribbon text-white border-ribbon' 
+                                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  Manual
+                                </button>
+                              </div>
+                            )}
                           </div>
                           
-                          <div className="grid grid-cols-4 gap-4">
-                            {row.mode === 'manual' && (
+                          <div className={`grid ${calculatorMode === 'field' ? 'grid-cols-2' : 'grid-cols-4'} gap-4`}>
+                            {calculatorMode === 'standard' && row.mode === 'manual' && (
                               <div>
                                 <label className="text-sm font-medium text-gray-900">Strap Count</label>
                                 <Input
@@ -897,40 +1070,83 @@ export default function TDSTool() {
                                 />
                               </div>
                             )}
+                            
+                            {/* Strap Type/Rating */}
                             <div>
-                              <label className="text-sm font-medium text-gray-900">Strap Rating (daN)</label>
-                              <Select 
-                                value={row.lcDaN?.toString() || ''} 
-                                onValueChange={(v) => updateLashingRow(row.direction, 'lcDaN', parseInt(v))}
-                              >
-                                <SelectTrigger className="bg-white text-gray-900 border-border">
-                                  <SelectValue placeholder="Select rating" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-white">
-                                  <SelectItem value="1000">1,000 daN (Light)</SelectItem>
-                                  <SelectItem value="2000">2,000 daN (Standard)</SelectItem>
-                                  <SelectItem value="4000">4,000 daN (Heavy)</SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <label className="text-sm font-medium text-gray-900">
+                                {calculatorMode === 'field' ? 'Strap Type' : 'Strap Rating (daN)'}
+                              </label>
+                              {calculatorMode === 'field' ? (
+                                <Select 
+                                  value={row.strapPreset || 'medium'} 
+                                  onValueChange={(v) => updateLashingRow(row.direction, 'strapPreset', v)}
+                                >
+                                  <SelectTrigger className="bg-white text-gray-900 border-border">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-white">
+                                    <SelectItem value="light">Light (1,000 daN)</SelectItem>
+                                    <SelectItem value="medium">Medium (2,000 daN)</SelectItem>
+                                    <SelectItem value="heavy">Heavy (4,000 daN)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Select 
+                                  value={row.lcDaN?.toString() || ''} 
+                                  onValueChange={(v) => updateLashingRow(row.direction, 'lcDaN', parseInt(v))}
+                                >
+                                  <SelectTrigger className="bg-white text-gray-900 border-border">
+                                    <SelectValue placeholder="Select rating" />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-white">
+                                    <SelectItem value="1000">1,000 daN (Light)</SelectItem>
+                                    <SelectItem value="2000">2,000 daN (Standard)</SelectItem>
+                                    <SelectItem value="4000">4,000 daN (Heavy)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              )}
                             </div>
+                            
+                            {/* Angle */}
                             <div>
-                              <label className="text-sm font-medium text-gray-900">Angle (°)</label>
-                              <Input
-                                type="number"
-                                value={row.angleDeg || ''}
-                                onChange={(e) => updateLashingRow(row.direction, 'angleDeg', parseFloat(e.target.value) || 0)}
-                                placeholder="20-30 recommended"
-                                step="1"
-                                className="bg-white text-gray-900 border-border"
-                              />
+                              <label className="text-sm font-medium text-gray-900">
+                                {calculatorMode === 'field' ? 'Angle Preset' : 'Angle (°)'}
+                              </label>
+                              {calculatorMode === 'field' ? (
+                                <Select 
+                                  value={row.anglePreset || 'typical'} 
+                                  onValueChange={(v) => updateLashingRow(row.direction, 'anglePreset', v)}
+                                >
+                                  <SelectTrigger className="bg-white text-gray-900 border-border">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="bg-white">
+                                    <SelectItem value="low">Low (~20°)</SelectItem>
+                                    <SelectItem value="typical">Typical (~30°)</SelectItem>
+                                    <SelectItem value="steep">Steep (~45°)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Input
+                                  type="number"
+                                  value={row.angleDeg || ''}
+                                  onChange={(e) => updateLashingRow(row.direction, 'angleDeg', parseFloat(e.target.value) || 0)}
+                                  placeholder="20-30 recommended"
+                                  step="1"
+                                  className="bg-white text-gray-900 border-border"
+                                />
+                              )}
                             </div>
-                            <div className="flex items-end">
-                              <p className="text-xs text-gray-500">
-                                {row.mode === 'auto' 
-                                  ? 'Auto calculates required strap count' 
-                                  : 'Enter your strap count to check'}
-                              </p>
-                            </div>
+                            
+                            {calculatorMode === 'standard' && (
+                              <div className="flex items-end">
+                                <p className="text-xs text-gray-500">
+                                  {row.mode === 'auto' 
+                                    ? 'Auto calculates required strap count' 
+                                    : 'Enter your strap count to check'}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -938,7 +1154,6 @@ export default function TDSTool() {
 
                     <div className="flex gap-2 mt-4">
                       <Button onClick={calcRestraint} variant="default" size="lg">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} variant="outline">Clear Results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
@@ -975,16 +1190,35 @@ export default function TDSTool() {
                                   <p className="text-sm mt-2 text-gray-700">{r.message}</p>
                                 </div>
 
+                                {/* Force details */}
                                 <div className="grid grid-cols-2 gap-3">
                                   <div className="bg-white p-3 rounded border border-gray-300">
                                     <p className="text-sm mb-1">Force Required:</p>
-                                    <p className="text-lg font-bold">{(r.requiredForceDaN || 0).toFixed(0)} daN</p>
+                                    <p className="text-lg font-bold">{(r.requiredForceDaN || 0).toLocaleString()} daN</p>
                                   </div>
                                   <div className="bg-white p-3 rounded border border-gray-300">
                                     <p className="text-sm mb-1">Total Strap Capacity:</p>
-                                    <p className="text-lg font-bold">{(r.totalCapacityDaN || 0).toFixed(0)} daN</p>
+                                    <p className="text-lg font-bold">{(r.totalCapacityDaN || 0).toLocaleString()} daN</p>
                                   </div>
                                 </div>
+
+                                {/* SWL Warning */}
+                                {r.swlWarning && (
+                                  <div className={`p-3 rounded border ${
+                                    r.swlWarning.includes('NOT CHECKED') 
+                                      ? 'bg-amber-50 border-amber-400' 
+                                      : 'bg-blue-50 border-blue-300'
+                                  }`}>
+                                    <div className="flex items-start gap-2">
+                                      {r.swlWarning.includes('NOT CHECKED') && (
+                                        <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                                      )}
+                                      <p className={`text-sm ${r.swlWarning.includes('NOT CHECKED') ? 'text-amber-900' : 'text-blue-900'}`}>
+                                        {r.swlWarning}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
 
                                 {r.mode === 'manual' && !r.pass && r.requiredCount && (
                                   <div className="bg-amber-100 border border-amber-400 p-3 rounded">
@@ -1014,23 +1248,24 @@ export default function TDSTool() {
                             Lower angles give better restraint. Angles above 45° significantly reduce effectiveness.
                           </p>
                         </div>
-                        
-                        {restraintHistory.length > 0 && (
-                          <div className="mt-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Calculation History</h3>
-                            <div className="space-y-2 max-h-60 overflow-y-auto">
-                              {restraintHistory.map((entry, idx) => (
-                                <div key={idx} className="bg-gray-100 p-3 rounded border border-gray-300">
-                                  <p className="text-xs text-gray-600 mb-1">{entry.timestamp}</p>
-                                  <p className="text-sm text-gray-900 font-semibold">
-                                    Mass: {entry.result.designMass}kg
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
                       </>
+                    )}
+                    
+                    {/* History - Always visible, never cleared */}
+                    {restraintHistory.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Calculation History</h3>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                          {restraintHistory.map((entry, idx) => (
+                            <div key={idx} className="bg-gray-100 p-3 rounded border border-gray-300">
+                              <p className="text-xs text-gray-600 mb-1">{entry.timestamp}</p>
+                              <p className="text-sm text-gray-900 font-semibold">
+                                Mass: {entry.result.designMass}kg
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -1213,80 +1448,28 @@ export default function TDSTool() {
                           <p className="text-gray-900 mb-2">
                             Always calculate CofG and restraint systems using the <strong>transportation weight</strong> - this is the actual weight during transport, which is different from laden or unladen weight.
                           </p>
-                          <p className="text-gray-900 mb-2"><strong>Transportation weight includes:</strong></p>
-                          <ul className="list-disc ml-5 space-y-1 text-gray-900">
-                            <li>Ammunition</li>
-                            <li>Weapon systems</li>
-                            <li>Fuel in tanks (typically full or operational level)</li>
-                            <li>Water systems</li>
-                            <li>Crew kit and equipment</li>
-                            <li>Any other items that will be onboard during transport</li>
-                          </ul>
-                          <p className="mt-2 text-gray-900 font-semibold">
-                            ⚠️ Never use just the empty vehicle (unladen) weight! These additional items add significant weight and change the CofG position, affecting both stability and restraint requirements.
+                          <p className="text-gray-900 text-sm">
+                            Transportation weight includes: empty vehicle weight + fuel + ammunition + crew equipment + any cargo being transported.
                           </p>
                         </div>
                         
                         <div>
-                          <h4 className="font-semibold mb-2">How to Calculate:</h4>
+                          <h4 className="font-semibold mb-2">How to Use:</h4>
                           <ol className="list-decimal list-inside space-y-2 text-sm">
-                            <li><strong>Break it down into parts:</strong> Divide your equipment into separate items (e.g., vehicle body, fuel, crew, cargo)</li>
-                            <li><strong>Weigh each part:</strong> Enter the weight (mass) of each item in kilograms</li>
-                            <li><strong>Measure the position:</strong> Measure where each item sits from a reference point (usually the front):
+                            <li><strong>Method 1 - Item by Item:</strong> Click "Add Item" and enter each component's mass and position (x, y, z coordinates from the front-left-bottom corner)</li>
+                            <li><strong>Method 2 - Axle Masses (Quick Method):</strong> If you know the weight on each axle:
                               <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                                <li>x = front to back distance (in meters)</li>
-                                <li>y = left to right distance (in meters)</li>
-                                <li>z = height from ground (in meters)</li>
+                                <li>Enter front axle mass and position (usually x = 0)</li>
+                                <li>Enter rear axle mass and position (distance from front axle in meters)</li>
+                                <li>Click "Use Axle Masses" then "Calculate CoG"</li>
                               </ul>
                             </li>
-                            <li><strong>Click "Calculate CofG":</strong> The tool will calculate the overall balance point automatically</li>
+                            <li>The tool calculates the overall balance point automatically</li>
                           </ol>
                         </div>
                         
-                        <div className="bg-green-50 border-2 border-green-400 p-4 rounded">
-                          <h4 className="font-semibold mb-2 text-green-900">Quick Method - Using Axle Weights (Example):</h4>
-                          <p className="text-sm text-gray-900 mb-2">
-                            If you have a vehicle with known axle weights, use the "Use axle masses" button. 
-                            Just enter the weight on each axle and where the axles are positioned. This gives you a quick CofG estimate.
-                          </p>
-                          <div className="bg-white p-3 rounded border border-green-300 mt-2">
-                            <p className="font-semibold text-gray-900 mb-1">Example Calculation:</p>
-                            <p className="text-sm text-gray-900">Vehicle: 10,000 kg total weight</p>
-                            <ul className="list-disc ml-5 text-sm text-gray-900 space-y-1 mt-1">
-                              <li>Front axle: 4,500 kg at position x = 0.00 m (reference point)</li>
-                              <li>Rear axle: 5,500 kg at position x = 3.50 m (from front)</li>
-                            </ul>
-                            <p className="text-sm text-gray-900 mt-2">
-                              <strong>Result:</strong> CofG at x = 1.93 m from front axle
-                            </p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              Formula: CofG(x) = (4500×0 + 5500×3.5) ÷ 10000 = 1.93 m
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-amber-50 border border-amber-200 rounded p-4">
-                          <p className="font-semibold text-amber-900 mb-2">Important: High CofG and Safety</p>
-                          <p className="text-gray-900 mb-2">
-                            A high CofG (large z value above 2m) means the equipment is more likely to tip over during transport, especially on slopes or during cornering.
-                          </p>
-                          <p className="text-gray-900 mb-2"><strong>What needs to be considered when planning transport:</strong></p>
-                          <ul className="list-disc ml-5 space-y-1 text-gray-900">
-                            <li>Stability during acceleration, braking, and cornering</li>
-                            <li>Risk of rollover on uneven terrain or slopes</li>
-                            <li>Route planning to avoid steep gradients and sharp bends</li>
-                            <li>Speed restrictions for high CofG loads</li>
-                          </ul>
-                          <p className="text-gray-900 mt-3 mb-2"><strong>High CofG Mitigation - How to transport safely:</strong></p>
-                          <ul className="list-disc ml-5 space-y-1 text-gray-900">
-                            <li><strong>Reduce speed:</strong> Drive slower, especially on bends and uneven terrain</li>
-                            <li><strong>Additional restraints:</strong> Use more lashings and ensure they're properly tensioned</li>
-                            <li><strong>Lower the load:</strong> Remove turrets, antennas, or detachable components if possible</li>
-                            <li><strong>Route planning:</strong> Avoid steep gradients, sharp turns, and rough terrain</li>
-                            <li><strong>Weight distribution:</strong> Place heavier items lower in the vehicle where practical</li>
-                            <li><strong>Driver briefing:</strong> Ensure drivers understand stability risks and safe driving practices</li>
-                            <li><strong>Escort vehicles:</strong> Consider using escort for very high CofG loads</li>
-                          </ul>
+                        <div className="bg-green-50 border border-green-300 rounded p-3">
+                          <p className="text-sm"><strong>Example:</strong> A 10,000 kg vehicle with front axle at 0m carrying 4,500 kg and rear axle at 3.5m carrying 5,500 kg has its CofG at approximately x = 1.93m from the front.</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -1298,71 +1481,62 @@ export default function TDSTool() {
                       </CardHeader>
                       <CardContent className="space-y-4 text-gray-900">
                         <div>
-                          <h4 className="font-semibold mb-2">What is a Restraint System?</h4>
+                          <h4 className="font-semibold mb-2">What is the Restraint System Calculator?</h4>
                           <p className="text-sm">
-                            A restraint system is how you tie down and secure equipment to prevent it from moving during transport. 
-                            You need to secure it in three directions: forward (braking), rearward (acceleration), and sideways (cornering).
+                            This tool calculates how many straps you need to safely secure equipment during transport. 
+                            It follows JSP 800 Vol 7 Defence Standards to ensure loads don't shift during braking, accelerating, or turning.
                           </p>
                         </div>
-                        
-                        <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded mb-4">
-                          <p className="font-semibold text-blue-900 mb-2">⚠️ CRITICAL: Use Transportation Weight</p>
-                          <p className="text-gray-900 text-sm">
-                            The "Transportation Weight (kg)" field must contain the actual weight during transport - NOT the empty/unladen weight. 
-                            This includes fuel, ammunition, crew equipment, and all items onboard during transport. 
-                            This is the same weight used for Centre of Gravity calculations.
+
+                        {/* Field Mode Section */}
+                        <div className="bg-green-50 border-2 border-green-500 p-4 rounded">
+                          <h4 className="font-semibold text-green-900 mb-2">Field Mode (Recommended for Soldiers)</h4>
+                          <p className="text-gray-900 text-sm mb-3">
+                            Field Mode is designed for use in the field when you don't have time for complex calculations.
+                            It uses Defence Standard values automatically and gives you simple answers.
                           </p>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-semibold mb-2">Step-by-Step Guide:</h4>
-                          <ol className="list-decimal list-inside space-y-3 text-sm">
-                            <li><strong>Enter the Transportation Weight:</strong> This is the total weight including all fuel, ammunition, crew kit, and equipment (in kilograms)</li>
-                            
-                            <li><strong>Select Defence Preset:</strong> Click "Defence Preset (μ=0)" for military operations (assumes zero friction, which is the Defence Standard)</li>
-                            
-                            <li><strong>Add your lashings (tie-down straps):</strong>
-                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                                <li><strong>Direction:</strong> Choose Forward (for braking), Rearward (for acceleration), or Lateral (for cornering/sideways)</li>
-                                <li><strong>Count:</strong> How many straps in this direction (e.g., 4 straps)</li>
-                                <li><strong>LC (Lashing Capacity):</strong> The strength rating printed on your strap label. Common ratings are 1000 daN or 2000 daN</li>
-                                <li><strong>Unit:</strong> Usually daN (deca-Newtons) - this is the standard for strap ratings</li>
-                                <li><strong>Angle (θ):</strong> The angle between the strap and the horizontal plane - keep this between 20-30° for best results. Angles above 45° are much less effective</li>
-                              </ul>
-                            </li>
-                            
-                            <li><strong>Click "Calculate":</strong> The tool checks if your lashings are strong enough</li>
-                            
-                            <li><strong>Read the results:</strong>
-                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
-                                <li><strong>PASS:</strong> Your restraint system is adequate</li>
-                                <li><strong>FAIL:</strong> You need more lashings in that direction - add more and recalculate</li>
-                              </ul>
-                            </li>
+                          <ol className="list-decimal list-inside space-y-2 text-sm text-gray-900">
+                            <li>Click <strong>"Field"</strong> mode toggle at the top</li>
+                            <li>Enter the <strong>Transportation Weight</strong> of your equipment</li>
+                            <li>For each direction, select your <strong>Strap Type</strong> (Light/Medium/Heavy) and <strong>Angle</strong> (Low/Typical/Steep)</li>
+                            <li>If you know the tie-down point SWL, select "I know the SWL" and enter it - otherwise leave as "I do NOT know"</li>
+                            <li>Click <strong>"Calculate"</strong></li>
+                            <li>The tool tells you exactly how many straps you need</li>
                           </ol>
+                          <p className="text-xs text-green-800 mt-3">
+                            Field Mode automatically uses: 0.8g forward, 0.5g rearward/lateral, zero friction (μ=0)
+                          </p>
                         </div>
-                        
-                        <div className="bg-green-50 border-2 border-green-400 p-4 rounded">
-                          <h4 className="font-semibold mb-2 text-green-900">Recommended Starting Point (Example):</h4>
-                          <p className="text-sm text-gray-900 mb-2">Click "Starter Plan" button to load a typical setup for a 9,500 kg vehicle:</p>
-                          <ul className="list-disc list-inside ml-6 space-y-1 text-sm text-gray-900">
-                            <li><strong>Forward:</strong> 4 straps @ 2000 daN capacity, 20° angle</li>
-                            <li><strong>Rearward:</strong> 2 straps @ 4000 daN capacity, 10° angle</li>
-                            <li><strong>Lateral:</strong> 4 straps @ 2000 daN capacity, 30° angle</li>
-                          </ul>
-                          <p className="text-xs text-gray-600 mt-2">You can then adjust these numbers based on your actual strap availability and the calculation results</p>
+
+                        {/* Standard Mode Section */}
+                        <div className="bg-gray-50 border border-gray-300 p-4 rounded">
+                          <h4 className="font-semibold text-gray-900 mb-2">Standard Mode (For Detailed Calculations)</h4>
+                          <p className="text-gray-900 text-sm mb-3">
+                            Standard Mode gives you full control over all parameters for detailed engineering calculations.
+                          </p>
+                          <ol className="list-decimal list-inside space-y-2 text-sm text-gray-900">
+                            <li>Defence values are pre-loaded (0.8g forward, 0.5g rear/lateral, μ=0)</li>
+                            <li>Enter the <strong>Transportation Weight</strong></li>
+                            <li>Choose <strong>Auto</strong> or <strong>Manual</strong> mode for each direction:
+                              <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                                <li><strong>Auto:</strong> Tool calculates how many straps you need</li>
+                                <li><strong>Manual:</strong> You enter strap count, tool checks if it's enough</li>
+                              </ul>
+                            </li>
+                            <li>Select strap rating (daN) and angle for each direction</li>
+                            <li>Click <strong>"Calculate"</strong></li>
+                          </ol>
                         </div>
                         
                         <div className="bg-amber-50 border-2 border-amber-600 rounded p-4">
                           <p className="text-sm font-bold text-amber-900 mb-2">⚠️ Important Field Explanations:</p>
                           <ul className="list-disc list-inside ml-4 space-y-2 text-sm text-gray-900">
                             <li><strong>Transportation Weight (kg):</strong> The total weight including fuel, ammunition, crew equipment - NOT empty weight</li>
-                            <li><strong>g (m/s²):</strong> Gravity constant - leave at 9.81 (this is standard Earth gravity)</li>
                             <li><strong>Friction μ (mu):</strong> Defence Standard is μ=0 (zero friction) for safety. Never rely on friction for Defence operations</li>
                             <li><strong>Forward/Rearward/Lateral accel (g):</strong> The g-forces during transport. Defence Standards: Forward 0.8g, Rearward 0.5g, Lateral 0.5g</li>
-                            <li><strong>Safety factors:</strong> Usually 1.00 (already built into Defence Standards)</li>
                             <li><strong>LC (Lashing Capacity):</strong> Strap strength printed on the label - common values are 1000, 2000, or 4000 daN</li>
                             <li><strong>Angle θ:</strong> Keep between 20-30° for best efficiency. Lower angles = more effective restraint</li>
+                            <li><strong>Anchor SWL:</strong> The Safe Working Load of your tie-down points. If unknown, the tool will warn you to verify</li>
                           </ul>
                         </div>
                         
