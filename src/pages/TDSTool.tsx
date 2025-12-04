@@ -18,11 +18,19 @@ interface Item {
   z: string;
 }
 
-interface Lashing {
-  count: string;
-  LC: string;
-  unit: string;
-  angle: string;
+interface LashingRow {
+  direction: 'Forward' | 'Rearward' | 'Lateral';
+  mode: 'manual' | 'auto';
+  count: number;
+  lcDaN: number | null;
+  angleDeg: number;
+  // Computed outputs
+  requiredForceDaN?: number;
+  strapCapacityPerStrapDaN?: number;
+  requiredCount?: number;
+  totalCapacityDaN?: number;
+  pass?: boolean;
+  message?: string;
 }
 
 interface HistoryEntry {
@@ -48,7 +56,6 @@ export default function TDSTool() {
   const [designMass, setDesignMass] = useState('');
   const [grav, setGrav] = useState('9.81');
   const [mu, setMu] = useState('');
-  const [ratingUnit, setRatingUnit] = useState('daN');
   const [af, setAf] = useState('');
   const [ar, setAr] = useState('');
   const [al, setAl] = useState('');
@@ -57,17 +64,12 @@ export default function TDSTool() {
   const [sfR, setSfR] = useState('1.00');
   const [sfL, setSfL] = useState('1.00');
   const [anchorMargin, setAnchorMargin] = useState('1.00');
-  const [lashDir, setLashDir] = useState('Forward');
-  const [lashCount, setLashCount] = useState('');
-  const [lashLC, setLashLC] = useState('');
-  const [lashUnit, setLashUnit] = useState('daN');
-  const [lashAngle, setLashAngle] = useState('');
-  const [lashings, setLashings] = useState<{ Forward: Lashing[], Rearward: Lashing[], Lateral: Lashing[] }>({
-    Forward: [],
-    Rearward: [],
-    Lateral: []
-  });
-  const [restraintResults, setRestraintResults] = useState<any[]>([]);
+  const [lashingRows, setLashingRows] = useState<LashingRow[]>([
+    { direction: 'Forward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
+    { direction: 'Rearward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
+    { direction: 'Lateral', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 }
+  ]);
+  const [restraintResults, setRestraintResults] = useState<LashingRow[]>([]);
   const [restraintHistory, setRestraintHistory] = useState<HistoryEntry[]>([]);
 
   // Container State
@@ -179,41 +181,27 @@ export default function TDSTool() {
   };
 
   // Restraint Functions
-  const addLashing = () => {
-    if (!lashCount || !lashLC || !lashAngle) {
-      toast({
-        title: 'Error',
-        description: 'Please enter count, LC, and angle',
-        variant: 'destructive'
-      });
-      return;
-    }
-    const newLashings = { ...lashings };
-    newLashings[lashDir as keyof typeof lashings].push({
-      count: lashCount,
-      LC: lashLC,
-      unit: lashUnit,
-      angle: lashAngle
-    });
-    setLashings(newLashings);
-    setLashCount('');
-    setLashLC('');
-    setLashAngle('');
+  const updateLashingRow = (direction: 'Forward' | 'Rearward' | 'Lateral', field: keyof LashingRow, value: any) => {
+    setLashingRows(rows => rows.map(row => 
+      row.direction === direction ? { ...row, [field]: value } : row
+    ));
   };
 
   const clearLashings = () => {
-    setLashings({ Forward: [], Rearward: [], Lateral: [] });
-    setLashCount('');
-    setLashLC('');
-    setLashAngle('');
+    setLashingRows([
+      { direction: 'Forward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
+      { direction: 'Rearward', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 },
+      { direction: 'Lateral', mode: 'auto', count: 0, lcDaN: 2000, angleDeg: 30 }
+    ]);
+    setRestraintResults([]);
   };
 
   const starterPlan = () => {
-    setLashings({
-      Forward: [{ count: '4', LC: '2000', unit: 'daN', angle: '20' }],
-      Rearward: [{ count: '2', LC: '4000', unit: 'daN', angle: '10' }],
-      Lateral: [{ count: '4', LC: '2000', unit: 'daN', angle: '30' }]
-    });
+    setLashingRows([
+      { direction: 'Forward', mode: 'manual', count: 4, lcDaN: 2000, angleDeg: 20 },
+      { direction: 'Rearward', mode: 'manual', count: 2, lcDaN: 4000, angleDeg: 10 },
+      { direction: 'Lateral', mode: 'manual', count: 4, lcDaN: 2000, angleDeg: 30 }
+    ]);
   };
 
   const presetDef = () => {
@@ -223,44 +211,130 @@ export default function TDSTool() {
     setAl('0.50');
   };
 
+  const calculateLashings = (): LashingRow[] => {
+    const weightKg = parseFloat(designMass) || 0;
+    const gMs2 = parseFloat(grav) || 9.81;
+    const accelForwardG = parseFloat(af) || 0;
+    const accelRearwardG = parseFloat(ar) || 0;
+    const accelLateralG = parseFloat(al) || 0;
+    const sfForward = parseFloat(sfF) || 1;
+    const sfRearward = parseFloat(sfR) || 1;
+    const sfLateral = parseFloat(sfL) || 1;
+    const anchorSwlDaN = parseFloat(anchorSWL) || 0;
+    const anchorMarg = parseFloat(anchorMargin) || 1;
+
+    const weightN = weightKg * gMs2;
+
+    const accelByDir: Record<string, { accel: number; sf: number }> = {
+      Forward: { accel: accelForwardG, sf: sfForward },
+      Rearward: { accel: accelRearwardG, sf: sfRearward },
+      Lateral: { accel: accelLateralG, sf: sfLateral }
+    };
+
+    return lashingRows.map((row) => {
+      const { accel, sf } = accelByDir[row.direction];
+      const FreqN = weightN * accel * sf;
+      const requiredForceDaN = FreqN / 10;
+
+      if (!row.lcDaN || !row.angleDeg) {
+        return {
+          ...row,
+          pass: false,
+          requiredForceDaN,
+          message: 'Enter strap rating (LC) and angle.'
+        };
+      }
+
+      const angleRad = (row.angleDeg * Math.PI) / 180;
+      const strapCapacityPerStrapN = row.lcDaN * 10 * Math.cos(angleRad);
+      const strapCapacityPerStrapDaN = strapCapacityPerStrapN / 10;
+
+      if (strapCapacityPerStrapN <= 0) {
+        return {
+          ...row,
+          pass: false,
+          requiredForceDaN,
+          strapCapacityPerStrapDaN,
+          message: 'Strap angle invalid; capacity becomes zero.'
+        };
+      }
+
+      let requiredCount: number;
+      let totalCapacityN: number;
+      let totalCapacityDaN: number;
+      let countUsed: number;
+
+      if (row.mode === 'auto') {
+        requiredCount = Math.ceil(FreqN / strapCapacityPerStrapN);
+        countUsed = requiredCount;
+        totalCapacityN = strapCapacityPerStrapN * requiredCount;
+        totalCapacityDaN = totalCapacityN / 10;
+      } else {
+        countUsed = Math.max(0, row.count || 0);
+        totalCapacityN = strapCapacityPerStrapN * countUsed;
+        totalCapacityDaN = totalCapacityN / 10;
+        requiredCount = Math.ceil(FreqN / strapCapacityPerStrapN);
+      }
+
+      let pass = totalCapacityN >= FreqN;
+      let message = '';
+
+      // Anchor SWL check
+      if (anchorSwlDaN && countUsed > 0) {
+        const perStrapLoadDaN = requiredForceDaN / countUsed;
+        const maxPerStrapDaN = anchorSwlDaN * anchorMarg;
+        if (perStrapLoadDaN > maxPerStrapDaN) {
+          pass = false;
+          message += `Anchor SWL exceeded: each strap would see ~${perStrapLoadDaN.toFixed(0)} daN but max allowed is ${maxPerStrapDaN.toFixed(0)} daN. `;
+        }
+      }
+
+      if (row.mode === 'auto') {
+        if (pass) {
+          message += `Required straps: ${requiredCount} × ${row.lcDaN} daN @ ${row.angleDeg}°.`;
+        } else {
+          message += `Required straps (for force only): ${requiredCount} × ${row.lcDaN} daN @ ${row.angleDeg}°, but anchor/capacity checks failed.`;
+        }
+      } else {
+        if (pass) {
+          message += `PASS with ${countUsed} × ${row.lcDaN} daN @ ${row.angleDeg}°. Minimum required straps for force only would be ${requiredCount}.`;
+        } else {
+          const deficitN = FreqN - totalCapacityN;
+          const extraNeeded = Math.ceil(deficitN / strapCapacityPerStrapN);
+          message += `FAIL: need approximately ${extraNeeded} more ${row.lcDaN} daN straps at ${row.angleDeg}° (total required ≈ ${requiredCount}).`;
+        }
+      }
+
+      return {
+        ...row,
+        requiredForceDaN,
+        strapCapacityPerStrapDaN,
+        requiredCount,
+        totalCapacityDaN,
+        count: row.mode === 'auto' ? requiredCount : countUsed,
+        pass,
+        message
+      };
+    });
+  };
+
   const calcRestraint = () => {
     const m = parseFloat(designMass) || 0;
-    const g = parseFloat(grav) || 9.81;
-    const muVal = parseFloat(mu) || 0;
-    const afVal = parseFloat(af) || 0;
-    const arVal = parseFloat(ar) || 0;
-    const alVal = parseFloat(al) || 0;
-    const sfFVal = parseFloat(sfF) || 1;
-    const sfRVal = parseFloat(sfR) || 1;
-    const sfLVal = parseFloat(sfL) || 1;
+    if (m === 0) {
+      toast({
+        title: 'Error',
+        description: 'Please enter Transportation Weight',
+        variant: 'destructive'
+      });
+      return;
+    }
 
-    const directionResidual = (a: number, sf: number) => {
-      const Freq = m * g * a * sf;
-      const Fmu = muVal * m * g;
-      const Residual = Math.max(Freq - Fmu, 0);
-      return { Freq, Fmu, Residual };
-    };
-
-    const directionCapacity = (dir: 'Forward' | 'Rearward' | 'Lateral') => {
-      return lashings[dir].reduce((sum, L) => {
-        const LC_N = toN(L.LC, L.unit);
-        const eff_each = LC_N * Math.cos((parseFloat(L.angle) || 0) * Math.PI / 180);
-        return sum + eff_each * (parseFloat(L.count) || 0);
-      }, 0);
-    };
-
-    const results = [
-      { dir: 'Forward', ...directionResidual(afVal, sfFVal), cap: directionCapacity('Forward') },
-      { dir: 'Rearward', ...directionResidual(arVal, sfRVal), cap: directionCapacity('Rearward') },
-      { dir: 'Lateral', ...directionResidual(alVal, sfLVal), cap: directionCapacity('Lateral') }
-    ];
-
+    const results = calculateLashings();
     setRestraintResults(results);
     
-    // Add to history
     const historyEntry: HistoryEntry = {
       timestamp: new Date().toLocaleString(),
-      result: { results, designMass: m, lashings },
+      result: { results, designMass: m, lashingRows },
       type: 'restraint'
     };
     setRestraintHistory([historyEntry, ...restraintHistory].slice(0, 10));
@@ -631,27 +705,25 @@ export default function TDSTool() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-md mb-4">
-                      <p className="font-bold text-blue-900 mb-2">Example: Securing a 9,500 kg Vehicle</p>
+                      <p className="font-bold text-blue-900 mb-2">How to Use This Tool</p>
                       <p className="text-gray-900 text-sm mb-2">
-                        <strong>Step 1:</strong> Click "Defence Preset" to set friction μ=0 and acceleration values (0.8g forward, 0.5g rearward/lateral)
+                        <strong>Auto Mode:</strong> Enter strap rating and angle - the tool tells you exactly how many straps you need.
                       </p>
                       <p className="text-gray-900 text-sm mb-2">
-                        <strong>Step 2:</strong> Enter Transportation Weight = 9500 kg (this is the actual weight during transport)
-                      </p>
-                      <p className="text-gray-900 text-sm mb-2">
-                        <strong>Step 3:</strong> Click "Starter Plan" to load typical strap setup, then adjust as needed
+                        <strong>Manual Mode:</strong> Enter your strap count to check if it's enough (PASS/FAIL).
                       </p>
                       <p className="text-gray-900 text-sm">
-                        <strong>Step 4:</strong> Click "Calculate" to check if your straps are sufficient
+                        Click "Defence Preset" first, then enter your load weight and click "Calculate".
                       </p>
                     </div>
                     
                     <div className="flex gap-2 flex-wrap">
                       <Button onClick={presetDef} variant="secondary">Defence Preset (μ=0)</Button>
-                      <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white">Starter Plan</Button>
+                      <Button onClick={starterPlan} className="bg-ribbon hover:bg-ribbon/90 text-white">Starter Plan (Manual)</Button>
+                      <Button onClick={clearLashings} variant="outline">Reset All</Button>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-900">Transportation Weight (kg)</label>
                         <Input
@@ -679,23 +751,10 @@ export default function TDSTool() {
                           type="number"
                           value={mu}
                           onChange={(e) => setMu(e.target.value)}
-                          placeholder="UK ~0.30; Defence 0.00"
+                          placeholder="Defence = 0.00"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Rating unit</label>
-                        <Select value={ratingUnit} onValueChange={setRatingUnit}>
-                          <SelectTrigger className="bg-white text-gray-900 border-border">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            <SelectItem value="daN">daN</SelectItem>
-                            <SelectItem value="kN">kN</SelectItem>
-                            <SelectItem value="N">N</SelectItem>
-                          </SelectContent>
-                        </Select>
                       </div>
                     </div>
 
@@ -706,7 +765,7 @@ export default function TDSTool() {
                           type="number"
                           value={af}
                           onChange={(e) => setAf(e.target.value)}
-                          placeholder="e.g., 0.80"
+                          placeholder="0.80"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
@@ -717,7 +776,7 @@ export default function TDSTool() {
                           type="number"
                           value={ar}
                           onChange={(e) => setAr(e.target.value)}
-                          placeholder="e.g., 0.50"
+                          placeholder="0.50"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
@@ -728,18 +787,18 @@ export default function TDSTool() {
                           type="number"
                           value={al}
                           onChange={(e) => setAl(e.target.value)}
-                          placeholder="e.g., 0.50"
+                          placeholder="0.50"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-900">Anchor SWL per point</label>
+                        <label className="text-sm font-medium text-gray-900">Anchor SWL (daN)</label>
                         <Input
                           type="number"
                           value={anchorSWL}
                           onChange={(e) => setAnchorSWL(e.target.value)}
-                          placeholder="e.g., 20"
+                          placeholder="Optional"
                           className="bg-white text-gray-900 border-border"
                         />
                       </div>
@@ -752,7 +811,7 @@ export default function TDSTool() {
                           type="number"
                           value={sfF}
                           onChange={(e) => setSfF(e.target.value)}
-                          placeholder="e.g., 1.00"
+                          placeholder="1.00"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
@@ -763,7 +822,7 @@ export default function TDSTool() {
                           type="number"
                           value={sfR}
                           onChange={(e) => setSfR(e.target.value)}
-                          placeholder="e.g., 1.00"
+                          placeholder="1.00"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
@@ -774,7 +833,7 @@ export default function TDSTool() {
                           type="number"
                           value={sfL}
                           onChange={(e) => setSfL(e.target.value)}
-                          placeholder="e.g., 1.00"
+                          placeholder="1.00"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
@@ -785,181 +844,174 @@ export default function TDSTool() {
                           type="number"
                           value={anchorMargin}
                           onChange={(e) => setAnchorMargin(e.target.value)}
-                          placeholder="e.g., 1.00"
+                          placeholder="1.00"
                           step="0.01"
                           className="bg-white text-gray-900 border-border"
                         />
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-900">Add Lashing</h3>
-                    <div className="grid grid-cols-6 gap-4 items-end">
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Direction</label>
-                        <Select value={lashDir} onValueChange={setLashDir}>
-                          <SelectTrigger className="bg-white text-gray-900 border-border">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            <SelectItem value="Forward">Forward</SelectItem>
-                            <SelectItem value="Rearward">Rearward</SelectItem>
-                            <SelectItem value="Lateral">Lateral</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Count</label>
-                        <Input
-                          type="number"
-                          value={lashCount}
-                          onChange={(e) => setLashCount(e.target.value)}
-                          placeholder="e.g., 2"
-                          min="1"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">LC</label>
-                        <Input
-                          type="number"
-                          value={lashLC}
-                          onChange={(e) => setLashLC(e.target.value)}
-                          placeholder="e.g., 2000"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">Unit</label>
-                        <Select value={lashUnit} onValueChange={setLashUnit}>
-                          <SelectTrigger className="bg-white text-gray-900 border-border">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white">
-                            <SelectItem value="daN">daN</SelectItem>
-                            <SelectItem value="kN">kN</SelectItem>
-                            <SelectItem value="N">N</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">θ°</label>
-                        <Input
-                          type="number"
-                          value={lashAngle}
-                          onChange={(e) => setLashAngle(e.target.value)}
-                          placeholder="e.g., 20"
-                          step="0.1"
-                          className="bg-white text-gray-900 border-border"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button onClick={addLashing} variant="default">Add</Button>
-                        <Button onClick={clearLashings} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear All</Button>
-                      </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mt-6">Lashing Configuration by Direction</h3>
+                    
+                    <div className="space-y-4">
+                      {lashingRows.map((row) => (
+                        <div key={row.direction} className="bg-gray-50 p-4 rounded-lg border border-gray-300">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-md font-bold text-gray-900">{row.direction}</h4>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600">Mode:</span>
+                              <button
+                                onClick={() => updateLashingRow(row.direction, 'mode', 'auto')}
+                                className={`px-3 py-1 text-sm rounded-l-md border ${
+                                  row.mode === 'auto' 
+                                    ? 'bg-ribbon text-white border-ribbon' 
+                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                                }`}
+                              >
+                                Auto
+                              </button>
+                              <button
+                                onClick={() => updateLashingRow(row.direction, 'mode', 'manual')}
+                                className={`px-3 py-1 text-sm rounded-r-md border-t border-b border-r ${
+                                  row.mode === 'manual' 
+                                    ? 'bg-ribbon text-white border-ribbon' 
+                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                                }`}
+                              >
+                                Manual
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-4 gap-4">
+                            {row.mode === 'manual' && (
+                              <div>
+                                <label className="text-sm font-medium text-gray-900">Strap Count</label>
+                                <Input
+                                  type="number"
+                                  value={row.count || ''}
+                                  onChange={(e) => updateLashingRow(row.direction, 'count', parseInt(e.target.value) || 0)}
+                                  placeholder="e.g., 4"
+                                  min="0"
+                                  className="bg-white text-gray-900 border-border"
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <label className="text-sm font-medium text-gray-900">Strap Rating (daN)</label>
+                              <Select 
+                                value={row.lcDaN?.toString() || ''} 
+                                onValueChange={(v) => updateLashingRow(row.direction, 'lcDaN', parseInt(v))}
+                              >
+                                <SelectTrigger className="bg-white text-gray-900 border-border">
+                                  <SelectValue placeholder="Select rating" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white">
+                                  <SelectItem value="1000">1,000 daN (Light)</SelectItem>
+                                  <SelectItem value="2000">2,000 daN (Standard)</SelectItem>
+                                  <SelectItem value="4000">4,000 daN (Heavy)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-gray-900">Angle (°)</label>
+                              <Input
+                                type="number"
+                                value={row.angleDeg || ''}
+                                onChange={(e) => updateLashingRow(row.direction, 'angleDeg', parseFloat(e.target.value) || 0)}
+                                placeholder="20-30 recommended"
+                                step="1"
+                                className="bg-white text-gray-900 border-border"
+                              />
+                            </div>
+                            <div className="flex items-end">
+                              <p className="text-xs text-gray-500">
+                                {row.mode === 'auto' 
+                                  ? 'Auto calculates required strap count' 
+                                  : 'Enter your strap count to check'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                      <Button onClick={calcRestraint} variant="default">Calculate</Button>
-                      <Button onClick={() => setRestraintResults([])} className="bg-ribbon hover:bg-ribbon/90 text-white">Clear Results</Button>
+                      <Button onClick={calcRestraint} variant="default" size="lg">Calculate</Button>
+                      <Button onClick={() => setRestraintResults([])} variant="outline">Clear Results</Button>
                     </div>
 
                     {restraintResults.length > 0 && (
                       <>
-                        <h3 className="text-lg font-semibold text-gray-900">Lashing Results - Your Restraint Plan</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mt-6">Results - Your Restraint Plan</h3>
                         
                         <div className="bg-red-50 border-2 border-red-600 p-4 rounded-md mb-4">
-                          <p className="font-bold text-red-900 mb-2">⚠️ CRITICAL DEFENCE STANDARD:</p>
+                          <p className="font-bold text-red-900 mb-2">⚠️ DEFENCE STANDARD (JSP 800 Vol 7):</p>
                           <p className="text-gray-900">
-                            <strong>Zero Friction (μ=0)</strong> is assumed for Defence operations. Your lashings must 
-                            provide ALL the restraint force. Do NOT rely on friction between the load and the platform. 
-                            The load surface must be treated as completely slippery.
+                            <strong>Zero Friction (μ=0)</strong> is assumed. Lashings must provide ALL restraint force. 
+                            Do NOT rely on friction.
                           </p>
                         </div>
 
-                        {restraintResults.map((r, i) => {
-                          const pass = r.cap >= r.Residual;
-                          const directionLashings = lashings[r.dir as keyof typeof lashings];
-                          const totalStraps = directionLashings.reduce((sum, L) => sum + (parseFloat(L.count) || 0), 0);
-                          
-                          return (
-                            <Card key={i} className={`${pass ? 'bg-green-50 border-green-600' : 'bg-red-50 border-red-600'} border-2`}>
-                              <CardContent className="pt-6">
-                                <div className="flex items-center justify-between mb-4">
-                                  <h4 className="text-xl font-bold text-gray-900">{r.dir} Direction</h4>
-                                  <span className={`text-2xl font-bold ${pass ? 'text-green-700' : 'text-red-700'}`}>
-                                    {pass ? '✓ PASS' : '✗ FAIL'}
-                                  </span>
+                        {restraintResults.map((r, i) => (
+                          <Card key={i} className={`${r.pass ? 'bg-green-50 border-green-600' : 'bg-red-50 border-red-600'} border-2`}>
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-xl font-bold text-gray-900">{r.direction} Direction</h4>
+                                <span className={`text-2xl font-bold ${r.pass ? 'text-green-700' : 'text-red-700'}`}>
+                                  {r.pass ? '✓ PASS' : '✗ FAIL'}
+                                </span>
+                              </div>
+
+                              <div className="space-y-3 text-gray-900">
+                                {/* Main Result Display */}
+                                <div className={`p-4 rounded border-2 ${r.pass ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'}`}>
+                                  <p className="text-lg font-bold mb-2">
+                                    {r.mode === 'auto' ? 'Required Straps:' : 'Your Configuration:'}
+                                  </p>
+                                  <p className="text-3xl font-bold">
+                                    {r.count} × {r.lcDaN} daN @ {r.angleDeg}°
+                                  </p>
+                                  <p className="text-sm mt-2 text-gray-700">{r.message}</p>
                                 </div>
 
-                                <div className="space-y-3 text-gray-900">
+                                <div className="grid grid-cols-2 gap-3">
                                   <div className="bg-white p-3 rounded border border-gray-300">
-                                    <p className="text-sm font-semibold mb-1">Total Straps Required:</p>
-                                    <p className="text-2xl font-bold">{totalStraps} straps in {r.dir.toLowerCase()} direction</p>
+                                    <p className="text-sm mb-1">Force Required:</p>
+                                    <p className="text-lg font-bold">{(r.requiredForceDaN || 0).toFixed(0)} daN</p>
                                   </div>
-
                                   <div className="bg-white p-3 rounded border border-gray-300">
-                                    <p className="text-sm font-semibold mb-2">Your Strap Configuration:</p>
-                                    {directionLashings.length === 0 ? (
-                                      <p className="text-red-600 font-semibold">⚠️ No straps configured for this direction!</p>
-                                    ) : (
-                                      <ul className="space-y-1">
-                                        {directionLashings.map((L, idx) => (
-                                          <li key={idx} className="flex items-center justify-between">
-                                            <span>• {L.count} straps @ {L.LC} {L.unit} capacity</span>
-                                            <span className="font-semibold">Angle: {L.angle}°</span>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    )}
+                                    <p className="text-sm mb-1">Total Strap Capacity:</p>
+                                    <p className="text-lg font-bold">{(r.totalCapacityDaN || 0).toFixed(0)} daN</p>
                                   </div>
+                                </div>
 
-                                  <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-white p-3 rounded border border-gray-300">
-                                      <p className="text-sm mb-1">Force Needed (with safety factor):</p>
-                                      <p className="text-lg font-bold">{fmt(r.Residual)} N</p>
-                                      <p className="text-xs text-gray-600 mt-1">({(r.Residual / 10).toFixed(0)} daN)</p>
-                                    </div>
-                                    <div className="bg-white p-3 rounded border border-gray-300">
-                                      <p className="text-sm mb-1">Your Strap Capacity:</p>
-                                      <p className="text-lg font-bold">{fmt(r.cap)} N</p>
-                                      <p className="text-xs text-gray-600 mt-1">({(r.cap / 10).toFixed(0)} daN)</p>
-                                    </div>
-                                  </div>
-
-                                  {!pass && (
-                                    <div className="bg-red-100 border border-red-400 p-3 rounded">
-                                      <p className="font-bold text-red-900 mb-1">⚠️ Action Required:</p>
-                                      <p className="text-gray-900 text-sm">
-                                        Add more straps or use higher capacity straps (e.g., upgrade from 1000 daN to 2000 daN). 
-                                        You need approximately <strong>{Math.ceil((r.Residual - r.cap) / 10000)} more standard (2000 daN) straps</strong> to pass.
-                                      </p>
-                                    </div>
-                                  )}
-
-                                  <div className="bg-blue-50 border border-blue-300 p-3 rounded">
-                                    <p className="font-semibold text-blue-900 mb-1">Lashing Angle Guide:</p>
-                                    <p className="text-sm text-gray-900">
-                                      Keep strap angles <strong>20-30°</strong> for maximum efficiency. 
-                                      Lower angles (closer to horizontal) provide better restraint. 
-                                      Angles above 45° significantly reduce effectiveness.
+                                {r.mode === 'manual' && !r.pass && r.requiredCount && (
+                                  <div className="bg-amber-100 border border-amber-400 p-3 rounded">
+                                    <p className="font-bold text-amber-900">
+                                      💡 Tip: You need at least {r.requiredCount} straps at this rating and angle.
                                     </p>
                                   </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
 
                         <div className="bg-amber-50 border-2 border-amber-600 p-4 rounded-md mt-4">
                           <p className="font-bold text-amber-900 mb-2">Standard Strap Ratings:</p>
                           <ul className="space-y-1 text-gray-900">
-                            <li>• <strong>Light duty:</strong> 1,000 daN (suitable for loads under 5,000 kg)</li>
-                            <li>• <strong>Medium duty:</strong> 2,000 daN (most common, suitable for loads 5,000-15,000 kg)</li>
-                            <li>• <strong>Heavy duty:</strong> 4,000 daN (for heavy loads over 15,000 kg)</li>
+                            <li>• <strong>1,000 daN:</strong> Light duty (loads under 5,000 kg)</li>
+                            <li>• <strong>2,000 daN:</strong> Standard (loads 5,000-15,000 kg)</li>
+                            <li>• <strong>4,000 daN:</strong> Heavy duty (loads over 15,000 kg)</li>
                           </ul>
-                          <p className="mt-2 text-sm text-gray-900">
-                            <strong>Defence Standard:</strong> Strap capacity should be at least <strong>2× the g-force applied</strong>. 
-                            For 1g acceleration, minimum 2,000 daN straps recommended.
+                        </div>
+
+                        <div className="bg-blue-50 border border-blue-300 p-3 rounded mt-4">
+                          <p className="font-semibold text-blue-900 mb-1">Lashing Angle Guide:</p>
+                          <p className="text-sm text-gray-900">
+                            Keep strap angles <strong>20-30°</strong> for best results. 
+                            Lower angles give better restraint. Angles above 45° significantly reduce effectiveness.
                           </p>
                         </div>
                         
@@ -971,10 +1023,7 @@ export default function TDSTool() {
                                 <div key={idx} className="bg-gray-100 p-3 rounded border border-gray-300">
                                   <p className="text-xs text-gray-600 mb-1">{entry.timestamp}</p>
                                   <p className="text-sm text-gray-900 font-semibold">
-                                    Mass: {entry.result.designMass}kg | 
-                                    F: {entry.result.lashings.Forward.length} sets, 
-                                    R: {entry.result.lashings.Rearward.length} sets, 
-                                    L: {entry.result.lashings.Lateral.length} sets
+                                    Mass: {entry.result.designMass}kg
                                   </p>
                                 </div>
                               ))}
