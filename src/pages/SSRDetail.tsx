@@ -374,10 +374,9 @@ export default function SSRDetail() {
               <div className="flex gap-2">
                 {changeHistory.length > 0 && (
                   <Button 
-                    variant="outline" 
+                    variant="default" 
                     size="sm" 
                     onClick={() => setShowHistoryDialog(true)}
-                    className="bg-white/10 border-white/30 text-white hover:bg-white/20"
                   >
                     <History className="h-4 w-4 mr-2" />
                     History ({changeHistory.length})
@@ -385,10 +384,9 @@ export default function SSRDetail() {
                 )}
                 {isAdmin && (
                   <Button 
-                    variant="outline" 
+                    variant="default" 
                     size="sm" 
                     onClick={openEditSSRDialog}
-                    className="bg-white/10 border-white/30 text-white hover:bg-white/20"
                   >
                     <Pencil className="h-4 w-4 mr-2" />
                     Edit SSR
