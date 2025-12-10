@@ -121,6 +121,68 @@ export type Database = {
           },
         ]
       }
+      ssr_change_history: {
+        Row: {
+          changed_at: string
+          id: string
+          previous_email: string
+          previous_first_name: string
+          previous_last_name: string
+          previous_phone: string | null
+          previous_role_type: string
+          previous_title: string | null
+          reason: string | null
+          replaced_by_email: string
+          replaced_by_first_name: string
+          replaced_by_last_name: string
+          replaced_by_title: string | null
+          replaced_by_user_id: string | null
+          ssr_record_id: string
+        }
+        Insert: {
+          changed_at?: string
+          id?: string
+          previous_email: string
+          previous_first_name: string
+          previous_last_name: string
+          previous_phone?: string | null
+          previous_role_type: string
+          previous_title?: string | null
+          reason?: string | null
+          replaced_by_email: string
+          replaced_by_first_name: string
+          replaced_by_last_name: string
+          replaced_by_title?: string | null
+          replaced_by_user_id?: string | null
+          ssr_record_id: string
+        }
+        Update: {
+          changed_at?: string
+          id?: string
+          previous_email?: string
+          previous_first_name?: string
+          previous_last_name?: string
+          previous_phone?: string | null
+          previous_role_type?: string
+          previous_title?: string | null
+          reason?: string | null
+          replaced_by_email?: string
+          replaced_by_first_name?: string
+          replaced_by_last_name?: string
+          replaced_by_title?: string | null
+          replaced_by_user_id?: string | null
+          ssr_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ssr_change_history_ssr_record_id_fkey"
+            columns: ["ssr_record_id"]
+            isOneToOne: false
+            referencedRelation: "ssrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ssrs: {
         Row: {
           created_at: string
