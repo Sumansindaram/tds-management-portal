@@ -406,7 +406,7 @@ export default function SSRDetail() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Delivery Team</p>
-                  <p className="font-semibold text-foreground mt-0.5">{ssr.delivery_team}</p>
+                  <p className="font-semibold text-card-foreground mt-0.5">{ssr.delivery_team}</p>
                 </div>
               </div>
               
@@ -416,7 +416,7 @@ export default function SSRDetail() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Name</p>
-                  <p className="font-semibold text-foreground mt-0.5">
+                  <p className="font-semibold text-card-foreground mt-0.5">
                     {ssr.title} {ssr.first_name} {ssr.last_name}
                   </p>
                 </div>
@@ -428,7 +428,7 @@ export default function SSRDetail() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Email</p>
-                  <p className="font-semibold text-foreground mt-0.5">{ssr.email}</p>
+                  <p className="font-semibold text-card-foreground mt-0.5">{ssr.email}</p>
                 </div>
               </div>
               
@@ -438,7 +438,7 @@ export default function SSRDetail() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Phone</p>
-                  <p className="font-semibold text-foreground mt-0.5">{ssr.phone || 'N/A'}</p>
+                  <p className="font-semibold text-card-foreground mt-0.5">{ssr.phone || 'N/A'}</p>
                 </div>
               </div>
               
@@ -448,7 +448,7 @@ export default function SSRDetail() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Role Type</p>
-                  <p className="font-semibold text-foreground mt-0.5">{ssr.role_type}</p>
+                  <p className="font-semibold text-card-foreground mt-0.5">{ssr.role_type}</p>
                 </div>
               </div>
               
@@ -474,8 +474,8 @@ export default function SSRDetail() {
         {/* Assets Managed Card - Professional Design */}
         <Card className="p-0 overflow-hidden border-0 shadow-lg">
           <div className="bg-gradient-to-r from-secondary via-secondary/95 to-secondary/90 p-6 border-b border-border/50">
-            <h2 className="text-xl font-bold text-foreground">Assets Managed</h2>
-            <p className="text-muted-foreground text-sm mt-1">Equipment and vehicles assigned to this SSR</p>
+            <h2 className="text-xl font-bold text-secondary-foreground">Assets Managed</h2>
+            <p className="text-secondary-foreground/70 text-sm mt-1">Equipment and vehicles assigned to this SSR</p>
           </div>
           
           <div className="p-6 bg-card">
