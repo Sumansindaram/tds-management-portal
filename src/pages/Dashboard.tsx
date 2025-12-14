@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-import { FileText, List, PlusCircle, Users, Search, Wrench } from 'lucide-react';
+import { FileText, List, PlusCircle, Users, Search, Wrench, FilePlus2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import heroBanner from '@/assets/tds-hero-banner.jpg';
@@ -13,6 +13,7 @@ import iconMySubmissions from '@/assets/icon-my-submissions-new.jpg';
 import iconViewRequests from '@/assets/icon-view-all-requests.jpg';
 import iconManageUsers from '@/assets/icon-ssr-directory-new.jpg';
 import iconTdsTool from '@/assets/icon-tds-tool.jpg';
+import iconNewAssetRequest from '@/assets/icon-new-asset-request.jpg';
 
 export default function Dashboard() {
   const { role, user } = useAuth();
@@ -210,6 +211,33 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </Card>
+
+                {/* New Asset Request */}
+                <Card 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
+                  onClick={() => navigate('/new-asset-requests')}
+                >
+                  <img 
+                    src={iconNewAssetRequest} 
+                    alt="New Asset Request" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <FilePlus2 className="h-10 w-10 text-white" />
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">New Asset Request</h3>
+                        <p className="text-white/90 text-sm">Request TDS for new assets</p>
+                      </div>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">View Requests</Button>
+                    </div>
+                  </div>
+                </Card>
               </>
             )}
           </div>
@@ -379,6 +407,33 @@ export default function Dashboard() {
                         <p className="text-white/90 text-sm">Transportation planning calculations</p>
                       </div>
                       <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">Open Tool</Button>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* New Asset Request - Admin View */}
+                <Card 
+                  className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
+                  onClick={() => navigate('/new-asset-requests')}
+                >
+                  <img 
+                    src={iconNewAssetRequest} 
+                    alt="New Asset Request" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
+                  
+                  <div className="relative h-full flex flex-col justify-between p-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg group-hover:scale-110 transition-transform border-2 border-white/40">
+                      <FilePlus2 className="h-10 w-10 text-white" />
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-2xl font-semibold text-white mb-2">New Asset Requests</h3>
+                        <p className="text-white/90 text-sm">Manage new asset TDS requests</p>
+                      </div>
+                      <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">View All</Button>
                     </div>
                   </div>
                 </Card>

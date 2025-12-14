@@ -44,6 +44,125 @@ export type Database = {
         }
         Relationships: []
       }
+      new_asset_documents: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_type: string
+          file_name: string
+          file_path: string
+          id: string
+          request_id: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_type: string
+          file_name: string
+          file_path: string
+          id?: string
+          request_id: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          request_id?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "new_asset_documents_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "new_asset_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      new_asset_requests: {
+        Row: {
+          admin_comment: string | null
+          asset_name: string
+          asset_type: string
+          assigned_to: string | null
+          business_justification: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          estimated_dimensions: string | null
+          estimated_weight_kg: string | null
+          id: string
+          manufacturer: string | null
+          model_number: string | null
+          project_team: string
+          reference: string
+          required_by_date: string | null
+          status: string
+          submitted_by: string
+          task_description: string
+          task_title: string
+          updated_at: string
+          urgency_level: string
+        }
+        Insert: {
+          admin_comment?: string | null
+          asset_name: string
+          asset_type: string
+          assigned_to?: string | null
+          business_justification?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          estimated_dimensions?: string | null
+          estimated_weight_kg?: string | null
+          id?: string
+          manufacturer?: string | null
+          model_number?: string | null
+          project_team: string
+          reference: string
+          required_by_date?: string | null
+          status?: string
+          submitted_by: string
+          task_description: string
+          task_title: string
+          updated_at?: string
+          urgency_level?: string
+        }
+        Update: {
+          admin_comment?: string | null
+          asset_name?: string
+          asset_type?: string
+          assigned_to?: string | null
+          business_justification?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          estimated_dimensions?: string | null
+          estimated_weight_kg?: string | null
+          id?: string
+          manufacturer?: string | null
+          model_number?: string | null
+          project_team?: string
+          reference?: string
+          required_by_date?: string | null
+          status?: string
+          submitted_by?: string
+          task_description?: string
+          task_title?: string
+          updated_at?: string
+          urgency_level?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           approved: boolean | null
@@ -556,6 +675,7 @@ export type Database = {
       }
     }
     Functions: {
+      generate_new_asset_reference: { Args: never; Returns: string }
       generate_tds_reference: { Args: never; Returns: string }
       has_role: {
         Args: {
