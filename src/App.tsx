@@ -18,6 +18,9 @@ import SSRDirectory from "./pages/SSRDirectory";
 import SSRDetail from "./pages/SSRDetail";
 import TDSTool from "./pages/TDSTool";
 import UserApproval from "./pages/UserApproval";
+import NewAssetRequest from "./pages/NewAssetRequest";
+import NewAssetRequestsList from "./pages/NewAssetRequestsList";
+import NewAssetRequestDetail from "./pages/NewAssetRequestDetail";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +112,31 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <TDSTool />
+                </ProtectedRoute>
+              }
+            />
+            {/* New Asset Request routes */}
+            <Route
+              path="/new-asset-request/create"
+              element={
+                <ProtectedRoute>
+                  <NewAssetRequest />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/new-asset-requests"
+              element={
+                <ProtectedRoute>
+                  <NewAssetRequestsList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/new-asset-request/:id"
+              element={
+                <ProtectedRoute>
+                  <NewAssetRequestDetail />
                 </ProtectedRoute>
               }
             />
