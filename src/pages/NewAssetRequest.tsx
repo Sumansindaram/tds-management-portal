@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, Upload, FileText, X, Plus } from 'lucide-react';
+import { Loader2, ArrowLeft, Upload, FileText, X, Plus, ClipboardList, Truck, FileCheck, Info, Ruler, Weight, Settings, File } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ASSET_TYPES = [
@@ -25,19 +26,47 @@ const ASSET_TYPES = [
   'Other'
 ];
 
-const URGENCY_LEVELS = [
-  { value: 'Low', label: 'Low - Within 6 months' },
-  { value: 'Normal', label: 'Normal - Within 3 months' },
-  { value: 'High', label: 'High - Within 1 month' },
-  { value: 'Urgent', label: 'Urgent - Within 2 weeks' }
+const PROTECTIVE_MARKINGS = [
+  'Official',
+  'Official-Sensitive',
+  'Secret',
+  'Top Secret'
+];
+
+const REASON_FOR_TASK = [
+  'New Entry',
+  'Amendment to existing entry',
+  'UOR',
+  'R&D'
+];
+
+const LICENCE_CATEGORIES = [
+  'B', 'C', 'C+E', 'D', 'D+E', 'H', 'Military Only', 'N/A'
+];
+
+const TASKS_DATA_SHEETS = [
+  { id: 'basic_data', label: 'Basic Data' },
+  { id: 'slinging', label: 'Slinging' },
+  { id: 'let', label: 'LET' },
+  { id: 'road', label: 'Road' },
+  { id: 'rail', label: 'Rail' },
+  { id: 'het', label: 'HET' },
+  { id: 'drops', label: 'DROPS' },
+  { id: 'epls', label: 'EPLS' },
+  { id: 'container_mje', label: 'Container (MJE)' },
+  { id: 'container_ym', label: 'Container (YM)' },
+  { id: 'special_request', label: 'Special Request/Task' },
 ];
 
 const DOCUMENT_TYPES = [
-  'CAD Drawing',
+  'CAD Drawing (.dxf/.dwg)',
   'Technical Specification',
-  'Business Case',
+  'BIRD Form',
   'Weight Certificate',
+  'CoG Data',
+  'Lashing Point Data',
   'Manufacturer Documentation',
+  'Business Case',
   'Safety Assessment',
   'Risk Assessment',
   'Other'
@@ -57,21 +86,86 @@ export default function NewAssetRequest() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [currentDocType, setCurrentDocType] = useState('');
   const [currentDescription, setCurrentDescription] = useState('');
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
-    task_title: '',
-    task_description: '',
-    urgency_level: 'Normal',
-    required_by_date: '',
+    // Part 1 - PT/Sponsor Info
+    project_team: '',
+    poc_name: '',
+    tel_no: '',
+    contact_email: '',
+    uin: '',
+    rac: '',
+    management_code: '',
+    blb_code: '',
+    
+    // Part 2 - Equipment Details
     asset_name: '',
+    short_name: '',
+    nsn: '',
     asset_type: '',
+    ric_code: '',
+    protective_marking: 'Official',
     manufacturer: '',
     model_number: '',
+    
+    // Part 3 - Task Requirements
+    reason_for_task: 'New Entry',
+    bird_completed: false,
+    tech_drawings_attached: false,
+    proposed_trial_dates: '',
+    delivery_date_to_service: '',
+    task_description: '',
+    
+    // Part 4 - Driver Information
+    licence_category: '',
+    crew_number: '',
+    passenger_capacity: '',
+    fuel_capacity_litres: '',
+    range_km: '',
+    speed_single_carriageway: '',
+    speed_dual_carriageway: '',
+    max_speed: '',
+    
+    // Overview & Tasking
+    overview: '',
+    tasking_description: '',
+    
+    // BIRD - Dimensional Information
+    length_mm: '',
+    width_mm: '',
+    height_mm: '',
+    ground_clearance_mm: '',
+    approach_angle: '',
+    departure_angle: '',
+    front_track_width_mm: '',
+    rear_track_width_mm: '',
+    
+    // BIRD - Weight Information
+    laden_weight_kg: '',
+    unladen_weight_kg: '',
+    mlc_laden: '',
+    mlc_unladen: '',
+    
+    // BIRD - Other Information
+    turning_circle: '',
+    cog_height: '',
+    cog_longitudinal: '',
+    cog_lateral: '',
+    tyre_size: '',
+    tyre_type: '',
+    lashing_point_info: '',
+    lifting_eye_positions: '',
+    removable_items: '',
+    additional_remarks: '',
+    
+    // Legacy fields
+    task_title: '',
+    urgency_level: 'Normal',
+    required_by_date: '',
     estimated_weight_kg: '',
     estimated_dimensions: '',
-    project_team: '',
     contact_name: '',
-    contact_email: '',
     contact_phone: '',
     business_justification: '',
   });
@@ -85,8 +179,16 @@ export default function NewAssetRequest() {
     }
   }, [user]);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleTaskToggle = (taskId: string) => {
+    setSelectedTasks(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(t => t !== taskId)
+        : [...prev, taskId]
+    );
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,35 +222,81 @@ export default function NewAssetRequest() {
 
   const handleReset = () => {
     setFormData({
-      task_title: '',
-      task_description: '',
-      urgency_level: 'Normal',
-      required_by_date: '',
+      project_team: '',
+      poc_name: '',
+      tel_no: '',
+      contact_email: user?.email || '',
+      uin: '',
+      rac: '',
+      management_code: '',
+      blb_code: '',
       asset_name: '',
+      short_name: '',
+      nsn: '',
       asset_type: '',
+      ric_code: '',
+      protective_marking: 'Official',
       manufacturer: '',
       model_number: '',
+      reason_for_task: 'New Entry',
+      bird_completed: false,
+      tech_drawings_attached: false,
+      proposed_trial_dates: '',
+      delivery_date_to_service: '',
+      task_description: '',
+      licence_category: '',
+      crew_number: '',
+      passenger_capacity: '',
+      fuel_capacity_litres: '',
+      range_km: '',
+      speed_single_carriageway: '',
+      speed_dual_carriageway: '',
+      max_speed: '',
+      overview: '',
+      tasking_description: '',
+      length_mm: '',
+      width_mm: '',
+      height_mm: '',
+      ground_clearance_mm: '',
+      approach_angle: '',
+      departure_angle: '',
+      front_track_width_mm: '',
+      rear_track_width_mm: '',
+      laden_weight_kg: '',
+      unladen_weight_kg: '',
+      mlc_laden: '',
+      mlc_unladen: '',
+      turning_circle: '',
+      cog_height: '',
+      cog_longitudinal: '',
+      cog_lateral: '',
+      tyre_size: '',
+      tyre_type: '',
+      lashing_point_info: '',
+      lifting_eye_positions: '',
+      removable_items: '',
+      additional_remarks: '',
+      task_title: '',
+      urgency_level: 'Normal',
+      required_by_date: '',
       estimated_weight_kg: '',
       estimated_dimensions: '',
-      project_team: '',
       contact_name: '',
-      contact_email: user?.email || '',
       contact_phone: '',
       business_justification: '',
     });
     setUploadedFiles([]);
+    setSelectedTasks([]);
   };
 
   const handleSubmit = async () => {
     // Validate required fields
     const requiredFields = [
-      { field: 'task_title', label: 'Task Title' },
-      { field: 'task_description', label: 'Task Description' },
-      { field: 'asset_name', label: 'Asset Name' },
-      { field: 'asset_type', label: 'Asset Type' },
       { field: 'project_team', label: 'Project Team' },
-      { field: 'contact_name', label: 'Contact Name' },
-      { field: 'contact_email', label: 'Contact Email' },
+      { field: 'poc_name', label: 'POC Name' },
+      { field: 'contact_email', label: 'Email' },
+      { field: 'asset_name', label: 'Equipment Designation' },
+      { field: 'asset_type', label: 'Asset Type' },
     ];
 
     const missingFields = requiredFields.filter(({ field }) => !formData[field as keyof typeof formData]);
@@ -179,14 +327,80 @@ export default function NewAssetRequest() {
 
       if (refError) throw refError;
 
+      // Create task title from equipment name
+      const taskTitle = `TDS Request: ${formData.asset_name}${formData.short_name ? ` (${formData.short_name})` : ''}`;
+
       // Create request entry
       const { data: request, error: requestError } = await supabase
         .from('new_asset_requests')
         .insert([{
-          ...formData,
           reference: refData,
           submitted_by: user.id,
           status: 'Pending',
+          task_title: taskTitle,
+          task_description: formData.task_description || formData.tasking_description,
+          urgency_level: formData.urgency_level,
+          required_by_date: formData.required_by_date || null,
+          asset_name: formData.asset_name,
+          asset_type: formData.asset_type,
+          manufacturer: formData.manufacturer || null,
+          model_number: formData.model_number || null,
+          estimated_weight_kg: formData.laden_weight_kg || formData.estimated_weight_kg || null,
+          estimated_dimensions: formData.estimated_dimensions || `${formData.length_mm}mm x ${formData.width_mm}mm x ${formData.height_mm}mm`,
+          project_team: formData.project_team,
+          contact_name: formData.poc_name || formData.contact_name,
+          contact_email: formData.contact_email,
+          contact_phone: formData.tel_no || formData.contact_phone || null,
+          business_justification: formData.business_justification || null,
+          // New fields
+          poc_name: formData.poc_name || null,
+          tel_no: formData.tel_no || null,
+          uin: formData.uin || null,
+          rac: formData.rac || null,
+          management_code: formData.management_code || null,
+          blb_code: formData.blb_code || null,
+          short_name: formData.short_name || null,
+          nsn: formData.nsn || null,
+          ric_code: formData.ric_code || null,
+          protective_marking: formData.protective_marking || null,
+          reason_for_task: formData.reason_for_task || null,
+          tasks_required: selectedTasks,
+          bird_completed: formData.bird_completed,
+          tech_drawings_attached: formData.tech_drawings_attached,
+          proposed_trial_dates: formData.proposed_trial_dates || null,
+          delivery_date_to_service: formData.delivery_date_to_service || null,
+          licence_category: formData.licence_category || null,
+          crew_number: formData.crew_number || null,
+          passenger_capacity: formData.passenger_capacity || null,
+          fuel_capacity_litres: formData.fuel_capacity_litres || null,
+          range_km: formData.range_km || null,
+          speed_single_carriageway: formData.speed_single_carriageway || null,
+          speed_dual_carriageway: formData.speed_dual_carriageway || null,
+          max_speed: formData.max_speed || null,
+          overview: formData.overview || null,
+          tasking_description: formData.tasking_description || null,
+          length_mm: formData.length_mm || null,
+          width_mm: formData.width_mm || null,
+          height_mm: formData.height_mm || null,
+          ground_clearance_mm: formData.ground_clearance_mm || null,
+          approach_angle: formData.approach_angle || null,
+          departure_angle: formData.departure_angle || null,
+          front_track_width_mm: formData.front_track_width_mm || null,
+          rear_track_width_mm: formData.rear_track_width_mm || null,
+          laden_weight_kg: formData.laden_weight_kg || null,
+          unladen_weight_kg: formData.unladen_weight_kg || null,
+          mlc_laden: formData.mlc_laden || null,
+          mlc_unladen: formData.mlc_unladen || null,
+          turning_circle: formData.turning_circle || null,
+          cog_height: formData.cog_height || null,
+          cog_longitudinal: formData.cog_longitudinal || null,
+          cog_lateral: formData.cog_lateral || null,
+          tyre_size: formData.tyre_size || null,
+          tyre_type: formData.tyre_type || null,
+          lashing_point_info: formData.lashing_point_info || null,
+          lifting_eye_positions: formData.lifting_eye_positions || null,
+          removable_items: formData.removable_items || null,
+          additional_remarks: formData.additional_remarks || null,
         }])
         .select()
         .single();
@@ -223,7 +437,7 @@ export default function NewAssetRequest() {
 
       toast({
         title: 'Success!',
-        description: `New asset request submitted with reference: ${refData}`,
+        description: `Task request submitted with reference: ${refData}`,
       });
 
       navigate('/');
@@ -239,352 +453,774 @@ export default function NewAssetRequest() {
     }
   };
 
+  const SectionHeader = ({ number, title, icon: Icon }: { number: number; title: string; icon: any }) => (
+    <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
+      <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">{number}</span>
+      <Icon className="h-5 w-5" />
+      {title}
+    </h3>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto p-4 lg:p-8 max-w-6xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-6 gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-        </Button>
+      <main className="w-full p-4 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="mb-6 gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+          </Button>
 
-        <Card className="shadow-2xl border-2">
-          <CardHeader className="bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border-b-2 border-primary/10">
-            <CardTitle className="text-3xl font-bold text-center">
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                New Asset TDS Request
-              </span>
-            </CardTitle>
-            <p className="text-center text-muted-foreground mt-2 text-sm">
-              Submit a request for TDS documentation for a new asset. Fields marked with <span className="text-destructive font-bold">*</span> are required.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-8 pt-8">
-            
-            {/* Task Information Section */}
-            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
-              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">1</span>
-                Task Information
-              </h3>
-              <div className="p-6 space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="md:col-span-2">
-                    <Label htmlFor="task_title">Task Title *</Label>
-                    <Input
-                      id="task_title"
-                      value={formData.task_title}
-                      onChange={(e) => handleInputChange('task_title', e.target.value)}
-                      placeholder="Brief title describing the request"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label htmlFor="task_description">Task Description *</Label>
-                    <Textarea
-                      id="task_description"
-                      value={formData.task_description}
-                      onChange={(e) => handleInputChange('task_description', e.target.value)}
-                      placeholder="Detailed description of what TDS documentation is required and why"
-                      rows={4}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="urgency_level">Urgency Level *</Label>
-                    <Select
-                      value={formData.urgency_level}
-                      onValueChange={(value) => handleInputChange('urgency_level', value)}
-                    >
-                      <SelectTrigger id="urgency_level">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {URGENCY_LEVELS.map(level => (
-                          <SelectItem key={level.value} value={level.value}>
-                            {level.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="required_by_date">Required By Date</Label>
-                    <Input
-                      id="required_by_date"
-                      type="date"
-                      value={formData.required_by_date}
-                      onChange={(e) => handleInputChange('required_by_date', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Basic Asset Information Section */}
-            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
-              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">2</span>
-                Basic Asset Information
-              </h3>
-              <div className="p-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="asset_name">Asset Name *</Label>
-                    <Input
-                      id="asset_name"
-                      value={formData.asset_name}
-                      onChange={(e) => handleInputChange('asset_name', e.target.value)}
-                      placeholder="Name or designation of the asset"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="asset_type">Asset Type *</Label>
-                    <Select
-                      value={formData.asset_type}
-                      onValueChange={(value) => handleInputChange('asset_type', value)}
-                    >
-                      <SelectTrigger id="asset_type">
-                        <SelectValue placeholder="Select asset type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ASSET_TYPES.map(type => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="manufacturer">Manufacturer</Label>
-                    <Input
-                      id="manufacturer"
-                      value={formData.manufacturer}
-                      onChange={(e) => handleInputChange('manufacturer', e.target.value)}
-                      placeholder="Manufacturer name"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="model_number">Model Number</Label>
-                    <Input
-                      id="model_number"
-                      value={formData.model_number}
-                      onChange={(e) => handleInputChange('model_number', e.target.value)}
-                      placeholder="Model or part number"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="estimated_weight_kg">Estimated Weight (kg)</Label>
-                    <Input
-                      id="estimated_weight_kg"
-                      value={formData.estimated_weight_kg}
-                      onChange={(e) => handleInputChange('estimated_weight_kg', e.target.value.replace(/[^0-9.]/g, ''))}
-                      placeholder="Approximate weight in kg"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="estimated_dimensions">Estimated Dimensions (L x W x H)</Label>
-                    <Input
-                      id="estimated_dimensions"
-                      value={formData.estimated_dimensions}
-                      onChange={(e) => handleInputChange('estimated_dimensions', e.target.value)}
-                      placeholder="e.g., 5.0m x 2.5m x 3.0m"
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Contact Information Section */}
-            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
-              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">3</span>
-                Contact Information
-              </h3>
-              <div className="p-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="project_team">Project Team *</Label>
-                    <Input
-                      id="project_team"
-                      value={formData.project_team}
-                      onChange={(e) => handleInputChange('project_team', e.target.value)}
-                      placeholder="Your project team name"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contact_name">Contact Name *</Label>
-                    <Input
-                      id="contact_name"
-                      value={formData.contact_name}
-                      onChange={(e) => handleInputChange('contact_name', e.target.value)}
-                      placeholder="Primary contact person"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contact_email">Contact Email *</Label>
-                    <Input
-                      id="contact_email"
-                      type="email"
-                      value={formData.contact_email}
-                      onChange={(e) => handleInputChange('contact_email', e.target.value)}
-                      placeholder="your.email@mod.gov.uk"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contact_phone">Contact Phone</Label>
-                    <Input
-                      id="contact_phone"
-                      value={formData.contact_phone}
-                      onChange={(e) => handleInputChange('contact_phone', e.target.value)}
-                      placeholder="Contact phone number"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label htmlFor="business_justification">Business Justification</Label>
-                    <Textarea
-                      id="business_justification"
-                      value={formData.business_justification}
-                      onChange={(e) => handleInputChange('business_justification', e.target.value)}
-                      placeholder="Explain the business need for this TDS request"
-                      rows={3}
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Supporting Documents Section */}
-            <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
-              <h3 className="mb-0 px-6 py-4 text-lg font-bold text-ribbon-foreground bg-ribbon flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-ribbon-foreground/20 flex items-center justify-center text-sm font-bold">4</span>
-                Supporting Documents
-              </h3>
-              <div className="p-6 space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Upload supporting documents such as CAD drawings, technical specifications, business case, etc. 
-                  You can add more documents after submission.
-                </p>
-
-                {/* Upload Controls */}
-                <div className="grid gap-4 md:grid-cols-3 p-4 bg-muted/50 rounded-lg border">
-                  <div>
-                    <Label htmlFor="doc_type">Document Type</Label>
-                    <Select
-                      value={currentDocType}
-                      onValueChange={setCurrentDocType}
-                    >
-                      <SelectTrigger id="doc_type">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DOCUMENT_TYPES.map(type => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="doc_description">Description (Optional)</Label>
-                    <Input
-                      id="doc_description"
-                      value={currentDescription}
-                      onChange={(e) => setCurrentDescription(e.target.value)}
-                      placeholder="Brief description"
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <div className="relative w-full">
-                      <input
-                        type="file"
-                        id="file_upload"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        onChange={handleFileSelect}
-                        multiple
-                        accept=".pdf,.doc,.docx,.dwg,.dxf,.jpg,.jpeg,.png,.xlsx,.xls"
+          <Card className="shadow-2xl border-2">
+            <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b-2 border-primary/20">
+              <CardTitle className="text-3xl font-bold text-center">
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Task and Publication Process Checklist
+                </span>
+              </CardTitle>
+              <p className="text-center text-muted-foreground mt-2 text-sm">
+                Basic Information Requirement Data (BIRD) Form - Fields marked with <span className="text-destructive font-bold">*</span> are required
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              
+              {/* PART 1 - PT/Sponsor Information */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={1} title="PART 1 – PT/SPONSOR" icon={ClipboardList} />
+                <div className="p-6">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <Label htmlFor="project_team">Project Team *</Label>
+                      <Input
+                        id="project_team"
+                        value={formData.project_team}
+                        onChange={(e) => handleInputChange('project_team', e.target.value)}
+                        placeholder="e.g., LEOC-LCV-MIV"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full gap-2"
-                        disabled={!currentDocType}
-                      >
-                        <Upload className="h-4 w-4" />
-                        Choose Files
-                      </Button>
+                    </div>
+                    <div>
+                      <Label htmlFor="poc_name">POC (Point of Contact) *</Label>
+                      <Input
+                        id="poc_name"
+                        value={formData.poc_name}
+                        onChange={(e) => handleInputChange('poc_name', e.target.value)}
+                        placeholder="e.g., James Meaden"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="tel_no">Tel No</Label>
+                      <Input
+                        id="tel_no"
+                        value={formData.tel_no}
+                        onChange={(e) => handleInputChange('tel_no', e.target.value)}
+                        placeholder="e.g., 03001578711"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contact_email">Email *</Label>
+                      <Input
+                        id="contact_email"
+                        type="email"
+                        value={formData.contact_email}
+                        onChange={(e) => handleInputChange('contact_email', e.target.value)}
+                        placeholder="e.g., name@mod.gov.uk"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="uin">UIN</Label>
+                      <Input
+                        id="uin"
+                        value={formData.uin}
+                        onChange={(e) => handleInputChange('uin', e.target.value)}
+                        placeholder="e.g., P0317A"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="rac">RAC</Label>
+                      <Input
+                        id="rac"
+                        value={formData.rac}
+                        onChange={(e) => handleInputChange('rac', e.target.value)}
+                        placeholder="e.g., ASF080"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="management_code">Management (MG) Code</Label>
+                      <Input
+                        id="management_code"
+                        value={formData.management_code}
+                        onChange={(e) => handleInputChange('management_code', e.target.value)}
+                        placeholder="e.g., D00"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="blb_code">Bottom Level Budget (BLB) Code</Label>
+                      <Input
+                        id="blb_code"
+                        value={formData.blb_code}
+                        onChange={(e) => handleInputChange('blb_code', e.target.value)}
+                        placeholder="e.g., 8575"
+                      />
                     </div>
                   </div>
                 </div>
+              </section>
 
-                {/* Uploaded Files List */}
-                {uploadedFiles.length > 0 && (
-                  <div className="space-y-2">
-                    <Label>Uploaded Documents ({uploadedFiles.length})</Label>
-                    <div className="border rounded-lg divide-y">
-                      {uploadedFiles.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 hover:bg-muted/50">
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium text-sm">{item.file.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {item.documentType}{item.description && ` - ${item.description}`}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeFile(index)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+              {/* PART 2 - Equipment Details */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={2} title="PART 2 – EQUIPMENT DETAILS" icon={Truck} />
+                <div className="p-6">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="sm:col-span-2">
+                      <Label htmlFor="asset_name">Full Equipment Designation / Name *</Label>
+                      <Input
+                        id="asset_name"
+                        value={formData.asset_name}
+                        onChange={(e) => handleInputChange('asset_name', e.target.value)}
+                        placeholder="e.g., Mechanised Infantry Vehicle"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="short_name">Short Equipment Name / Abbreviations</Label>
+                      <Input
+                        id="short_name"
+                        value={formData.short_name}
+                        onChange={(e) => handleInputChange('short_name', e.target.value)}
+                        placeholder="e.g., MIV"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="nsn">NSN (NATO Stock Number)</Label>
+                      <Input
+                        id="nsn"
+                        value={formData.nsn}
+                        onChange={(e) => handleInputChange('nsn', e.target.value)}
+                        placeholder="e.g., 2355-12-420-0842"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="asset_type">Asset Type *</Label>
+                      <Select
+                        value={formData.asset_type}
+                        onValueChange={(value) => handleInputChange('asset_type', value)}
+                      >
+                        <SelectTrigger id="asset_type">
+                          <SelectValue placeholder="Select asset type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ASSET_TYPES.map(type => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="ric_code">RIC Code</Label>
+                      <Input
+                        id="ric_code"
+                        value={formData.ric_code}
+                        onChange={(e) => handleInputChange('ric_code', e.target.value)}
+                        placeholder="e.g., TBD"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="manufacturer">Manufacturer</Label>
+                      <Input
+                        id="manufacturer"
+                        value={formData.manufacturer}
+                        onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                        placeholder="Manufacturer name"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="model_number">Model Number</Label>
+                      <Input
+                        id="model_number"
+                        value={formData.model_number}
+                        onChange={(e) => handleInputChange('model_number', e.target.value)}
+                        placeholder="Model or part number"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="protective_marking">Protective Marking Status</Label>
+                      <Select
+                        value={formData.protective_marking}
+                        onValueChange={(value) => handleInputChange('protective_marking', value)}
+                      >
+                        <SelectTrigger id="protective_marking">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PROTECTIVE_MARKINGS.map(marking => (
+                            <SelectItem key={marking} value={marking}>{marking}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* PART 3 - Task Requirement Details */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={3} title="PART 3 – TASK REQUIREMENT DETAILS" icon={FileCheck} />
+                <div className="p-6 space-y-6">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <Label htmlFor="reason_for_task">Reason for Task</Label>
+                      <Select
+                        value={formData.reason_for_task}
+                        onValueChange={(value) => handleInputChange('reason_for_task', value)}
+                      >
+                        <SelectTrigger id="reason_for_task">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {REASON_FOR_TASK.map(reason => (
+                            <SelectItem key={reason} value={reason}>{reason}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="proposed_trial_dates">Proposed Trial Dates</Label>
+                      <Input
+                        id="proposed_trial_dates"
+                        value={formData.proposed_trial_dates}
+                        onChange={(e) => handleInputChange('proposed_trial_dates', e.target.value)}
+                        placeholder="e.g., CW19 2024"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="delivery_date_to_service">Required Delivery Date</Label>
+                      <Input
+                        id="delivery_date_to_service"
+                        type="date"
+                        value={formData.delivery_date_to_service}
+                        onChange={(e) => handleInputChange('delivery_date_to_service', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tasks/Data Sheets Required */}
+                  <div>
+                    <Label className="text-base font-semibold mb-3 block">Tasks/Data Sheets Required (In consultation with MTSR)</Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                      {TASKS_DATA_SHEETS.map(task => (
+                        <div key={task.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={task.id}
+                            checked={selectedTasks.includes(task.id)}
+                            onCheckedChange={() => handleTaskToggle(task.id)}
+                          />
+                          <Label htmlFor={task.id} className="text-sm cursor-pointer">{task.label}</Label>
                         </div>
                       ))}
                     </div>
                   </div>
-                )}
-              </div>
-            </section>
 
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-end pt-4 border-t">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleReset}
-                disabled={loading}
-              >
-                Reset Form
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4" />
-                    Submit Request
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="bird_completed"
+                        checked={formData.bird_completed}
+                        onCheckedChange={(checked) => handleInputChange('bird_completed', checked as boolean)}
+                      />
+                      <Label htmlFor="bird_completed" className="cursor-pointer">BIRD Form Completed</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="tech_drawings_attached"
+                        checked={formData.tech_drawings_attached}
+                        onCheckedChange={(checked) => handleInputChange('tech_drawings_attached', checked as boolean)}
+                      />
+                      <Label htmlFor="tech_drawings_attached" className="cursor-pointer">Tech Drawings Attached (.dxf or .dwg)</Label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="task_description">Task Description / Special Requirements</Label>
+                    <Textarea
+                      id="task_description"
+                      value={formData.task_description}
+                      onChange={(e) => handleInputChange('task_description', e.target.value)}
+                      placeholder="Describe the specific TDS requirements, special requests, or additional notes..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* PART 4 - Equipment Master Driver Information */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={4} title="PART 4 – EQUIPMENT MASTER DRIVER INFORMATION" icon={Info} />
+                <div className="p-6">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <Label htmlFor="licence_category">Licence Category</Label>
+                      <Select
+                        value={formData.licence_category}
+                        onValueChange={(value) => handleInputChange('licence_category', value)}
+                      >
+                        <SelectTrigger id="licence_category">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LICENCE_CATEGORIES.map(cat => (
+                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="crew_number">No. of Crew</Label>
+                      <Input
+                        id="crew_number"
+                        value={formData.crew_number}
+                        onChange={(e) => handleInputChange('crew_number', e.target.value.replace(/[^0-9]/g, ''))}
+                        placeholder="e.g., 3"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="passenger_capacity">No. of Passengers</Label>
+                      <Input
+                        id="passenger_capacity"
+                        value={formData.passenger_capacity}
+                        onChange={(e) => handleInputChange('passenger_capacity', e.target.value.replace(/[^0-9]/g, ''))}
+                        placeholder="e.g., 8"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="fuel_capacity_litres">Fuel Capacity (Litres)</Label>
+                      <Input
+                        id="fuel_capacity_litres"
+                        value={formData.fuel_capacity_litres}
+                        onChange={(e) => handleInputChange('fuel_capacity_litres', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 562"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="range_km">Range (Km)</Label>
+                      <Input
+                        id="range_km"
+                        value={formData.range_km}
+                        onChange={(e) => handleInputChange('range_km', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 530"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="speed_single_carriageway">Speed Single Carriageway</Label>
+                      <Input
+                        id="speed_single_carriageway"
+                        value={formData.speed_single_carriageway}
+                        onChange={(e) => handleInputChange('speed_single_carriageway', e.target.value)}
+                        placeholder="e.g., 40 mph"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="speed_dual_carriageway">Speed Dual Carriageway</Label>
+                      <Input
+                        id="speed_dual_carriageway"
+                        value={formData.speed_dual_carriageway}
+                        onChange={(e) => handleInputChange('speed_dual_carriageway', e.target.value)}
+                        placeholder="e.g., 40 mph"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="max_speed">Max Speed</Label>
+                      <Input
+                        id="max_speed"
+                        value={formData.max_speed}
+                        onChange={(e) => handleInputChange('max_speed', e.target.value)}
+                        placeholder="e.g., 103 km/h"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* OVERVIEW & TASKING */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={5} title="OVERVIEW & TASKING" icon={FileText} />
+                <div className="p-6 space-y-4">
+                  <div>
+                    <Label htmlFor="overview">Overview</Label>
+                    <Textarea
+                      id="overview"
+                      value={formData.overview}
+                      onChange={(e) => handleInputChange('overview', e.target.value)}
+                      placeholder="Provide an overview of the equipment and its deployability requirements..."
+                      rows={4}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="tasking_description">Tasking Details</Label>
+                    <Textarea
+                      id="tasking_description"
+                      value={formData.tasking_description}
+                      onChange={(e) => handleInputChange('tasking_description', e.target.value)}
+                      placeholder="Describe the specific tasking requirements, theoretical assessments needed, physical trialling requirements..."
+                      rows={4}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* BIRD - Dimensional Information */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={6} title="BIRD – DIMENSIONAL INFORMATION" icon={Ruler} />
+                <div className="p-6">
+                  <p className="text-sm text-muted-foreground mb-4">All dimensions should be provided in millimetres (mm). Drawings must be supplied electronically in .DXF or .DWG formats.</p>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <Label htmlFor="length_mm">Length (mm)</Label>
+                      <Input
+                        id="length_mm"
+                        value={formData.length_mm}
+                        onChange={(e) => handleInputChange('length_mm', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 8909"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="width_mm">Width (mm)</Label>
+                      <Input
+                        id="width_mm"
+                        value={formData.width_mm}
+                        onChange={(e) => handleInputChange('width_mm', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 2999"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="height_mm">Height (mm)</Label>
+                      <Input
+                        id="height_mm"
+                        value={formData.height_mm}
+                        onChange={(e) => handleInputChange('height_mm', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 3747"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ground_clearance_mm">Ground Clearance (mm)</Label>
+                      <Input
+                        id="ground_clearance_mm"
+                        value={formData.ground_clearance_mm}
+                        onChange={(e) => handleInputChange('ground_clearance_mm', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 400"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="approach_angle">Approach Angle (degrees)</Label>
+                      <Input
+                        id="approach_angle"
+                        value={formData.approach_angle}
+                        onChange={(e) => handleInputChange('approach_angle', e.target.value)}
+                        placeholder="e.g., 40"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="departure_angle">Departure Angle (degrees)</Label>
+                      <Input
+                        id="departure_angle"
+                        value={formData.departure_angle}
+                        onChange={(e) => handleInputChange('departure_angle', e.target.value)}
+                        placeholder="e.g., 35"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="front_track_width_mm">Front Track Width (mm)</Label>
+                      <Input
+                        id="front_track_width_mm"
+                        value={formData.front_track_width_mm}
+                        onChange={(e) => handleInputChange('front_track_width_mm', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 2582"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="rear_track_width_mm">Rear Track Width (mm)</Label>
+                      <Input
+                        id="rear_track_width_mm"
+                        value={formData.rear_track_width_mm}
+                        onChange={(e) => handleInputChange('rear_track_width_mm', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 2582"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* BIRD - Weight Information */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={7} title="BIRD – WEIGHT INFORMATION" icon={Weight} />
+                <div className="p-6">
+                  <p className="text-sm text-muted-foreground mb-4">All weights should be provided in kilograms (kg).</p>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <Label htmlFor="laden_weight_kg">Maximum Laden Weight (kg)</Label>
+                      <Input
+                        id="laden_weight_kg"
+                        value={formData.laden_weight_kg}
+                        onChange={(e) => handleInputChange('laden_weight_kg', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 38500"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="unladen_weight_kg">Minimum Unladen Weight (kg)</Label>
+                      <Input
+                        id="unladen_weight_kg"
+                        value={formData.unladen_weight_kg}
+                        onChange={(e) => handleInputChange('unladen_weight_kg', e.target.value.replace(/[^0-9.]/g, ''))}
+                        placeholder="e.g., 34129"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="mlc_laden">Bridge Classification Laden (MLC)</Label>
+                      <Input
+                        id="mlc_laden"
+                        value={formData.mlc_laden}
+                        onChange={(e) => handleInputChange('mlc_laden', e.target.value)}
+                        placeholder="e.g., MLC 48"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="mlc_unladen">Bridge Classification Unladen (MLC)</Label>
+                      <Input
+                        id="mlc_unladen"
+                        value={formData.mlc_unladen}
+                        onChange={(e) => handleInputChange('mlc_unladen', e.target.value)}
+                        placeholder="e.g., MLC 38"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* BIRD - Other Information */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={8} title="BIRD – OTHER INFORMATION" icon={Settings} />
+                <div className="p-6 space-y-6">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                      <Label htmlFor="turning_circle">Turning Circle</Label>
+                      <Input
+                        id="turning_circle"
+                        value={formData.turning_circle}
+                        onChange={(e) => handleInputChange('turning_circle', e.target.value)}
+                        placeholder="e.g., 20 m"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="tyre_size">Tyre Size</Label>
+                      <Input
+                        id="tyre_size"
+                        value={formData.tyre_size}
+                        onChange={(e) => handleInputChange('tyre_size', e.target.value)}
+                        placeholder="e.g., 415/80R685"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="tyre_type">Tyre Type</Label>
+                      <Input
+                        id="tyre_type"
+                        value={formData.tyre_type}
+                        onChange={(e) => handleInputChange('tyre_type', e.target.value)}
+                        placeholder="e.g., 415/80R685TR X FORCE ZL"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-base font-semibold mb-3 block">Centre of Gravity (CoG) Information</Label>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <Label htmlFor="cog_height">CoG Height from Ground (mm)</Label>
+                        <Input
+                          id="cog_height"
+                          value={formData.cog_height}
+                          onChange={(e) => handleInputChange('cog_height', e.target.value)}
+                          placeholder="e.g., 1356"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cog_longitudinal">Longitudinal Position (mm)</Label>
+                        <Input
+                          id="cog_longitudinal"
+                          value={formData.cog_longitudinal}
+                          onChange={(e) => handleInputChange('cog_longitudinal', e.target.value)}
+                          placeholder="e.g., 2572"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cog_lateral">Lateral Position (mm)</Label>
+                        <Input
+                          id="cog_lateral"
+                          value={formData.cog_lateral}
+                          onChange={(e) => handleInputChange('cog_lateral', e.target.value)}
+                          placeholder="e.g., 1300"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="lifting_eye_positions">Lifting Eye Positions</Label>
+                      <Textarea
+                        id="lifting_eye_positions"
+                        value={formData.lifting_eye_positions}
+                        onChange={(e) => handleInputChange('lifting_eye_positions', e.target.value)}
+                        placeholder="e.g., 2 front upper (1 left, 1 right), 2 back (1 left, 1 right)"
+                        rows={2}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="lashing_point_info">Lashing Point Information</Label>
+                      <Textarea
+                        id="lashing_point_info"
+                        value={formData.lashing_point_info}
+                        onChange={(e) => handleInputChange('lashing_point_info', e.target.value)}
+                        placeholder="e.g., 4 front (2 upper, 2 lower), 2 back (1 left, 1 right)"
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="removable_items">Removable Items (Antenna, Canvas, Tool bins, etc.)</Label>
+                    <Textarea
+                      id="removable_items"
+                      value={formData.removable_items}
+                      onChange={(e) => handleInputChange('removable_items', e.target.value)}
+                      placeholder="List any removable items that may need to be removed prior to transport..."
+                      rows={2}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="additional_remarks">Additional Information or Remarks</Label>
+                    <Textarea
+                      id="additional_remarks"
+                      value={formData.additional_remarks}
+                      onChange={(e) => handleInputChange('additional_remarks', e.target.value)}
+                      placeholder="Any additional information or remarks..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* Supporting Documents Section */}
+              <section className="bg-card rounded-lg border-2 shadow-sm overflow-hidden">
+                <SectionHeader number={9} title="SUPPORTING DOCUMENTATION" icon={File} />
+                <div className="p-6 space-y-6">
+                  <p className="text-sm text-muted-foreground">
+                    Attach supporting documents including CAD drawings (.dxf/.dwg), technical specifications, CoG data, lashing point data, etc.
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-4 items-end">
+                    <div className="flex-1 min-w-[200px]">
+                      <Label htmlFor="doc_type">Document Type</Label>
+                      <Select value={currentDocType} onValueChange={setCurrentDocType}>
+                        <SelectTrigger id="doc_type">
+                          <SelectValue placeholder="Select document type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DOCUMENT_TYPES.map(type => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex-1 min-w-[200px]">
+                      <Label htmlFor="doc_description">Description (Optional)</Label>
+                      <Input
+                        id="doc_description"
+                        value={currentDescription}
+                        onChange={(e) => setCurrentDescription(e.target.value)}
+                        placeholder="Brief description of document"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="file_upload" className="cursor-pointer">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                          <Upload className="h-4 w-4" />
+                          <span>Upload File</span>
+                        </div>
+                        <input
+                          id="file_upload"
+                          type="file"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          multiple
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.dxf,.dwg,.jpg,.jpeg,.png,.gif"
+                        />
+                      </Label>
+                    </div>
+                  </div>
+
+                  {/* Uploaded Files List */}
+                  {uploadedFiles.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Attached Documents ({uploadedFiles.length})</Label>
+                      <div className="grid gap-2">
+                        {uploadedFiles.map((item, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border">
+                            <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{item.file.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {item.documentType}{item.description && ` - ${item.description}`}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeFile(index)}
+                              className="flex-shrink-0 h-8 w-8 text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Form Actions */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-end pt-6 border-t">
+                <Button
+                  variant="outline"
+                  onClick={handleReset}
+                  disabled={loading}
+                  className="sm:w-auto"
+                >
+                  Reset Form
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="sm:w-auto min-w-[200px]"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Submit Task Request
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );
