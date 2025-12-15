@@ -87,79 +87,223 @@ export type Database = {
       }
       new_asset_requests: {
         Row: {
+          additional_remarks: string | null
           admin_comment: string | null
+          approach_angle: string | null
           asset_name: string
           asset_type: string
           assigned_to: string | null
+          bird_completed: boolean | null
+          blb_code: string | null
           business_justification: string | null
+          cog_height: string | null
+          cog_lateral: string | null
+          cog_longitudinal: string | null
           contact_email: string
           contact_name: string
           contact_phone: string | null
           created_at: string
+          crew_number: string | null
+          delivery_date_to_service: string | null
+          departure_angle: string | null
           estimated_dimensions: string | null
           estimated_weight_kg: string | null
+          front_track_width_mm: string | null
+          fuel_capacity_litres: string | null
+          ground_clearance_mm: string | null
+          height_mm: string | null
           id: string
+          laden_weight_kg: string | null
+          lashing_point_info: string | null
+          length_mm: string | null
+          licence_category: string | null
+          lifting_eye_positions: string | null
+          management_code: string | null
           manufacturer: string | null
+          max_speed: string | null
+          mlc_laden: string | null
+          mlc_unladen: string | null
           model_number: string | null
+          nsn: string | null
+          overview: string | null
+          passenger_capacity: string | null
+          poc_name: string | null
           project_team: string
+          proposed_trial_dates: string | null
+          protective_marking: string | null
+          rac: string | null
+          range_km: string | null
+          rear_track_width_mm: string | null
+          reason_for_task: string | null
           reference: string
+          removable_items: string | null
           required_by_date: string | null
+          ric_code: string | null
+          short_name: string | null
+          speed_dual_carriageway: string | null
+          speed_single_carriageway: string | null
           status: string
           submitted_by: string
           task_description: string
           task_title: string
+          tasking_description: string | null
+          tasks_required: Json | null
+          tech_drawings_attached: boolean | null
+          tel_no: string | null
+          turning_circle: string | null
+          tyre_size: string | null
+          tyre_type: string | null
+          uin: string | null
+          unladen_weight_kg: string | null
           updated_at: string
           urgency_level: string
+          width_mm: string | null
         }
         Insert: {
+          additional_remarks?: string | null
           admin_comment?: string | null
+          approach_angle?: string | null
           asset_name: string
           asset_type: string
           assigned_to?: string | null
+          bird_completed?: boolean | null
+          blb_code?: string | null
           business_justification?: string | null
+          cog_height?: string | null
+          cog_lateral?: string | null
+          cog_longitudinal?: string | null
           contact_email: string
           contact_name: string
           contact_phone?: string | null
           created_at?: string
+          crew_number?: string | null
+          delivery_date_to_service?: string | null
+          departure_angle?: string | null
           estimated_dimensions?: string | null
           estimated_weight_kg?: string | null
+          front_track_width_mm?: string | null
+          fuel_capacity_litres?: string | null
+          ground_clearance_mm?: string | null
+          height_mm?: string | null
           id?: string
+          laden_weight_kg?: string | null
+          lashing_point_info?: string | null
+          length_mm?: string | null
+          licence_category?: string | null
+          lifting_eye_positions?: string | null
+          management_code?: string | null
           manufacturer?: string | null
+          max_speed?: string | null
+          mlc_laden?: string | null
+          mlc_unladen?: string | null
           model_number?: string | null
+          nsn?: string | null
+          overview?: string | null
+          passenger_capacity?: string | null
+          poc_name?: string | null
           project_team: string
+          proposed_trial_dates?: string | null
+          protective_marking?: string | null
+          rac?: string | null
+          range_km?: string | null
+          rear_track_width_mm?: string | null
+          reason_for_task?: string | null
           reference: string
+          removable_items?: string | null
           required_by_date?: string | null
+          ric_code?: string | null
+          short_name?: string | null
+          speed_dual_carriageway?: string | null
+          speed_single_carriageway?: string | null
           status?: string
           submitted_by: string
           task_description: string
           task_title: string
+          tasking_description?: string | null
+          tasks_required?: Json | null
+          tech_drawings_attached?: boolean | null
+          tel_no?: string | null
+          turning_circle?: string | null
+          tyre_size?: string | null
+          tyre_type?: string | null
+          uin?: string | null
+          unladen_weight_kg?: string | null
           updated_at?: string
           urgency_level?: string
+          width_mm?: string | null
         }
         Update: {
+          additional_remarks?: string | null
           admin_comment?: string | null
+          approach_angle?: string | null
           asset_name?: string
           asset_type?: string
           assigned_to?: string | null
+          bird_completed?: boolean | null
+          blb_code?: string | null
           business_justification?: string | null
+          cog_height?: string | null
+          cog_lateral?: string | null
+          cog_longitudinal?: string | null
           contact_email?: string
           contact_name?: string
           contact_phone?: string | null
           created_at?: string
+          crew_number?: string | null
+          delivery_date_to_service?: string | null
+          departure_angle?: string | null
           estimated_dimensions?: string | null
           estimated_weight_kg?: string | null
+          front_track_width_mm?: string | null
+          fuel_capacity_litres?: string | null
+          ground_clearance_mm?: string | null
+          height_mm?: string | null
           id?: string
+          laden_weight_kg?: string | null
+          lashing_point_info?: string | null
+          length_mm?: string | null
+          licence_category?: string | null
+          lifting_eye_positions?: string | null
+          management_code?: string | null
           manufacturer?: string | null
+          max_speed?: string | null
+          mlc_laden?: string | null
+          mlc_unladen?: string | null
           model_number?: string | null
+          nsn?: string | null
+          overview?: string | null
+          passenger_capacity?: string | null
+          poc_name?: string | null
           project_team?: string
+          proposed_trial_dates?: string | null
+          protective_marking?: string | null
+          rac?: string | null
+          range_km?: string | null
+          rear_track_width_mm?: string | null
+          reason_for_task?: string | null
           reference?: string
+          removable_items?: string | null
           required_by_date?: string | null
+          ric_code?: string | null
+          short_name?: string | null
+          speed_dual_carriageway?: string | null
+          speed_single_carriageway?: string | null
           status?: string
           submitted_by?: string
           task_description?: string
           task_title?: string
+          tasking_description?: string | null
+          tasks_required?: Json | null
+          tech_drawings_attached?: boolean | null
+          tel_no?: string | null
+          turning_circle?: string | null
+          tyre_size?: string | null
+          tyre_type?: string | null
+          uin?: string | null
+          unladen_weight_kg?: string | null
           updated_at?: string
           urgency_level?: string
+          width_mm?: string | null
         }
         Relationships: []
       }
