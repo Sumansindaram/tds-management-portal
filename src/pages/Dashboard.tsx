@@ -212,14 +212,14 @@ export default function Dashboard() {
                   </div>
                 </Card>
 
-                {/* New Asset Request */}
+                {/* New TDS Requests */}
                 <Card 
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/new-asset-requests')}
                 >
                   <img 
                     src={iconNewAssetRequest} 
-                    alt="New Asset Request" 
+                    alt="New TDS Requests" 
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
@@ -231,8 +231,8 @@ export default function Dashboard() {
                     
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-2xl font-semibold text-white mb-2">New Asset Request</h3>
-                        <p className="text-white/90 text-sm">Request TDS for new assets</p>
+                        <h3 className="text-2xl font-semibold text-white mb-2">New TDS Requests</h3>
+                        <p className="text-white/90 text-sm">Request TDS for new or existing assets</p>
                       </div>
                       <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">View Requests</Button>
                     </div>
@@ -411,14 +411,14 @@ export default function Dashboard() {
                   </div>
                 </Card>
 
-                {/* New Asset Request - Admin View */}
+                {/* New TDS Requests - Admin View */}
                 <Card 
                   className="cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-primary/30 group overflow-hidden relative h-80" 
                   onClick={() => navigate('/new-asset-requests')}
                 >
                   <img 
                     src={iconNewAssetRequest} 
-                    alt="New Asset Request" 
+                    alt="New TDS Requests" 
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/70 to-primary/40" />
@@ -430,8 +430,8 @@ export default function Dashboard() {
                     
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-2xl font-semibold text-white mb-2">New Asset Requests</h3>
-                        <p className="text-white/90 text-sm">Manage new asset TDS requests</p>
+                        <h3 className="text-2xl font-semibold text-white mb-2">New TDS Requests</h3>
+                        <p className="text-white/90 text-sm">Manage new TDS requests</p>
                       </div>
                       <Button className="w-full shadow-lg bg-white text-ribbon hover:bg-white/90 font-semibold border-2 border-white">View All</Button>
                     </div>
