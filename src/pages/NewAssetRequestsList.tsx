@@ -88,13 +88,13 @@ export default function NewAssetRequestsList() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex items-center gap-4">
             <Button
-              variant="ghost"
+              variant="secondary"
               onClick={() => navigate('/')}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" /> Back
             </Button>
-            <h1 className="text-2xl font-bold">New Asset Requests</h1>
+            <h1 className="text-2xl font-bold">New TDS Requests</h1>
           </div>
           <Button onClick={() => navigate('/new-asset-request/create')} className="gap-2">
             <Plus className="h-4 w-4" /> New Request
